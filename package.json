@@ -6,8 +6,10 @@
     "build": "rimraf -rf dist && tsc -p tsconfig.json",
     "format": "prettier --write \"{lib,test}/**/*.ts\"",
     "lint": "eslint 'lib/**/*.ts' --fix",
+    "test": "jest --config ./tests/jest-e2e.json --runInBand",
     "postversion": "git push --follow-tags",
-    "test": "jest --config ./tests/jest-e2e.json --runInBand"
+    "release:dry": "release-it --dry-run",
+    "release": "release-it"
   },
   "repository": {
     "type": "git",
@@ -36,6 +38,7 @@
     "jest": "^27.4.5",
     "prettier": "^2.5.1",
     "reflect-metadata": "^0.1.13",
+    "release-it": "^14.11.8",
     "rimraf": "^3.0.2",
     "rxjs": "^7.4.0",
     "ts-jest": "^27.1.2",
