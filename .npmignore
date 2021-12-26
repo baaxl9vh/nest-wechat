@@ -1,6 +1,7 @@
 # source
 
 lib/
+tests/
 index.ts
 tsconfig.json
 .prettierrc
