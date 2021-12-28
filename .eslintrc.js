@@ -30,6 +30,8 @@ module.exports = {
       'after': true,
     }],
     'comma-dangle': ['error', {
+      'imports': 'always-multiline',
+      'exports': 'always-multiline',
       'arrays': 'always-multiline',
       'objects': 'always-multiline',
     }],

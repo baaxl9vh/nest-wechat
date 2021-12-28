@@ -4,7 +4,7 @@ import * as env from 'dotenv';
 import { existsSync } from 'fs';
 import * as path from 'path';
 
-import { AccountAccessTokenResult, WeChatService } from '../../lib';
+import { AccountAccessTokenResult, TicketResult, WeChatService } from '../../lib';
 import { AppModule } from '../app.module';
 
 describe('jsapi', () => {
@@ -52,12 +52,17 @@ describe('jsapi', () => {
     const service = app.get(WeChatService);
     service.config = { appId: process.env.TEST_APPID || '', secret: process.env.TEST_SECRET || ''};
     const ret = await service.getAccountAccessToken();
+    // must got access_token
     expect(ret).toHaveProperty('access_token');
-    expect(ret).toHaveProperty('expires_in', 7200);
+    const accessToken = ret.access_token;
     const retTicket = await service.getJSApiTicket((ret as AccountAccessTokenResult).access_token);
     expect(retTicket).toHaveProperty('errcode', 0);
+    // must got ticket
     expect(retTicket).toHaveProperty('ticket');
-    expect(retTicket).toHaveProperty('expires_in', 7200);
+    const ticket = retTicket.ticket;
+    // cache must be the same
+    expect(accessToken).toEqual((await service.cacheAdapter.get<AccountAccessTokenResult>(WeChatService.KEY_ACCESS_TOKEN)).access_token);
+    expect(ticket).toEqual((await service.cacheAdapter.get<TicketResult>(WeChatService.KEY_TICKET)).ticket);
   });
 
   afterEach(async () => {

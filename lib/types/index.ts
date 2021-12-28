@@ -96,7 +96,7 @@ export interface AccessTokenResult {
    * 正确返回没有该字段
    * There is no this property when success.
    */
-  errcode?: string;
+  errcode?: number;
   /**
    * 正确返回没有该字段
    * There is no this property when success.
@@ -115,7 +115,7 @@ export interface TicketResult {
    * 
    * response code, code = 0 when success
    */
-  errcode: string;
+  errcode: number;
   /**
    * 响应消息
    * response message
@@ -135,8 +135,22 @@ export interface TicketResult {
   expires_in: number;
 }
 
+/**
+ * JS-SDK签名结果
+ * 
+ * Result of signature
+ * 
+ */
 export interface SignatureResult {
+  /**
+   * Official account appid
+   */
   appId: string;
+  /**
+   * 随机字符串
+   * 
+   * Random string
+   */
   nonceStr: string;
   timestamp: number;
   signature: string;
