@@ -39,7 +39,7 @@ export class OfficialAccountApi {
    * @param code 
    * @returns 
    */
-  public static getAccessTokenCode (appId: string, secret: string, code: string): Promise<AccessTokenResult | AccessTokenErrorResult> {
+  public static getAccessTokenByCode (appId: string, secret: string, code: string): Promise<AccessTokenResult | AccessTokenErrorResult> {
     const url = `https://api.weixin.qq.com/sns/oauth2/access_token?appid=${appId}&secret=${secret}&code=${code}&grant_type=authorization_code`;
     return new Promise((resolve, reject) => {
       axios.get(url).then((res) => {
@@ -49,4 +49,15 @@ export class OfficialAccountApi {
       });
     });
   }
+}
+
+export function createNonceStr (length = 16) {
+  length = length || 16;
+  length = length > 32 ? 32 : length;
+  let str = '';
+  const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  for (let i = 0; i < length; i++) {
+    str += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return str;
 }

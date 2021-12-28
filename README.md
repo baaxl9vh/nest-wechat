@@ -4,7 +4,9 @@ NestJS Module for WeChat
 
 ## Description
 
-NestJS Module for WeChat
+NestJS Module for WeChat official account API.
+
+微信公众号网页开发 nestjs 模块封装。
 
 ## Installation
 
@@ -25,3 +27,7 @@ import { WeChatModule } from 'nest-wechat';
 export class AppModule {
 }
 ```
+
+## Run Test
+
+Create .env.test.local file, and save your test appid and secret in the file.
