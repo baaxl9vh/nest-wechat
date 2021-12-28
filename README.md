@@ -31,3 +31,23 @@ export class AppModule {
 ## Run Test
 
 Create .env.test.local file, and save your test appid and secret in the file.
+
+```config
+TEST_APPID=your/test/appid
+TEST_SECRET=your/test/secret
+```
+
+Run test.
+
+```shell
+npm run test
+```
+
+## Service API
+
+```typescript
+getAccessTokenByCode (code: string): Promise<AccessTokenResult>;
+getAccountAccessToken (): Promise<AccountAccessTokenResult>;
+getJSApiTicket (accessToken?: string): Promise<TicketResult>;
+jssdkSignature (url: string): Promise<SignatureResult>;
+```

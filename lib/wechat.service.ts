@@ -1,13 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import axios from 'axios';
+import { createHash } from 'crypto';
 
-import { AccessTokenErrorResult, AccessTokenResult, AccountAccessTokenResult, OfficialAccountApi, WeChatErrorResult, WeChatServiceOptions } from '.';
+import { AccessTokenResult, AccountAccessTokenResult, createNonceStr, SignatureResult, TicketResult, WeChatServiceOptions } from '.';
 
 @Injectable()
 export class WeChatService {
 
   constructor (private options: WeChatServiceOptions) {
     this._accessToken = '';
+    this._jssdkTicket = '';
   }
 
   public get config () {
@@ -24,7 +26,21 @@ export class WeChatService {
   }
 
   public set accessToken (token: string) {
-    this._accessToken = token;
+    if (token) {
+      this._accessToken = token;
+    }
+  }
+  
+  protected _jssdkTicket: string;
+
+  public get jssdkTicket () {
+    return this._jssdkTicket;
+  }
+
+  public set jssdkTicket (ticket: string) {
+    if (ticket) {
+      this._jssdkTicket = ticket;
+    }
   }
 
   /**
@@ -41,7 +57,7 @@ export class WeChatService {
    * @tutorial https://developers.weixin.qq.com/doc/offiaccount/Basic_Information/Get_access_token.html
    * @returns 
    */
-  public async getAccountAccessToken (): Promise<AccountAccessTokenResult | WeChatErrorResult> {
+  public async getAccountAccessToken (): Promise<AccountAccessTokenResult> {
     if (!this.options.appId || !this.options.secret) {
       throw new Error(WeChatService.name + ': No appId or secret.');
     }
@@ -67,7 +83,7 @@ export class WeChatService {
    * @param accessToken 
    * @returns 
    */
-  public getJSApiTicket (accessToken?: string) {
+  public async getJSApiTicket (accessToken?: string): Promise<TicketResult> {
     if (!accessToken && this.accessToken) {
       accessToken = this.accessToken;
     }
@@ -84,10 +100,69 @@ export class WeChatService {
     });
   }
 
-  public async getAccessTokenByCode (code: string): Promise<AccessTokenResult | AccessTokenErrorResult> {
+  public async jssdkSignature (url: string): Promise<SignatureResult> {
+    return new Promise((resolve, reject) => {     
+      if (!url) {
+        return reject(new Error(`${WeChatService.name}: JS-SDK signature must provide url param.`));
+      }
+      if (!this.jssdkTicket) {
+        return reject(new Error(`${WeChatService.name}: JS-SDK ticket NOT found.`));
+      }
+      const timestamp = Math.floor(Date.now() / 1000);
+      const nonceStr = createNonceStr(16);
+      const signStr = 'jsapi_ticket=' + this.jssdkTicket + '&noncestr=' + nonceStr + '&timestamp=' + timestamp + '&url=' + url;
+      const signature = createHash('sha1').update(signStr).digest('hex');
+      resolve({
+        appId: this.options.appId,
+        nonceStr,
+        timestamp,
+        signature,
+      });
+    });
+  }
+
+  /**
+   * 
+   * 通过code换取网页授权access_token
+   * 
+   * 正确返回
+   * 
+   * {
+   * 
+   *   "access_token":"ACCESS_TOKEN",
+   * 
+   *   "expires_in":7200,
+   * 
+   *   "refresh_token":"REFRESH_TOKEN",
+   * 
+   *   "openid":"OPENID",
+   * 
+   *   "scope":"SCOPE" 
+   * 
+   * }
+   * 
+   * 错误返回
+   * 
+   * {"errcode":40029,"errmsg":"invalid code"}
+   * 
+   * {"errcode":40013,"errmsg":"iinvalid appid, rid: 61c82e61-2e62fb72-467cb9ec"}
+   * 
+   * @param code 
+   * @param code 
+   * @returns 
+   * @tutorial https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/Wechat_webpage_authorization.html#1
+   */
+  public async getAccessTokenByCode (code: string): Promise<AccessTokenResult> {
     if (!this.options.appId || !this.options.secret) {
       throw new Error(WeChatService.name + ': No appId or secret.');
     }
-    return OfficialAccountApi.getAccessTokenByCode(this.options.appId, this.options.secret, code);
+    const url = `https://api.weixin.qq.com/sns/oauth2/access_token?appid=${this.options.appId}&secret=${this.options.secret}&code=${code}&grant_type=authorization_code`;
+    return new Promise((resolve, reject) => {
+      axios.get(url).then((res) => {
+        resolve(res.data);
+      }).catch((err) => {
+        reject(err);
+      });
+    });
   }
 }
