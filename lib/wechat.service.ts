@@ -89,14 +89,25 @@ export class WeChatService {
    * @param accessToken 
    * @returns 
    */
-  public async getJSApiTicket (accessToken?: string): Promise<TicketResult> {
+  public async getJSApiTicket (): Promise<TicketResult> {
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
-      if (!accessToken) {
-        // no param, get from cache
-        const cache = await this.cacheAdapter.get<AccessTokenResult>(WeChatService.KEY_ACCESS_TOKEN);
-        accessToken = cache && cache.access_token;
+
+      let accessToken;
+      // get token from cache
+      const cache = await this.cacheAdapter.get<AccountAccessTokenResult>(WeChatService.KEY_ACCESS_TOKEN);
+
+      if (!this.checkAccessToken(cache)) {
+        // expire, request a new one.
+        const ret = await this.getAccountAccessToken();
+        if (ret && ret.access_token) {
+          // got
+          accessToken = ret.access_token;
+        }
+      } else {
+        accessToken = cache.access_token;
       }
+
       if (!accessToken) {
         // finally, there was no access token.
         return reject(new Error(`${WeChatService.name}: No access token of official account.`));
@@ -117,22 +128,38 @@ export class WeChatService {
     });
   }
 
-  public jssdkSignature (url: string, ticket?: string): Promise<SignatureResult> {
+  /**
+   * 
+   * 对URL进行签名
+   * 
+   * sign a url
+   * 
+   * @param url url for signature
+   * @returns 
+   */
+  public jssdkSignature (url: string): Promise<SignatureResult> {
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
       if (!url) {
         return reject(new Error(`${WeChatService.name}: JS-SDK signature must provide url param.`));
       }
 
-      if (!ticket) {
-        // no ticket, get from cache
-        const cache = await this.cacheAdapter.get<TicketResult>(WeChatService.KEY_TICKET);
+      let ticket;
+      const cache = await this.cacheAdapter.get<TicketResult>(WeChatService.KEY_TICKET);
+      if (!this.checkTicket(cache)) {
+        // expire, request a new ticket
+        const ret = await this.getJSApiTicket();
+        if (ret && ret.errcode === 0) {
+          // got
+          ticket = ret.ticket;
+        }
+      } else {
         ticket = cache && cache.ticket;
       }
 
       if (!ticket) {
         // finally, there waw no ticket.
-        return reject(new Error(`${WeChatService.name}: JS-SDK ticket NOT found.`));
+        return reject(new Error(`${WeChatService.name}: JS-SDK could NOT get a ticket.`));
       }
       const timestamp = Math.floor(Date.now() / 1000);
       const nonceStr = createNonceStr(16);
@@ -145,6 +172,28 @@ export class WeChatService {
         signature,
       });
     });
+  }
+
+  /**
+   * 
+   * Check token saved in the cache
+   * 
+   * @param token 
+   * @returns 
+   */
+  private checkAccessToken (token: AccountAccessTokenResult): boolean {
+    return token && token.expires_in > (Date.now() / 1000);
+  }
+
+  /**
+   * 
+   * Check ticket saved in the cache
+   * 
+   * @param ticket 
+   * @returns 
+   */
+  private checkTicket (ticket: TicketResult): boolean {
+    return ticket && ticket.expires_in > (Date.now() / 1000);
   }
 
   /**

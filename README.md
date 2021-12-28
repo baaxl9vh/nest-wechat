@@ -35,6 +35,7 @@ Create .env.test.local file, and save your test appid and secret in the file.
 ```config
 TEST_APPID=your/test/appid
 TEST_SECRET=your/test/secret
+TEST_JSSDK_URL=your/test/url
 ```
 
 Run test.
