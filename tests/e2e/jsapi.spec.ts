@@ -1,5 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
+import axios from 'axios';
 import * as env from 'dotenv';
 import { existsSync } from 'fs';
 import * as path from 'path';
@@ -41,16 +42,17 @@ describe('jsapi', () => {
   });
 
   it('should GOT access token and a ticket, then do anything', async () => {
-    let envPath;
-
-    for (const file of ['.env.test.local', '.env.test', '.env']) {
-      envPath = path.join(process.cwd(), file);
-      if (existsSync(envPath)) {
-        break;
+    if (process.env.NODE_ENV !== 'ci') {
+      let envPath;
+      for (const file of ['.env.test.local', '.env.test', '.env']) {
+        envPath = path.join(process.cwd(), file);
+        if (existsSync(envPath)) {
+          break;
+        }
       }
+      expect(envPath).not.toBe(undefined);
+      env.config({ path: envPath });
     }
-    expect(envPath).not.toBe(undefined);
-    env.config({ path: envPath });
     expect(process.env.TEST_APPID).not.toBeUndefined();
     expect(process.env.TEST_SECRET).not.toBeUndefined();
     expect(process.env.TEST_JSSDK_URL).not.toBeUndefined();
@@ -60,26 +62,81 @@ describe('jsapi', () => {
 
     const service = app.get(WeChatService);
     service.config = { appId: process.env.TEST_APPID || '', secret: process.env.TEST_SECRET || ''};
+
+    jest.spyOn(axios, 'get');
+
+    jest.spyOn(service.cacheAdapter, 'set');
+    jest.spyOn(service.cacheAdapter, 'get');
+
     const ret = await service.getAccountAccessToken();
+    // call set to cache
+    expect(service.cacheAdapter.set).toBeCalledTimes(1);
     // must got access_token
     expect(ret).toHaveProperty('access_token');
     const accessToken = ret.access_token;
     const retTicket = await service.getJSApiTicket();
+    // use access from token
+    expect(service.cacheAdapter.get).toBeCalledTimes(1);
+
     expect(retTicket).toHaveProperty('errcode', 0);
     // must got ticket
     expect(retTicket).toHaveProperty('ticket');
     const ticket = retTicket.ticket;
     // cache must be the same
     expect(accessToken).toEqual((await service.cacheAdapter.get<AccountAccessTokenResult>(WeChatService.KEY_ACCESS_TOKEN)).access_token);
+    expect(service.cacheAdapter.get).toBeCalledTimes(2);
     expect(ticket).toEqual((await service.cacheAdapter.get<TicketResult>(WeChatService.KEY_TICKET)).ticket);
+    expect(service.cacheAdapter.get).toBeCalledTimes(3);
 
-    // to sign a url 
-    const sign = await service.jssdkSignature(process.env.TEST_JSSDK_URL || '');
+    // to sign a url and use the ticket in cache
+    let sign = await service.jssdkSignature(process.env.TEST_JSSDK_URL || '');
+
+    // cache get call
+    expect(service.cacheAdapter.get).toBeCalledTimes(4);
+
     expect(sign).toHaveProperty('appId', process.env.TEST_APPID);
     expect(sign.nonceStr).toBeTruthy();
     expect(sign.nonceStr).toBeTruthy();
     expect(sign.timestamp).toBeTruthy();
     expect(sign.signature).toBeTruthy();
+
+    // throw error when no url
+    expect(service.jssdkSignature('')).rejects.toThrow();
+
+    // request an access token and a ticket
+    expect(axios.get).toBeCalledTimes(2);
+
+    // make the ticket and the token expire
+    const ticketInCache = await service.cacheAdapter.get<TicketResult>(WeChatService.KEY_TICKET);
+    // eslint-disable-next-line camelcase
+    ticketInCache.expires_in -= 10800;
+    service.cacheAdapter.set(WeChatService.KEY_TICKET, ticketInCache);
+    const tokenInCache = await service.cacheAdapter.get<AccountAccessTokenResult>(WeChatService.KEY_ACCESS_TOKEN);
+    // eslint-disable-next-line camelcase
+    tokenInCache.expires_in -= 10800;
+    service.cacheAdapter.set(WeChatService.KEY_ACCESS_TOKEN, tokenInCache);
+
+    // now they are expired
+
+    // empty the sign
+    sign = {
+      appId: '',
+      nonceStr: '',
+      timestamp: 0,
+      signature: '',
+    };
+
+    sign = await service.jssdkSignature(process.env.TEST_JSSDK_URL || '');
+
+    expect(sign).toHaveProperty('appId', process.env.TEST_APPID);
+    expect(sign.nonceStr).toBeTruthy();
+    expect(sign.nonceStr).toBeTruthy();
+    expect(sign.timestamp).toBeTruthy();
+    expect(sign.signature).toBeTruthy();
+
+    // request call twice
+    expect(axios.get).toBeCalledTimes(4);
+
   });
 
   afterEach(async () => {

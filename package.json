@@ -7,6 +7,7 @@
     "format": "prettier --write \"{lib,test}/**/*.ts\"",
     "lint": "eslint 'lib/**/*.ts' --fix",
     "test": "jest --config ./tests/jest-e2e.json --runInBand",
+    "test:ci": "cross-env NODE_ENV=ci jest --config ./tests/jest-e2e.json --runInBand",
     "postversion": "git push --follow-tags",
     "release:dry": "release-it --dry-run",
     "release": "release-it"
@@ -34,6 +35,7 @@
     "@types/jest": "^27.0.3",
     "@typescript-eslint/eslint-plugin": "^5.8.0",
     "@typescript-eslint/parser": "^5.8.0",
+    "cross-env": "^7.0.3",
     "dotenv": "^10.0.0",
     "eslint": "^8.5.0",
     "jest": "^27.4.5",
