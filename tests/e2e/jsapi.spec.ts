@@ -8,6 +8,8 @@ import * as path from 'path';
 import { AccountAccessTokenResult, TicketResult, WeChatService } from '../../lib';
 import { AppModule } from '../app.module';
 
+jest.setTimeout(20000);
+
 describe('jsapi', () => {
 
   let app: INestApplication;
