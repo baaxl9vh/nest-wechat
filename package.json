@@ -7,7 +7,6 @@
     "format": "prettier --write \"{lib,test}/**/*.ts\"",
     "lint": "eslint 'lib/**/*.ts' --fix",
     "test": "jest --config ./tests/jest-e2e.json --runInBand",
-    "test:ci": "cross-env NODE_ENV=ci jest --config ./tests/jest-e2e.json --runInBand",
     "postversion": "git push --follow-tags",
     "release:dry": "release-it --dry-run",
     "release": "release-it"

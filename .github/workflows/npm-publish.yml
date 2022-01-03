@@ -27,11 +27,15 @@ jobs:
           node-version: 16
           registry-url: https://registry.npmjs.org/
       - run: npm ci
-      - run: npm run test:ci
+      # - name: Create env file
+      #   run: |
+      #     touch .env.test.local
+      #     echo TEST_APPID=${{ secrets.TEST_APP_ID }} >> .env.test.local
+      #     echo TEST_SECRET=${{ secrets.TEST_APP_SECRET }} >> .env.test.local
+      #     echo TEST_JSSDK_URL=${{ secrets.TEST_JSSDK_URL }} >> .env.test.local
+      # - run: npm run test:ci
+      - run: npx cross-env NODE_ENV=ci TEST_APPID=${{secrets.TEST_APP_ID}} TEST_SECRET=${{secrets.TEST_APP_SECRET}} TEST_JSSDK_URL=${{secrets.TEST_JSSDK_URL}} jest --config ./tests/jest-e2e.json --runInBand
       - run: npm run build
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
-          TEST_APPID: ${{secrets.TEST_APP_ID}}
-          TEST_SECRET: ${{secrets.TEST_APP_SECRET}}
-          TEST_JSSDK_URL: ${{secrets.TEST_JSSDK_URL}}
