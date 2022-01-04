@@ -7,6 +7,7 @@
     "format": "prettier --write \"{lib,test}/**/*.ts\"",
     "lint": "eslint 'lib/**/*.ts' --fix",
     "test": "jest --config ./tests/jest-e2e.json --runInBand",
+    "serve:docs": "docsify serve docs",
     "postversion": "git push --follow-tags",
     "release:dry": "release-it --dry-run",
     "release": "release-it"
@@ -35,6 +36,7 @@
     "@typescript-eslint/eslint-plugin": "^5.8.0",
     "@typescript-eslint/parser": "^5.8.0",
     "cross-env": "^7.0.3",
+    "docsify-cli": "^4.4.3",
     "dotenv": "^10.0.0",
     "eslint": "^8.5.0",
     "jest": "^27.4.5",
