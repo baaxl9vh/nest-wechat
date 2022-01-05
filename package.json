@@ -10,7 +10,8 @@
     "serve:docs": "docsify serve docs",
     "postversion": "git push --follow-tags",
     "release:dry": "release-it --dry-run",
-    "release": "release-it"
+    "release": "release-it",
+    "prepare": "husky install"
   },
   "repository": {
     "type": "git",
@@ -28,6 +29,8 @@
   },
   "homepage": "https://github.com/baaxl9vh/nest-wechat#readme",
   "devDependencies": {
+    "@commitlint/cli": "^16.0.1",
+    "@commitlint/config-conventional": "^16.0.0",
     "@nestjs/common": "^8.2.4",
     "@nestjs/core": "^8.2.4",
     "@nestjs/platform-express": "^8.2.4",
@@ -39,6 +42,7 @@
     "docsify-cli": "^4.4.3",
     "dotenv": "^10.0.0",
     "eslint": "^8.5.0",
+    "husky": "^7.0.0",
     "jest": "^27.4.5",
     "prettier": "^2.5.1",
     "reflect-metadata": "^0.1.13",
