@@ -123,6 +123,17 @@ const service = new WeChatService({ appId: 'your app id', secret: 'your secret'}
 
 > [参考文档](https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/JS-SDK.html#65)
 
+### 发送模板消息
+
+#### sendTemplateMessage
+
++ 参数：
+  + {TemplateMessage} message 模板消息参数类型
++ 返回值
+  + Promise&lt;DefaultRequestResult & { msgid: string }&gt; 调用后返回Promise
+
+> [参考文档](https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Template_Message_Interface.html#5)
+
 ### Run Test
 
 Create .env.test.local file, and save your test appid and secret in the file.
