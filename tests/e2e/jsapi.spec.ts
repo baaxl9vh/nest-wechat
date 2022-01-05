@@ -5,7 +5,7 @@ import * as env from 'dotenv';
 import { existsSync } from 'fs';
 import * as path from 'path';
 
-import { AccountAccessTokenResult, TicketResult, WeChatService } from '../../lib';
+import { AccountAccessTokenResult, TemplateMessage, TicketResult, WeChatService } from '../../lib';
 import { AppModule } from '../app.module';
 
 jest.setTimeout(20000);
@@ -139,6 +139,26 @@ describe('jsapi', () => {
     // request call twice
     expect(axios.get).toBeCalledTimes(4);
 
+    // eslint-disable-next-line camelcase
+    ticketInCache.expires_in += 10800;
+    service.cacheAdapter.set(WeChatService.KEY_TICKET, ticketInCache);
+    // eslint-disable-next-line camelcase
+    tokenInCache.expires_in += 10800;
+    service.cacheAdapter.set(WeChatService.KEY_ACCESS_TOKEN, tokenInCache);
+
+    // now token and ticket are valid
+    const message: TemplateMessage = {
+      touser: 'osMyH5vmDjG3ouh2qfSm3EItWLyk',
+      // eslint-disable-next-line camelcase
+      template_id: 'Kr6sFcWadMfRz_rZumNbLw-mtZ5qJEeCo3X4pdcmNAQ',
+      data: {
+        'TITLE': {
+          value: 'This is title',
+        },
+      },
+    };
+    const msgRet = await service.sendTemplateMessage(message);
+    expect(msgRet).toHaveProperty('errcode', 0);
   });
 
   afterEach(async () => {

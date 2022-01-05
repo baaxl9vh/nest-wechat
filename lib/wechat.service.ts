@@ -6,7 +6,9 @@ import {
   AccessTokenResult,
   AccountAccessTokenResult,
   createNonceStr,
+  DefaultRequestResult,
   SignatureResult,
+  TemplateMessage,
   TicketResult,
   WeChatServiceOptions,
 } from '.';
@@ -75,6 +77,31 @@ export class WeChatService {
         reject(err);
       });
     });
+  }
+
+  /**
+   * 
+   * 实例读取access token的逻辑封装
+   * 
+   * @returns 
+   */
+  private async getToken (): Promise<string | undefined> {
+    let accessToken;
+
+    // get token from cache
+    const cache = await this.cacheAdapter.get<AccountAccessTokenResult>(WeChatService.KEY_ACCESS_TOKEN);
+
+    if (!this.checkAccessToken(cache)) {
+      // expire, request a new one.
+      const ret = await this.getAccountAccessToken();
+      if (ret && ret.access_token) {
+        // got
+        accessToken = ret.access_token;
+      }
+    } else {
+      accessToken = cache.access_token;
+    }
+    return accessToken;
   }
 
   /**
@@ -239,5 +266,20 @@ export class WeChatService {
         reject(err);
       });
     });
+  }
+
+  /**
+   * 
+   * 公众号向用户发送模板消息
+   * 
+   * @param message 
+   * @returns 
+   * @tutorial https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Template_Message_Interface.html#5
+   */
+  public async sendTemplateMessage (message: TemplateMessage): Promise<DefaultRequestResult & { msgid: string }> {
+    const token = await this.getToken();
+    const url = `https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=${token}`;
+    const ret = await axios.post<DefaultRequestResult & { msgid: string }>(url, message);
+    return ret.data;
   }
 }
