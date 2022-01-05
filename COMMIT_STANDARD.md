@@ -16,8 +16,10 @@ commit message 规范
 + feat: 新增功能特性
 + fix: 修复BUG
 + docs: 添加修改文档
++ style: Changes that do not affect the meaning of the code
 + refactor: 代码重构重写
 + perf: 性能优化、体验优化
++ test: Adding missing tests or correcting existing tests
 + build: 改变影响项目npm run build脚本的代码、配置等
 + chore: 改变构通流程、添加依懒、添加工具等
 + revert: 回滚版本
