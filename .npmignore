@@ -1,6 +1,12 @@
 # github
 .github/
 
+# husky
+.husky/
+
+docs/
+COMMIT_STANDARD.md
+
 # source
 
 lib/
@@ -8,11 +14,12 @@ tests/
 index.ts
 tsconfig.json
 .prettierrc
+
+# eslint
 .eslintrc.js
+.eslintignore
 
 .env.test
 .release-it.json
 .vscode/settings.json
-
-COMMIT_STANDARD.md
 commitlint.config.js
