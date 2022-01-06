@@ -5,6 +5,7 @@
     "jsapi",
     "jssdk",
     "nestjs",
-    "noncestr"
+    "noncestr",
+    "WECHAT"
   ]
 }
