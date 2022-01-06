@@ -10,6 +10,11 @@ commit message 规范
 <footer>
 ```
 
++ type必填
++ subject必填
++ body可选
++ footer可选
+
 提交 type 类型
 
 + ci: 改变CI配置文件和脚本
@@ -20,8 +25,8 @@ commit message 规范
 + refactor: 代码重构重写
 + perf: 性能优化、体验优化
 + test: Adding missing tests or correcting existing tests
-+ build: 改变影响项目npm run build脚本的代码、配置等
-+ chore: 改变构通流程、添加依懒、添加工具等
++ build: 改变影响项目build脚本的代码、配置等
++ chore: 改变构建流程、添加依懒、添加工具等
 + revert: 回滚版本
 
 提交单个文件
