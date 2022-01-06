@@ -1,5 +1,6 @@
 {
   "git": {
+    "requireCleanWorkingDir": true,
     "commitMessage": "chore: release v${version}"
   },
   "npm": {
@@ -7,5 +8,11 @@
   },
   "github": {
     "release": true
+  },
+  "plugins": {
+    "@release-it/conventional-changelog": {
+      "preset": "angular",
+      "infile": "CHANGELOG.md"
+    }
   }
 }
