@@ -1,8 +1,10 @@
 {
   "eslint.enable": true,
   "cSpell.words": [
+    "commitlint",
     "jsapi",
     "jssdk",
+    "nestjs",
     "noncestr"
   ]
 }

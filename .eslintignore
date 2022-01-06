@@ -1,1 +1,4 @@
 commitlint.config.js
+.eslintrc.js
+index.js
+**/*.spec.ts

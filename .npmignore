@@ -13,3 +13,6 @@ tsconfig.json
 .env.test
 .release-it.json
 .vscode/settings.json
+
+COMMIT_STANDARD.md
+commitlint.config.js
