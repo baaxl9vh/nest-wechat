@@ -10,7 +10,9 @@
 npm i --save nest-wechat
 ```
 
-### nestjs 模块
+### nestjs 模块引入
+
++ register方法注册
 
 ```javascript
 import { Module } from '@nestjs/common';
@@ -19,6 +21,29 @@ import { WeChatModule } from 'nest-wechat';
 
 @Module({
   imports: [WeChatModule.register({appId: 'your app id', secret: 'your secret'})],
+})
+export class AppModule {
+}
+```
+
++ forRoot配置注册
+
+```javascript
+import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+
+import { WeChatModule } from 'nest-wechat';
+
+@Module({
+  imports: [ConfigModule.forRoot({
+    envFilePath: '.env.test.local',
+  })],
+  inject: [ConfigService],
+  useFactory: (configService: ConfigService) => ({
+    appId: configService.get('TEST_APPID') || '',
+    secret: configService.get('TEST_SECRET') || '',
+  }),
+  })],
 })
 export class AppModule {
 }
