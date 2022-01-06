@@ -25,6 +25,8 @@ export class AppModule {
           useFactory: (configService: ConfigService) => ({
             appId: configService.get('TEST_APPID') || '',
             secret: configService.get('TEST_SECRET') || '',
+            token: configService.get('TEST_TOKEN'),
+            encodingAESKey: configService.get('TEST_AESKEY'),
           }),
         }),
       ],

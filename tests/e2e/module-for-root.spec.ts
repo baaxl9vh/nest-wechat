@@ -15,6 +15,7 @@ describe('Test module register', () => {
     const service = app.get(WeChatService);
 
     expect(service.config.appId).toBeTruthy();
+    expect(service.config.token).toBeTruthy();
 
     await app.close();
   });
