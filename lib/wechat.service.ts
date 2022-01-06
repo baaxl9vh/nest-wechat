@@ -3,13 +3,13 @@ import axios from 'axios';
 import { createHash } from 'crypto';
 
 import {
-  AccessTokenResult,
   AccountAccessTokenResult,
   createNonceStr,
   DefaultRequestResult,
   SignatureResult,
   TemplateMessage,
   TicketResult,
+  UserAccessTokenResult,
   WeChatServiceOptions,
 } from '.';
 import { ICache } from './types/utils';
@@ -56,7 +56,7 @@ export class WeChatService {
    * @tutorial https://developers.weixin.qq.com/doc/offiaccount/Basic_Information/Get_access_token.html
    * @returns 
    */
-  public getAccountAccessToken (): Promise<AccountAccessTokenResult> {
+  public async getAccountAccessToken (): Promise<AccountAccessTokenResult> {
     return new Promise((resolve, reject) => {
       if (!this.options.appId || !this.options.secret) {
         return reject(new Error(`${WeChatService.name}: No appId or secret.`));
@@ -94,7 +94,7 @@ export class WeChatService {
     if (!this.checkAccessToken(cache)) {
       // expire, request a new one.
       const ret = await this.getAccountAccessToken();
-      if (ret && ret.access_token) {
+      if (!(ret instanceof Error) && ret.access_token) {
         // got
         accessToken = ret.access_token;
       }
@@ -102,6 +102,21 @@ export class WeChatService {
       accessToken = cache.access_token;
     }
     return accessToken;
+  }
+
+  private async getTicket (): Promise<string | undefined> {
+    let ticket;
+    const cache = await this.cacheAdapter.get<TicketResult>(WeChatService.KEY_TICKET);
+    if (!this.checkTicket(cache)) {
+      // expire, request a new ticket
+      const ret = await this.getJSApiTicket();
+      if (!(ret instanceof Error) && ret.errcode === 0) {
+        ticket = ret.ticket;
+      }
+    } else {
+      ticket = cache.ticket;
+    }
+    return ticket;
   }
 
   /**
@@ -116,43 +131,24 @@ export class WeChatService {
    * @param accessToken 
    * @returns 
    */
-  public async getJSApiTicket (): Promise<TicketResult> {
-    // eslint-disable-next-line no-async-promise-executor
-    return new Promise(async (resolve, reject) => {
-
-      let accessToken;
-      // get token from cache
-      const cache = await this.cacheAdapter.get<AccountAccessTokenResult>(WeChatService.KEY_ACCESS_TOKEN);
-
-      if (!this.checkAccessToken(cache)) {
-        // expire, request a new one.
-        const ret = await this.getAccountAccessToken();
-        if (ret && ret.access_token) {
-          // got
-          accessToken = ret.access_token;
-        }
-      } else {
-        accessToken = cache.access_token;
-      }
-
-      if (!accessToken) {
-        // finally, there was no access token.
-        return reject(new Error(`${WeChatService.name}: No access token of official account.`));
-      }
+  public async getJSApiTicket (): Promise<TicketResult | Error> {
+    const accessToken = await this.getToken();
+    if (!accessToken) {
+      // finally, there was no access token.
+      return new Error(`${WeChatService.name}: No access token of official account.`);
+    }
+    try {
       const url = `https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=${accessToken}&type=jsapi`;
-      axios.get(url).then((res) => {
-        const ret = res && res.data;
-        if ((ret as TicketResult).errcode === 0) {
-          // 正确返回
-          // eslint-disable-next-line camelcase
-          (ret as TicketResult).expires_in += (Date.now() / 1000 - 120);
-          this.cacheAdapter.set(WeChatService.KEY_TICKET, ret);
-        }
-        resolve(ret);
-      }).catch((err) => {
-        reject(err);
-      });
-    });
+      const ret = await axios.get<TicketResult>(url);
+      if (ret.data.errcode === 0) {
+        // eslint-disable-next-line camelcase
+        (ret.data as TicketResult).expires_in += (Date.now() / 1000 - 120);
+        this.cacheAdapter.set(WeChatService.KEY_TICKET, ret.data);
+      }
+      return ret.data;
+    } catch (error) {
+      return (error as Error);
+    }
   }
 
   /**
@@ -164,41 +160,28 @@ export class WeChatService {
    * @param url url for signature
    * @returns 
    */
-  public jssdkSignature (url: string): Promise<SignatureResult> {
-    // eslint-disable-next-line no-async-promise-executor
-    return new Promise(async (resolve, reject) => {
-      if (!url) {
-        return reject(new Error(`${WeChatService.name}: JS-SDK signature must provide url param.`));
-      }
+  public async jssdkSignature (url: string): Promise<SignatureResult | Error> {
 
-      let ticket;
-      const cache = await this.cacheAdapter.get<TicketResult>(WeChatService.KEY_TICKET);
-      if (!this.checkTicket(cache)) {
-        // expire, request a new ticket
-        const ret = await this.getJSApiTicket();
-        if (ret && ret.errcode === 0) {
-          // got
-          ticket = ret.ticket;
-        }
-      } else {
-        ticket = cache && cache.ticket;
-      }
+    if (!url) {
+      return new Error(`${WeChatService.name}: JS-SDK signature must provide url param.`);
+    }
 
-      if (!ticket) {
-        // finally, there waw no ticket.
-        return reject(new Error(`${WeChatService.name}: JS-SDK could NOT get a ticket.`));
-      }
-      const timestamp = Math.floor(Date.now() / 1000);
-      const nonceStr = createNonceStr(16);
-      const signStr = 'jsapi_ticket=' + ticket + '&noncestr=' + nonceStr + '&timestamp=' + timestamp + '&url=' + url;
-      const signature = createHash('sha1').update(signStr).digest('hex');
-      resolve({
-        appId: this.options.appId,
-        nonceStr,
-        timestamp,
-        signature,
-      });
-    });
+    const ticket = await this.getTicket();
+
+    if (!ticket) {
+      // finally, there waw no ticket.
+      return new Error(`${WeChatService.name}: JS-SDK could NOT get a ticket.`);
+    }
+    const timestamp = Math.floor(Date.now() / 1000);
+    const nonceStr = createNonceStr(16);
+    const signStr = 'jsapi_ticket=' + ticket + '&noncestr=' + nonceStr + '&timestamp=' + timestamp + '&url=' + url;
+    const signature = createHash('sha1').update(signStr).digest('hex');
+    return {
+      appId: this.options.appId,
+      nonceStr,
+      timestamp,
+      signature,
+    };
   }
 
   /**
@@ -254,18 +237,18 @@ export class WeChatService {
    * @returns 
    * @tutorial https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/Wechat_webpage_authorization.html#1
    */
-  public async getAccessTokenByCode (code: string): Promise<AccessTokenResult> {
-    return new Promise((resolve, reject) => {
-      if (!this.options.appId || !this.options.secret) {
-        return reject(new Error(`${WeChatService.name}': No appId or secret.`));
-      }
+  public async getAccessTokenByCode (code: string): Promise<UserAccessTokenResult | Error> {
+    if (!this.options.appId || !this.options.secret) {
+      return new Error(`${WeChatService.name}': No appId or secret.`);
+    } else {
       const url = `https://api.weixin.qq.com/sns/oauth2/access_token?appid=${this.options.appId}&secret=${this.options.secret}&code=${code}&grant_type=authorization_code`;
-      axios.get(url).then((res) => {
-        resolve(res.data);
-      }).catch((err) => {
-        reject(err);
-      });
-    });
+      try {
+        const ret = await axios.get<UserAccessTokenResult>(url);
+        return ret.data;
+      } catch (error) {
+        return (error as Error);
+      }
+    }
   }
 
   /**
@@ -276,10 +259,14 @@ export class WeChatService {
    * @returns 
    * @tutorial https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Template_Message_Interface.html#5
    */
-  public async sendTemplateMessage (message: TemplateMessage): Promise<DefaultRequestResult & { msgid: string }> {
+  public async sendTemplateMessage (message: TemplateMessage): Promise<DefaultRequestResult & { msgid: string } | Error> {
     const token = await this.getToken();
     const url = `https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=${token}`;
-    const ret = await axios.post<DefaultRequestResult & { msgid: string }>(url, message);
-    return ret.data;
+    try {
+      const ret = await axios.post<DefaultRequestResult & { msgid: string }>(url, message);
+      return ret.data;
+    } catch (error) {
+      return (error as Error);
+    }
   }
 }

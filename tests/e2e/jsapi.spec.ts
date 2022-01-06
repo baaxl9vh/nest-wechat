@@ -76,7 +76,9 @@ describe('jsapi', () => {
     // must got access_token
     expect(ret).toHaveProperty('access_token');
     const accessToken = ret.access_token;
-    const retTicket = await service.getJSApiTicket();
+
+    const retTicket = await service.getJSApiTicket().catch((err) => err);
+    expect(retTicket).not.toBeInstanceOf(Error);
     // use access from token
     expect(service.cacheAdapter.get).toBeCalledTimes(1);
 
@@ -84,6 +86,7 @@ describe('jsapi', () => {
     // must got ticket
     expect(retTicket).toHaveProperty('ticket');
     const ticket = retTicket.ticket;
+
     // cache must be the same
     expect(accessToken).toEqual((await service.cacheAdapter.get<AccountAccessTokenResult>(WeChatService.KEY_ACCESS_TOKEN)).access_token);
     expect(service.cacheAdapter.get).toBeCalledTimes(2);
@@ -91,7 +94,7 @@ describe('jsapi', () => {
     expect(service.cacheAdapter.get).toBeCalledTimes(3);
 
     // to sign a url and use the ticket in cache
-    let sign = await service.jssdkSignature(process.env.TEST_JSSDK_URL || '');
+    let sign = await service.jssdkSignature(process.env.TEST_JSSDK_URL || '').catch(err => err);
 
     // cache get call
     expect(service.cacheAdapter.get).toBeCalledTimes(4);
@@ -103,7 +106,7 @@ describe('jsapi', () => {
     expect(sign.signature).toBeTruthy();
 
     // throw error when no url
-    expect(service.jssdkSignature('')).rejects.toThrow();
+    expect(service.jssdkSignature('')).resolves.toThrow();
 
     // request an access token and a ticket
     expect(axios.get).toBeCalledTimes(2);

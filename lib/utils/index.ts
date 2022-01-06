@@ -1,5 +1,4 @@
 export function createNonceStr (length = 16): string {
-  length = length || 16;
   length = length > 32 ? 32 : length;
   let str = '';
   const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
