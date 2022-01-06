@@ -8,12 +8,11 @@ import { WeChatService } from './wechat.service';
 export class WeChatModule {
 
   public static register (options: WeChatModuleOptions): DynamicModule {
-    const service = new WeChatService({ appId: options.appId, secret: options.secret});
     return {
       module: WeChatModule,
       providers: [{
         provide: WeChatService,
-        useValue: service,
+        useValue: new WeChatService(options),
       }],
       exports: [WeChatService],
     };
@@ -32,7 +31,7 @@ export class WeChatModule {
       provide: WeChatService,
       inject: [WECHAT_MODULE_OPTIONS],
       useFactory: (opt: WeChatModuleOptions) => {
-        return new WeChatService({ appId: opt.appId, secret: opt.secret});
+        return new WeChatService(opt);
       },
     });
     return {

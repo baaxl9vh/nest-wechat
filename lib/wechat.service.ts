@@ -6,11 +6,12 @@ import {
   AccountAccessTokenResult,
   createNonceStr,
   DefaultRequestResult,
+  MessageCrypto,
   SignatureResult,
   TemplateMessage,
   TicketResult,
   UserAccessTokenResult,
-  WeChatServiceOptions,
+  WeChatModuleOptions,
 } from '.';
 import { ICache } from './types/utils';
 import { MapCache } from './utils/cache';
@@ -32,13 +33,13 @@ export class WeChatService {
     return this._cacheAdapter;
   }
 
-  constructor (private options: WeChatServiceOptions) {
+  constructor (private options: WeChatModuleOptions) {
   }
 
   public get config () {
     return this.options;
   }
-  public set config (options: WeChatServiceOptions) {
+  public set config (options: WeChatModuleOptions) {
     this.options = options;
   }
   
@@ -268,5 +269,17 @@ export class WeChatService {
     } catch (error) {
       return (error as Error);
     }
+  }
+
+  public encryptMessage (msg: string): string {
+    const aesKey = MessageCrypto.getAESKey(this.config.encodingAESKey || '');
+    const iv = MessageCrypto.getAESKeyIV(aesKey);
+    return MessageCrypto.encrypt(aesKey, iv, msg, this.config.appId);
+  }
+
+  public decryptMessage (encryptMsg: string) {
+    const aesKey = MessageCrypto.getAESKey(this.config.encodingAESKey || '');
+    const iv = MessageCrypto.getAESKeyIV(aesKey);
+    return MessageCrypto.decrypt(aesKey, iv, encryptMsg, this.config.appId);
   }
 }

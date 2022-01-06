@@ -1,3 +1,12 @@
+export * from './cache';
+export * from './message-crypto';
+
+/**
+ * 指定长度随机字符串
+ * 
+ * @param length 
+ * @returns 
+ */
 export function createNonceStr (length = 16): string {
   length = length > 32 ? 32 : length;
   let str = '';

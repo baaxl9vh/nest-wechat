@@ -15,6 +15,16 @@ export interface WeChatModuleOptions {
    * WeChat official account secret
    */
   secret: string;
+
+  /**
+   * 微信公众号服务器Token
+   */
+  token?: string;
+
+  /**
+   * 微信公众号服务器EncodingAESKey
+   */
+  encodingAESKey?: string;
 }
 
 export interface WeChatModuleRootOptions extends Pick<ModuleMetadata, 'imports'> {
@@ -22,24 +32,6 @@ export interface WeChatModuleRootOptions extends Pick<ModuleMetadata, 'imports'>
   useFactory: (...args: any[]) => Promise<WeChatModuleOptions> | WeChatModuleOptions;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   inject: any[];
-}
-
-
-/**
- * WeChatService 配置项
- * WeChatService Options
- */
-export interface WeChatServiceOptions {
-  /**
-   * 微信公众号APP ID
-   * WeChat official account APP ID
-   */
-   appId: string;
-   /**
-    * 微信公众号secret
-    * WeChat official account secret
-    */
-   secret: string;
 }
 
 /**
