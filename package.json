@@ -1,7 +1,7 @@
 {
   "name": "nest-wechat",
   "version": "0.1.0",
-  "description": "nestjs module for wechat",
+  "description": "nestjs module for wechat server-side api.",
   "scripts": {
     "build": "rimraf -rf dist && tsc -p tsconfig.json",
     "format": "prettier --write \"{lib,test}/**/*.ts\"",
@@ -27,7 +27,7 @@
   "bugs": {
     "url": "https://github.com/baaxl9vh/nest-wechat/issues"
   },
-  "homepage": "https://github.com/baaxl9vh/nest-wechat#readme",
+  "homepage": "https://baaxl9vh.github.io/nest-wechat",
   "devDependencies": {
     "@commitlint/cli": "^16.0.1",
     "@commitlint/config-conventional": "^16.0.0",
