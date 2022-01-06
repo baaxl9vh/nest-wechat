@@ -1,0 +1,1 @@
+export const WECHAT_MODULE_OPTIONS = 'WeChatModuleOptions';

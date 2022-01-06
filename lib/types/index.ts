@@ -1,3 +1,5 @@
+import { ModuleMetadata } from '@nestjs/common';
+
 /**
  * WeChatModule 配置项
  * WeChatModule Options
@@ -14,6 +16,14 @@ export interface WeChatModuleOptions {
    */
   secret: string;
 }
+
+export interface WeChatModuleRootOptions extends Pick<ModuleMetadata, 'imports'> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  useFactory: (...args: any[]) => Promise<WeChatModuleOptions> | WeChatModuleOptions;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  inject: any[];
+}
+
 
 /**
  * WeChatService 配置项
