@@ -7,7 +7,8 @@
  */
 export interface ICache {
   get<T> (key: string): Promise<T>;
-  set (key: string, value: object | string): void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  set (key: string, value: any): void;
   remove (key: string): boolean;
   clean (): void;
 }
