@@ -2,6 +2,8 @@
 
 微信公众号、微信程序开、微信小游戏、微信支付以及企业微信等服务端API nestjs 模块封装。也可以直接当工具类使用。
 
+nest-wechat的目的是自用，有用到的api就会先写，如果你需要用的api还没实现，可以提 [issues](https://github.com/baaxl9vh/nest-wechat/issues) 给我，我会尽快补上。
+
 ## 快速开始
 
 ### 安装
@@ -55,6 +57,36 @@ export class AppModule {
 import { WeChatService } from 'nest-wechat';
 const service = new WeChatService({ appId: 'your app id', secret: 'your secret'});
 ```
+
+## 全局接口
+
+### ICache
+
+```javascript
+/**
+ * 缓存接口，需要自定义缓存，请实现该接口
+ * 
+ * cache interface, please implement this interface if you need.
+ * 
+ */
+export interface ICache {
+  get<T> (key: string): Promise<T>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  set (key: string, value: any): void;
+  remove (key: string): boolean;
+  clean (): void;
+}
+```
+
+## WeChatService 属性与方法
+
+### config: WeChatModuleOptions
+
+配置读写属性，类型：WeChatModuleOptions
+
+### cacheAdapter: ICache
+
+缓存适配器读写属性，类型：ICache，默认是一个Map实现的缓存
 
 ## 微信公众号API
 
@@ -166,7 +198,9 @@ Create .env.test.local file, and save your test appid and secret in the file.
 ```config
 TEST_APPID=your/test/appid
 TEST_SECRET=your/test/secret
-TEST_JSSDK_URL=your/test/url
+TEST_JSSDK_URL=https://your/website/url
+TEST_TOKEN=your/token
+TEST_AESKEY=your/aeskey
 ```
 
 Run test.
