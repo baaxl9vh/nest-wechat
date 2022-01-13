@@ -34,6 +34,7 @@ module.exports = {
       'exports': 'always-multiline',
       'arrays': 'always-multiline',
       'objects': 'always-multiline',
+      'functions': 'always-multiline',
     }],
     'eqeqeq': ['error', 'always'],
     'complexity': ['error', { max: 4 }],
