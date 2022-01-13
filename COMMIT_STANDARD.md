@@ -72,6 +72,17 @@ Configure commitlint to use conventional config
 echo "module.exports = { extends: ['@commitlint/config-conventional'] };" > commitlint.config.js
 ```
 
+Configure example
+
+```javascript
+module.exports = {
+  extends: ['@commitlint/config-conventional'],
+  rules: {
+    'body-max-line-length': [2, 'always', 60],
+  }
+}
+```
+
 Test
 
 ```shell
