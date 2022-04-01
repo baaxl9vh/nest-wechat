@@ -17,6 +17,10 @@ jobs:
         with:
           node-version: 16
           registry-url: https://registry.npmjs.org/
+      - name: Start Redis
+        uses: supercharge/redis-github-action@1.4.0
+        with:
+          redis-version: 5
       - run: npm ci
       - run: npx cross-env NODE_ENV=ci TEST_APPID=${{secrets.TEST_APP_ID}} TEST_SECRET=${{secrets.TEST_APP_SECRET}} TEST_JSSDK_URL=${{secrets.TEST_JSSDK_URL}} jest --config ./tests/jest-e2e.json --runInBand
       - run: npm run build
