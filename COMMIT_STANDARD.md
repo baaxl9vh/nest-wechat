@@ -89,4 +89,10 @@ Test
 npx commitlint --from HEAD~1 --to HEAD --verbose
 ```
 
+Lint from stdin
+
+```shell
+echo 'foo: bar' | npx commitlint
+```
+
 > [commitlint docs](https://commitlint.js.org/#/guides-local-setup)
