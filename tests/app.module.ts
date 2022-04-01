@@ -30,12 +30,11 @@ export class AppModule {
               imports: [ConfigModule],
               useFactory: async (configService: ConfigService) => ({
                 store: redisStore,
-                host: configService.get('REDIS_HOST'),
-                port: configService.get('REDIS_PORT'),
+                host: configService.get('REDIS_HOST') || '127.0.0.1',
+                port: configService.get('REDIS_PORT') || 6379,
                 // eslint-disable-next-line camelcase
-                auth_pass: configService.get('REDIS_PASSWORD'),
-                db: configService.get('REDIS_DB'),
-                ttl: configService.get('REDIS_TTL'),
+                db: 0,
+                ttl: 600,
               }),
               inject: [ConfigService],
             }),
