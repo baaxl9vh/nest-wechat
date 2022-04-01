@@ -13,6 +13,7 @@ import {
   UserAccessTokenResult,
   WeChatModuleOptions,
 } from '.';
+import { MiniProgramService } from './miniprogram.service';
 import { ICache } from './types/utils';
 import { MapCache } from './utils/cache';
 
@@ -24,6 +25,8 @@ export class WeChatService {
 
   protected _cacheAdapter: ICache = new MapCache();
 
+  public mp: MiniProgramService;
+
   public set cacheAdapter (adapter: ICache) {
     if (adapter) {
       this._cacheAdapter = adapter;
@@ -34,6 +37,10 @@ export class WeChatService {
   }
 
   constructor (private options: WeChatModuleOptions) {
+    this.mp = new MiniProgramService(options);
+    if (options && options.cacheAdapter) {
+      this.cacheAdapter = options.cacheAdapter as ICache;
+    }
   }
 
   public get config () {
@@ -71,7 +78,7 @@ export class WeChatService {
           // eslint-disable-next-line camelcase
           (ret as AccountAccessTokenResult).expires_in += (Date.now() / 1000 - 120);
           
-          this.cacheAdapter.set(WeChatService.KEY_ACCESS_TOKEN, ret);
+          this.cacheAdapter.set(WeChatService.KEY_ACCESS_TOKEN, ret, 7100);
         }
         resolve(ret);
       }).catch((err) => {
@@ -91,7 +98,6 @@ export class WeChatService {
 
     // get token from cache
     const cache = await this.cacheAdapter.get<AccountAccessTokenResult>(WeChatService.KEY_ACCESS_TOKEN);
-
     if (!this.checkAccessToken(cache)) {
       // expire, request a new one.
       const ret = await this.getAccountAccessToken();
@@ -144,7 +150,7 @@ export class WeChatService {
       if (ret.data.errcode === 0) {
         // eslint-disable-next-line camelcase
         (ret.data as TicketResult).expires_in += (Date.now() / 1000 - 120);
-        this.cacheAdapter.set(WeChatService.KEY_TICKET, ret.data);
+        this.cacheAdapter.set(WeChatService.KEY_TICKET, ret.data, 7100);
       }
       return ret.data;
     } catch (error) {

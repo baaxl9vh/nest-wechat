@@ -25,6 +25,11 @@ export interface WeChatModuleOptions {
    * 微信公众号服务器EncodingAESKey
    */
   encodingAESKey?: string;
+
+  /**
+   * 缓存适配器
+   */
+  cacheAdapter?: object;
 }
 
 export interface WeChatModuleRootOptions extends Pick<ModuleMetadata, 'imports'> {
