@@ -33,6 +33,7 @@ export class AppModule {
                 host: configService.get('REDIS_HOST') || '127.0.0.1',
                 port: configService.get('REDIS_PORT') || 6379,
                 // eslint-disable-next-line camelcase
+                // auth_pass: configService.get('REDIS_PORT') || '',
                 db: 0,
                 ttl: 600,
               }),

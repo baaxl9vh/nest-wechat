@@ -1,3 +1,4 @@
+import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import axios from 'axios';
 
@@ -6,14 +7,17 @@ import { AppModule } from '../app.module';
 
 describe('Test module register', () => {
 
+  let app: INestApplication;
+  let service: WeChatService;
+
   it('Should register module with config', async () => {
 
     const module = await Test.createTestingModule({
       imports: [AppModule.injectConfigModule()],
     }).compile();
 
-    const app = module.createNestApplication();
-    const service = app.get(WeChatService);
+    app = module.createNestApplication();
+    service = app.get(WeChatService);
 
     // spy 几个关键方法
     jest.spyOn(axios, 'get');
@@ -43,7 +47,17 @@ describe('Test module register', () => {
     expect(service.cacheAdapter.set).toBeCalledTimes(2);
     expect(axios.get).toBeCalledTimes(2);
 
+
     await app.close();
+  });
+
+  afterEach(async () => {
+    if (app) {
+      if (service) {
+        service.cacheAdapter.close();
+      }
+      await app.close();
+    }
   });
 
 });

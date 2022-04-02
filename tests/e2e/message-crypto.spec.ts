@@ -18,14 +18,18 @@ describe('Test Message Crypto', () => {
 
   it('Should origin text equal to the decrypt text', async () => {
 
+    const appId = 'wxb11529c136998cb6';
+
     const module = await Test.createTestingModule({
-      imports: [AppModule.injectConfigModule()],
+      imports: [AppModule.configAppIdAndSecret(appId, '')],
     }).compile();
 
     const app = module.createNestApplication();
     const service = app.get(WeChatService);
 
-    service.config.appId = 'wxb11529c136998cb6';
+    service.config.appId = appId;
+    service.config.encodingAESKey = 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFG';
+
     const text = '<xml><ToUserName><![CDATA[oia2Tj我是中文jewbmiOUlr6X-1crbLOvLw]]></ToUserName><FromUserName><![CDATA[gh_7f083739789a]]></FromUserName><CreateTime>1407743423</CreateTime><MsgType><![CDATA[video]]></MsgType><Video><MediaId><![CDATA[eYJ1MbwPRJtOvIEabaxHs7TX2D-HV71s79GUxqdUkjm6Gs2Ed1KF3ulAOA9H1xG0]]></MediaId><Title><![CDATA[testCallBackReplyVideo]]></Title><Description><![CDATA[testCallBackReplyVideo]]></Description></Video></xml>'
 
     const decryptText = service.decryptMessage(service.encryptMessage(text));
