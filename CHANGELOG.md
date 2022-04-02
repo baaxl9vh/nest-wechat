@@ -1,3 +1,10 @@
+## [0.2.1](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.0...v0.2.1) (2022-04-02)
+
+
+### Features
+
+* cache接口添加close方法,redis需要手动调用quit ([68b71c1](https://github.com/baaxl9vh/nest-wechat/commit/68b71c1528ed02f64e763f2bb7fa2886ff0fcb03))
+
 # [0.2.0](https://github.com/baaxl9vh/nest-wechat/compare/v0.1.0...v0.2.0) (2022-04-01)
 
 
