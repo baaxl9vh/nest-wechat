@@ -38,10 +38,6 @@ export default class RedisCache implements ICache {
     }
   }
 
-  clean (): void {
-    throw new Error('Method not implemented.');
-  }
-
   close (): void {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if (typeof (this.cache.store as any).getClient === 'function') {

@@ -19,10 +19,6 @@ export class MapCache implements ICache {
     return this.map.delete(key);
   }
 
-  clean (): void {
-    this.map.clear();
-  }
-
   close (): void {
     return;
   }
