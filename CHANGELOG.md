@@ -1,3 +1,10 @@
+## [0.2.2](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.1...v0.2.2) (2022-04-02)
+
+
+### Features
+
+* redis缓存适配器作为可选实现类添加进库 ([bda986f](https://github.com/baaxl9vh/nest-wechat/commit/bda986f5c258258d585506f619637cfbcc2bddde))
+
 ## [0.2.1](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.0...v0.2.1) (2022-04-02)
 
 
