@@ -11,7 +11,7 @@
     "cpdocs": "cp README.md CHANGELOG.md ./docs/ && cp README.md CHANGELOG.md ./docs/zh-cn/",
     "postversion": "git push --follow-tags",
     "release:dry": "release-it --dry-run",
-    "release": "release-it",
+    "release": "release-it patch",
     "prepare": "husky install"
   },
   "repository": {
