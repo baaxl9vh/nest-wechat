@@ -1,14 +1,25 @@
-import { ICache } from '../../lib/types/utils';
 import { Cache } from 'cache-manager';
 
-export default class RedisCache implements ICache {
+import { ICache } from '../types/utils';
+
+/**
+ * redis缓存适配器
+ */
+export class RedisCache implements ICache {
+
+  private namespace = 'nest-wechat:';
 
   /**
-   *
+   * 
+   * @param cache cache manager service
    */
   constructor (readonly cache: Cache) {}
 
   public async get<T> (key: string): Promise<T> {
+    if (!key) {
+      throw new Error('empty key');
+    }
+    key = this.namespace + key;
     let value = {};
     try {
       value = await this.cache.get<T>(key) as T;
@@ -23,6 +34,10 @@ export default class RedisCache implements ICache {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public async set (key: string, value: any, ttl?: number): Promise<any> {
+    if (!key) {
+      throw new Error('empty key');
+    }
+    key = this.namespace + key;
     if (!ttl) {
       ttl = 0;
     }
@@ -30,6 +45,8 @@ export default class RedisCache implements ICache {
   }
 
   remove (key: string): boolean {
+    if (!key) return false;
+    key = this.namespace + key;
     try {
       this.cache.del(key);
       return true;

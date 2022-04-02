@@ -1,4 +1,5 @@
 export * from './cache';
+export * from './redis.cache';
 export * from './message-crypto';
 
 /**

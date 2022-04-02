@@ -3,8 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Cache } from 'cache-manager';
 import * as redisStore from 'cache-manager-redis-store';
 
-import { WeChatModule } from '../lib';
-import RedisCache from './utils/redis.cache';
+import { WeChatModule, RedisCache } from '../lib';
 
 @Module({})
 export class AppModule {
