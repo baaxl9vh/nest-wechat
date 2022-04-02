@@ -18,7 +18,7 @@ export class WeChatModule {
     };
   }
 
-  public static forRoot (options: WeChatModuleRootOptions): DynamicModule {
+  public static forRootAsync (options: WeChatModuleRootOptions): DynamicModule {
     const providers: Provider[] = [];
     if (options.useFactory) {
       providers.push({

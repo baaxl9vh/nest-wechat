@@ -19,7 +19,7 @@ export class AppModule {
     return {
       module: AppModule,
       imports: [
-        WeChatModule.forRoot({
+        WeChatModule.forRootAsync({
           imports: [
             ConfigModule.forRoot({
               envFilePath: '.env.test.local',
