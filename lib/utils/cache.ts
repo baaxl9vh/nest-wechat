@@ -23,4 +23,8 @@ export class MapCache implements ICache {
     this.map.clear();
   }
 
+  close (): void {
+    return;
+  }
+
 }

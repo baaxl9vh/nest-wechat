@@ -11,4 +11,5 @@ export interface ICache {
   set (key: string, value: any, ttl?: number): void;
   remove (key: string): boolean;
   clean (): void;
+  close (): void;
 }
