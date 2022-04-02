@@ -37,18 +37,21 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { WeChatModule } from 'nest-wechat';
 
 @Module({
-  imports: [ConfigModule.forRoot({
-    envFilePath: '.env.test.local',
-  })],
-  inject: [ConfigService, CACHE_MANAGER],
-  useFactory: (configService: ConfigService, cache: Cache) => ({
-    appId: configService.get('TEST_APPID') || '',
-    secret: configService.get('TEST_SECRET') || '',
-    token: configService.get('TEST_TOKEN'),
-    encodingAESKey: configService.get('TEST_AESKEY'),
-    cacheAdapter: new RedisCache(cache),
-  }),
-  })],
+  imports: [
+    ConfigModule.forRoot({
+      envFilePath: '.env.test.local',
+    }),
+    WeChatModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        appId: configService.get('WX_APPID'),
+        secret: configService.get('WX_SECRET'),
+        token: configService.get('WX_TOKEN'),
+        encodingAESKey: configService.get('WX_AESKEY'),
+      }),
+    }),
+  ]
 })
 export class AppModule {
 }
