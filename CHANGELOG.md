@@ -1,3 +1,10 @@
+## [0.2.3](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.2...v0.2.3) (2022-04-02)
+
+
+### Bug Fixes
+
+* 订正方法名称 ([a93037c](https://github.com/baaxl9vh/nest-wechat/commit/a93037ca72577f9d0f3f0bd45b7d380516b07d7c))
+
 ## [0.2.2](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.1...v0.2.2) (2022-04-02)
 
 
