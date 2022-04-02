@@ -2,7 +2,7 @@
 
 微信公众号、微信程序开、微信小游戏、微信支付以及企业微信等服务端API nestjs 模块封装。也可以直接当工具类使用。
 
-nest-wechat的目的是自用，有用到的api就会先写，如果你需要用的api还没实现，可以提 [issues](https://github.com/baaxl9vh/nest-wechat/issues) 给我，我会尽快补上。
+写nest-wechat的目的是自用，有用到的api就会先写，如果你需要用的api还没实现，可以提 [issues](https://github.com/baaxl9vh/nest-wechat/issues) 给我，我会尽快补上。
 
 ## 快速开始
 
@@ -40,10 +40,13 @@ import { WeChatModule } from 'nest-wechat';
   imports: [ConfigModule.forRoot({
     envFilePath: '.env.test.local',
   })],
-  inject: [ConfigService],
-  useFactory: (configService: ConfigService) => ({
+  inject: [ConfigService, CACHE_MANAGER],
+  useFactory: (configService: ConfigService, cache: Cache) => ({
     appId: configService.get('TEST_APPID') || '',
     secret: configService.get('TEST_SECRET') || '',
+    token: configService.get('TEST_TOKEN'),
+    encodingAESKey: configService.get('TEST_AESKEY'),
+    cacheAdapter: new RedisCache(cache),
   }),
   })],
 })
@@ -74,7 +77,7 @@ export interface ICache {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   set (key: string, value: any): void;
   remove (key: string): boolean;
-  clean (): void;
+  close (): void;
 }
 ```
 
@@ -191,6 +194,29 @@ export interface ICache {
 
 > [参考文档](https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Template_Message_Interface.html#5)
 
+## 微信小程序
+
+### 登录code2Session
+
+#### mp.code2Session
+
++ 返回值
+  + Promise&lt;SessionResult&gt; 调用后返回Promise
+
+返回数据
+
+```json
+{
+  "openid": "openid",
+  "session_key": "key",
+  "unionid": "unionid",
+  "errcode": 0,
+  "errmsg": "ok",
+}
+```
+
+> [参考文档](https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/login/auth.code2Session.html)
+
 ### Run Test
 
 Create .env.test.local file, and save your test appid and secret in the file.
@@ -201,6 +227,12 @@ TEST_SECRET=your/test/secret
 TEST_JSSDK_URL=https://your/website/url
 TEST_TOKEN=your/token
 TEST_AESKEY=your/aeskey
+
+REDIS_HOST=your/redis/host
+REDIS_PORT=6379
+REDIS_PASSWORD=
+REDIS_DB=0
+REDIS_TTL=600
 ```
 
 Run test.

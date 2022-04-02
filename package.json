@@ -8,7 +8,7 @@
     "lint": "eslint 'lib/**/*.ts' --fix",
     "test": "jest --config ./tests/jest-e2e.json --runInBand",
     "serve:docs": "docsify serve docs",
-    "cpdocs": "cp README.md CHANGELOG.md ./docs/ && cp README.md CHANGELOG.md ./docs/zh-cn/",
+    "cpdocs": "cp README.md CHANGELOG.md ./docs/",
     "postversion": "git push --follow-tags",
     "release:dry": "release-it --dry-run",
     "release": "release-it patch",
