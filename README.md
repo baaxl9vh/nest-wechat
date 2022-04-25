@@ -241,5 +241,5 @@ REDIS_TTL=600
 Run test.
 
 ```shell
-npm run test
+npm run test:e2e
 ```

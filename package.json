@@ -6,7 +6,8 @@
     "build": "rimraf -rf dist && tsc -p tsconfig.json",
     "format": "prettier --write \"{lib,test}/**/*.ts\"",
     "lint": "eslint 'lib/**/*.ts' --fix",
-    "test": "jest --config ./tests/jest-e2e.json --runInBand",
+    "test": "jest",
+    "test:e2e": "jest --config ./tests/jest-e2e.json --runInBand",
     "serve:docs": "docsify serve docs",
     "cpdocs": "cp README.md CHANGELOG.md ./docs/",
     "postversion": "git push --follow-tags",
@@ -59,6 +60,7 @@
     "typescript": "^4.5.4"
   },
   "dependencies": {
-    "axios": "^0.24.0"
+    "axios": "^0.24.0",
+    "fast-xml-parser": "^4.0.7"
   }
 }
