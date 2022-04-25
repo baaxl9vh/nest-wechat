@@ -5,8 +5,31 @@ import { ComponentModuleOptions } from './types';
 export class ComponentService {
 
   constructor (private options: ComponentModuleOptions) {}
+
   // 解密推送ticket
   // https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/ThirdParty/token/component_verify_ticket.html
+
+  public decryptMessage (encryptXml: string, timestamp: string, nonce: string, signature: string) {
+    console.log(encryptXml);
+    console.log(timestamp);
+    console.log(nonce);
+    console.log(signature);
+  }
+
+  public encryptMessage () {
+    console.log();
+  }
+
+  // ticket
+  // $timeStamp = $request->input('timestamp');
+  //           $nonce = $request->input('nonce');
+  //           $msg_sign = $request->input('msg_signature');
+  //           $simxml = str2xml2arr($text);
+  //           $format = "<xml><ToUserName><![CDATA[toUser]]></ToUserName><Encrypt><![CDATA[%s]]></Encrypt></xml>";
+  //           $from_xml = sprintf($format, $simxml['Encrypt']);
+  //           @$wxBizMsgCrypt = new \wxBizMsgCrypt(self::TOKEN, self::ENCODING_AES_KEY, self::APP_ID);
+  //           $msg = '';
+  //           $errCode = $wxBizMsgCrypt->decryptMsg($msg_sign, $timeStamp, $nonce, $from_xml, $msg);
 
   // 获取令牌
   // https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/ThirdParty/token/component_access_token.html
