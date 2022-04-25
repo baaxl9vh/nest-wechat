@@ -32,9 +32,48 @@ export interface WeChatModuleOptions {
   cacheAdapter?: object;
 }
 
+/**
+ * WeChatComponentModule 配置项
+ * WeChatComponentModule Options
+ */
+export interface ComponentModuleOptions {
+  /**
+   * 第三方平台APP ID
+   * WeChat official account APP ID
+   */
+  componentAppId: string;
+  /**
+   * 第三方平台secret
+   * WeChat 第三方平台 secret
+   */
+   componentSecret: string;
+
+  /**
+   * 第三方平台Token
+   */
+   componentToken?: string;
+
+  /**
+   * 第三方平台EncodingAESKey
+   */
+   componentEncodingAESKey?: string;
+
+  /**
+   * 缓存适配器
+   */
+  cacheAdapter?: object;
+}
+
 export interface WeChatModuleRootOptions extends Pick<ModuleMetadata, 'imports'> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   useFactory: (...args: any[]) => Promise<WeChatModuleOptions> | WeChatModuleOptions;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  inject: any[];
+}
+
+export interface ComponentModuleRootOptions extends Pick<ModuleMetadata, 'imports'> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  useFactory: (...args: any[]) => Promise<ComponentModuleOptions> | ComponentModuleOptions;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   inject: any[];
 }

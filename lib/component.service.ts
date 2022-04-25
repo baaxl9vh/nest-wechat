@@ -1,7 +1,10 @@
-import { WeChatModuleOptions } from './types';
+import { Injectable } from '@nestjs/common';
+import { ComponentModuleOptions } from './types';
 
-export class Component {
-  constructor (private options: WeChatModuleOptions) {}
+@Injectable()
+export class ComponentService {
+
+  constructor (private options: ComponentModuleOptions) {}
   // 解密推送ticket
   // https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/ThirdParty/token/component_verify_ticket.html
 
