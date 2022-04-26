@@ -280,30 +280,46 @@ export class WeChatService {
 
   /**
    * 
-   * @param msg 
-   * @param timestamp 
-   * @param nonce 
-   * @returns XML
+   * 消息加密
+   * 
+   * @param message 明文消息
+   * @param timestamp 时间戳
+   * @param nonce 随机字符串
+   * @returns XML格式字符串 <xml><Encrypt></Encrypt><MsgSignature></MsgSignature><TimeStamp></TimeStamp><Nonce></Nonce></xml>
+   * @link https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/Before_Develop/Technical_Plan.html
+   * @link https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/Before_Develop/Message_encryption_and_decryption.html
    */
-  public encryptMessage (msg: string, timestamp: string, nonce: string): string {
+  public encryptMessage (message: string, timestamp: string, nonce: string): string {
     const aesKey = MessageCrypto.getAESKey(this.config.encodingAESKey || '');
     const iv = MessageCrypto.getAESKeyIV(aesKey);
-    const encrypt = MessageCrypto.encrypt(aesKey, iv, msg, this.config.appId);
+    const encrypt = MessageCrypto.encrypt(aesKey, iv, message, this.config.appId);
     const signature = MessageCrypto.sha1(this.config.token || '', timestamp, nonce, encrypt);
     const xml = `<xml><Encrypt><![CDATA[${encrypt}]]></Encrypt><MsgSignature><![CDATA[${signature}]]></MsgSignature><TimeStamp>${timestamp}</TimeStamp><Nonce><![CDATA[${nonce}]]></Nonce></xml>`;
     return xml;
   }
 
+  /**
+   * 
+   * 消息解密
+   * 
+   * @param signature 签名
+   * @param timestamp 时间戳
+   * @param nonce 随机字符串
+   * @param encryptXml 加密消息XML字符串
+   * @returns 消息明文内容
+   * @see WeChatService#encryptMessage
+   * @link https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/Before_Develop/Technical_Plan.html
+   * @link https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/Before_Develop/Message_encryption_and_decryption.html
+   * 
+   */
   public decryptMessage (signature: string, timestamp: string, nonce: string, encryptXml: string) {
     const aesKey = MessageCrypto.getAESKey(this.config.encodingAESKey || '');
     const iv = MessageCrypto.getAESKeyIV(aesKey);
     const parser = new XMLParser();
     const xml = parser.parse(encryptXml).xml;
-    // const signature = jsonObj.MsgSignature;
     const encryptMessage = xml.Encrypt;
-
     if (signature !== MessageCrypto.sha1(this.config.token || '', timestamp, nonce, encryptMessage)) {
-      console.log(false);
+      throw new Error('signature incorrect');
     }
     return MessageCrypto.decrypt(aesKey, iv, encryptMessage, this.config.appId);
   }
