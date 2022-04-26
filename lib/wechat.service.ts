@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import axios from 'axios';
 import { createHash } from 'crypto';
-import { XMLParser } from 'fast-xml-parser';
 
 import {
   AccountAccessTokenResult,
@@ -290,12 +289,7 @@ export class WeChatService {
    * @link https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/Before_Develop/Message_encryption_and_decryption.html
    */
   public encryptMessage (message: string, timestamp: string, nonce: string): string {
-    const aesKey = MessageCrypto.getAESKey(this.config.encodingAESKey || '');
-    const iv = MessageCrypto.getAESKeyIV(aesKey);
-    const encrypt = MessageCrypto.encrypt(aesKey, iv, message, this.config.appId);
-    const signature = MessageCrypto.sha1(this.config.token || '', timestamp, nonce, encrypt);
-    const xml = `<xml><Encrypt><![CDATA[${encrypt}]]></Encrypt><MsgSignature><![CDATA[${signature}]]></MsgSignature><TimeStamp>${timestamp}</TimeStamp><Nonce><![CDATA[${nonce}]]></Nonce></xml>`;
-    return xml;
+    return MessageCrypto.encryptMessage(this.config.appId, this.config.token || '', this.config.encodingAESKey || '', message, timestamp, nonce);
   }
 
   /**
@@ -313,14 +307,6 @@ export class WeChatService {
    * 
    */
   public decryptMessage (signature: string, timestamp: string, nonce: string, encryptXml: string) {
-    const aesKey = MessageCrypto.getAESKey(this.config.encodingAESKey || '');
-    const iv = MessageCrypto.getAESKeyIV(aesKey);
-    const parser = new XMLParser();
-    const xml = parser.parse(encryptXml).xml;
-    const encryptMessage = xml.Encrypt;
-    if (signature !== MessageCrypto.sha1(this.config.token || '', timestamp, nonce, encryptMessage)) {
-      throw new Error('signature incorrect');
-    }
-    return MessageCrypto.decrypt(aesKey, iv, encryptMessage, this.config.appId);
+    return MessageCrypto.decryptMessage(this.config.appId, this.config.token || '', this.config.encodingAESKey || '', signature, timestamp, nonce, encryptXml);
   }
 }

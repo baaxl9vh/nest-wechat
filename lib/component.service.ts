@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ComponentModuleOptions } from './types';
+import { MessageCrypto } from './utils';
 
 @Injectable()
 export class ComponentService {
@@ -8,28 +9,6 @@ export class ComponentService {
 
   // 解密推送ticket
   // https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/ThirdParty/token/component_verify_ticket.html
-
-  public decryptMessage (encryptXml: string, timestamp: string, nonce: string, signature: string) {
-    console.log(encryptXml);
-    console.log(timestamp);
-    console.log(nonce);
-    console.log(signature);
-  }
-
-  public encryptMessage () {
-    console.log();
-  }
-
-  // ticket
-  // $timeStamp = $request->input('timestamp');
-  //           $nonce = $request->input('nonce');
-  //           $msg_sign = $request->input('msg_signature');
-  //           $simxml = str2xml2arr($text);
-  //           $format = "<xml><ToUserName><![CDATA[toUser]]></ToUserName><Encrypt><![CDATA[%s]]></Encrypt></xml>";
-  //           $from_xml = sprintf($format, $simxml['Encrypt']);
-  //           @$wxBizMsgCrypt = new \wxBizMsgCrypt(self::TOKEN, self::ENCODING_AES_KEY, self::APP_ID);
-  //           $msg = '';
-  //           $errCode = $wxBizMsgCrypt->decryptMsg($msg_sign, $timeStamp, $nonce, $from_xml, $msg);
 
   // 获取令牌
   // https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/ThirdParty/token/component_access_token.html
@@ -46,6 +25,39 @@ export class ComponentService {
 
   // 获取授权帐号详情
   // https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/ThirdParty/token/api_get_authorizer_info.html
+
+  /**
+   * 
+   * 消息加密
+   * 
+   * @param message 明文消息
+   * @param timestamp 时间戳
+   * @param nonce 随机字符串
+   * @returns XML格式字符串 <xml><Encrypt></Encrypt><MsgSignature></MsgSignature><TimeStamp></TimeStamp><Nonce></Nonce></xml>
+   * @link https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/Before_Develop/Technical_Plan.html
+   * @link https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/Before_Develop/Message_encryption_and_decryption.html
+   */
+  public encryptMessage (message: string, timestamp: string, nonce: string): string {
+    return MessageCrypto.encryptMessage(this.options.componentAppId, this.options.componentToken || '', this.options.componentEncodingAESKey || '', message, timestamp, nonce);
+  }
+
+  /**
+   * 
+   * 消息解密
+   * 
+   * @param signature 签名
+   * @param timestamp 时间戳
+   * @param nonce 随机字符串
+   * @param encryptXml 加密消息XML字符串
+   * @returns 消息明文内容
+   * @see WeChatService#encryptMessage
+   * @link https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/Before_Develop/Technical_Plan.html
+   * @link https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/Before_Develop/Message_encryption_and_decryption.html
+   * 
+   */
+  public decryptMessage (signature: string, timestamp: string, nonce: string, encryptXml: string) {
+    return MessageCrypto.decryptMessage(this.options.componentAppId, this.options.componentToken || '', this.options.componentEncodingAESKey || '', signature, timestamp, nonce, encryptXml);
+  }
 
 
 
