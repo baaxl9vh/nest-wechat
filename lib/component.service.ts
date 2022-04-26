@@ -1,4 +1,6 @@
 import { Injectable } from '@nestjs/common';
+import axios from 'axios';
+import { DefaultRequestResult } from './interfaces';
 
 import { ComponentModuleOptions } from './types';
 import { ICache } from './types/utils';
@@ -6,6 +8,8 @@ import { MapCache, MessageCrypto } from './utils';
 
 @Injectable()
 export class ComponentService {
+
+  public static KEY_TICKET = 'key_component_ticket';
 
   protected _cacheAdapter: ICache = new MapCache();
 
@@ -22,6 +26,55 @@ export class ComponentService {
     if (options && options.cacheAdapter) {
       this.cacheAdapter = options.cacheAdapter as ICache;
     }
+  }
+
+  /**
+   * 
+   * 启动ticket推送服务
+   * 
+   * @returns 
+   * @throws
+   * @link https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/ThirdParty/token/component_verify_ticket_service.html
+   */
+  public async startPushTicket () {
+    const url = 'https://api.weixin.qq.com/cgi-bin/component/api_start_push_ticket';
+    return axios.post<DefaultRequestResult & { msgid: string }>(url, {
+      // eslint-disable-next-line camelcase
+      component_appid: this.options.componentAppId,
+      // eslint-disable-next-line camelcase
+      component_secret: this.options.componentSecret,
+    });
+  }
+
+  /**
+   * 
+   * 请求获取令牌
+   * 
+   * @returns {component_access_token: '', expires_in: 7200}
+   * @throws
+   */
+  public async requestComponentToken () {
+    const ticket = await this.getTicket();
+    if (!ticket) {
+      throw new Error('component ticket not found');
+    }
+    const url = 'https://api.weixin.qq.com/cgi-bin/component/api_component_token';
+    return axios.post<DefaultRequestResult & { msgid: string }>(url, {
+      // eslint-disable-next-line camelcase
+      component_appid: this.options.componentAppId,
+      // eslint-disable-next-line camelcase
+      component_appsecret: this.options.componentSecret,
+      // eslint-disable-next-line camelcase
+      component_verify_ticket: ticket,
+    });
+  }
+
+  public getTicket () {
+    return this.cacheAdapter.get<string>(ComponentService.KEY_TICKET);
+  }
+
+  public setTicket (ticket: string) {
+    this.cacheAdapter.set(ComponentService.KEY_TICKET, ticket);
   }
 
   // 解密推送ticket

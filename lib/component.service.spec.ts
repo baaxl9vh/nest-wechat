@@ -35,4 +35,32 @@ describe('component service test', () => {
     expect(decrypt).toStrictEqual(text);
   });
 
+  it('Test start push ticket', async () => {
+    const service = new ComponentService({
+      componentAppId: 'wxb11529c136998cb6',
+      componentSecret: '',
+      componentToken: 'pamtest',
+      componentEncodingAESKey: 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFG',
+    });
+    const ret = await service.startPushTicket();
+    expect(ret.data).toBeDefined();
+    // 41004 no secret
+    expect(ret.data.errcode).toEqual(41004);
+  });
+
+  it('Test get access token', async () => {
+    const service = new ComponentService({
+      componentAppId: 'wxb11529c136998cb6',
+      componentSecret: 'xxxxxx',
+      componentToken: 'pamtest',
+      componentEncodingAESKey: 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFG',
+    });
+    service.setTicket('ticket');
+    const ret = await service.getComponentToken();
+    console.log(ret);
+    expect(ret.data).toBeDefined();
+    // 41004 no secret
+    expect(ret.data.errcode).toEqual(41004);
+  });
+
 });
