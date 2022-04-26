@@ -1,11 +1,28 @@
 import { Injectable } from '@nestjs/common';
+
 import { ComponentModuleOptions } from './types';
-import { MessageCrypto } from './utils';
+import { ICache } from './types/utils';
+import { MapCache, MessageCrypto } from './utils';
 
 @Injectable()
 export class ComponentService {
 
-  constructor (private options: ComponentModuleOptions) {}
+  protected _cacheAdapter: ICache = new MapCache();
+
+  public set cacheAdapter (adapter: ICache) {
+    if (adapter) {
+      this._cacheAdapter = adapter;
+    }
+  }
+  public get cacheAdapter (): ICache {
+    return this._cacheAdapter;
+  }
+
+  constructor (private options: ComponentModuleOptions) {
+    if (options && options.cacheAdapter) {
+      this.cacheAdapter = options.cacheAdapter as ICache;
+    }
+  }
 
   // 解密推送ticket
   // https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/ThirdParty/token/component_verify_ticket.html
