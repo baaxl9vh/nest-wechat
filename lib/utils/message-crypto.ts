@@ -124,6 +124,7 @@ export class MessageCrypto {
    * @param nonce 随机字符串
    * @param encryptXml 加密消息XML字符串
    * @returns 消息明文内容
+   * @throws
    * @see MessageCrypto#encryptMessage
    * @link https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/Before_Develop/Technical_Plan.html
    * @link https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/Before_Develop/Message_encryption_and_decryption.html
