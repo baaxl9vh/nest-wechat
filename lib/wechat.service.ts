@@ -307,6 +307,6 @@ export class WeChatService {
    * 
    */
   public decryptMessage (signature: string, timestamp: string, nonce: string, encryptXml: string) {
-    return MessageCrypto.decryptMessage(this.config.appId, this.config.token || '', this.config.encodingAESKey || '', signature, timestamp, nonce, encryptXml);
+    return MessageCrypto.decryptMessage(this.config.token || '', this.config.encodingAESKey || '', signature, timestamp, nonce, encryptXml);
   }
 }

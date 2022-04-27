@@ -53,22 +53,18 @@ export class MessageCrypto {
 
   /**
    * 对给定的密文进行AES解密
-   * @param str 需要解密的密文
-   * @param appId 可选 需要对比的appId，如果第三方回调时默认是suiteId，也可自行传入作为匹配处理
-   * @returns {string} 解密后的结果
+   * @param aesKey 
+   * @param iv 
+   * @param str 
+   * @returns 
    */
-  public static decrypt (aesKey: Buffer, iv: Buffer, str: string, appId: string) {
+  public static decrypt (aesKey: Buffer, iv: Buffer, str: string) {
     const aesCipher = crypto.createDecipheriv('aes-256-cbc', aesKey, iv);
     aesCipher.setAutoPadding(false);
     const decipheredBuff = MessageCrypto.PKCS7Decoder(Buffer.concat([aesCipher.update(str, 'base64'), aesCipher.final()]));
     const data = decipheredBuff.slice(16);
     const msgLen = data.slice(0, 4).readUInt32BE(0);
-    const decryptAppId = data.slice(msgLen + 4).toString();
-    if (appId && appId !== decryptAppId) {
-      console.log('cropId is invalid');
-    } else {
-      return data.slice(4, msgLen + 4).toString();
-    }
+    return data.slice(4, msgLen + 4).toString();
   }
 
   /**
@@ -133,7 +129,7 @@ export class MessageCrypto {
    * @link https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/Before_Develop/Message_encryption_and_decryption.html
    * 
    */
-  public static decryptMessage (appId: string, token: string, encodingAESKey: string, signature: string, timestamp: string, nonce: string, encryptXml: string) {
+  public static decryptMessage (token: string, encodingAESKey: string, signature: string, timestamp: string, nonce: string, encryptXml: string) {
     const aesKey = MessageCrypto.getAESKey(encodingAESKey || '');
     const iv = MessageCrypto.getAESKeyIV(aesKey);
     const parser = new XMLParser();
@@ -142,7 +138,7 @@ export class MessageCrypto {
     if (signature !== MessageCrypto.sha1(token || '', timestamp, nonce, encryptMessage)) {
       throw new Error('signature incorrect');
     }
-    return MessageCrypto.decrypt(aesKey, iv, encryptMessage, appId);
+    return MessageCrypto.decrypt(aesKey, iv, encryptMessage);
   }
 
 }
