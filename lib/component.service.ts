@@ -9,6 +9,7 @@ import { ICache } from './types/utils';
 import { MapCache, MessageCrypto } from './utils';
 
 import type { Request, Response } from 'express';
+
 @Injectable()
 export class ComponentService {
 
@@ -32,24 +33,22 @@ export class ComponentService {
   }
 
   public async pushTicket (req: Request, res: Response) {
-    const query = req.query;
-    if (query) {
-      const timestamp = query.timestamp;
-      const nonce = query.nonce;
-      const signature = query.msg_signature;
-      const rawBody = await getRawBody(req);
 
-      if (rawBody) {
-        // <xml><AppId>some_appid</AppId><CreateTime>1413192605</CreateTime><InfoType>component_verify_ticket</InfoType><ComponentVerifyTicket>some_verify_ticket</ComponentVerifyTicket></xml>
-        try {
-          const decrypt = this.decryptMessage(signature as string, timestamp as string, nonce as string, rawBody.toString());
-          const parser = new XMLParser();
-          const xml = parser.parse(decrypt).xml;
-          const componentVerifyTicket = xml.ComponentVerifyTicket;
-          this.setTicket(componentVerifyTicket);
-        } catch (error) {
-          console.log(ComponentService.name, 'pushTicket() error =', error);
-        }
+    const timestamp = req.query && req.query.timestamp;
+    const nonce = req.query && req.query.nonce;
+    const signature = req.query && req.query.signature;
+
+    const rawBody = await getRawBody(req);
+
+    if (timestamp && nonce && signature && rawBody) {
+      try {
+        const decrypt = this.decryptMessage(signature as string, timestamp as string, nonce as string, rawBody.toString());
+        const parser = new XMLParser();
+        const xml = parser.parse(decrypt).xml;
+        const componentVerifyTicket = xml.ComponentVerifyTicket;
+        this.setTicket(componentVerifyTicket);
+      } catch (error) {
+        console.log(ComponentService.name, 'pushTicket() error =', error);
       }
     }
     res.send('success');

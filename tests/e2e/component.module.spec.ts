@@ -67,8 +67,8 @@ describe('Component module Test', () => {
     const text = `<xml><AppId>some_appid</AppId><CreateTime>1413192605</CreateTime><InfoType>component_verify_ticket</InfoType><ComponentVerifyTicket>${ticket}</ComponentVerifyTicket></xml>`;
     service = app.get(ComponentService);
     const encryptXml = service.encryptMessage(text, timestamp, nonce);
-    const paresr = new XMLParser();
-    const signature = paresr.parse(encryptXml).xml.MsgSignature;
+    const parser = new XMLParser();
+    const signature = parser.parse(encryptXml).xml.MsgSignature;
 
     // push ticket
     await axios.request({
