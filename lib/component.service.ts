@@ -1,10 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import axios from 'axios';
-import { DefaultRequestResult } from './interfaces';
 
+import { DefaultRequestResult } from './interfaces';
 import { ComponentModuleOptions } from './types';
 import { ICache } from './types/utils';
 import { MapCache, MessageCrypto } from './utils';
+
+import type { Request, Response } from 'express';
+import { XMLParser } from 'fast-xml-parser';
 
 @Injectable()
 export class ComponentService {
@@ -26,6 +29,26 @@ export class ComponentService {
     if (options && options.cacheAdapter) {
       this.cacheAdapter = options.cacheAdapter as ICache;
     }
+  }
+
+  public pushTicket (req: Request, res: Response) {
+    console.log(ComponentService.name, 'pushTicket() query :', req.query);
+    console.log(ComponentService.name, 'pushTicket() body :', req.body);
+    const query = req.query;
+    if (query) {
+      const timestamp = query.timestamp;
+      const nonce = query.nonce;
+      const signature = query.msg_signature;
+      if (Buffer.isBuffer(req.body)) {
+        // <xml><AppId>some_appid</AppId><CreateTime>1413192605</CreateTime><InfoType>component_verify_ticket</InfoType><ComponentVerifyTicket>some_verify_ticket</ComponentVerifyTicket></xml>
+        const decrypt = this.decryptMessage(signature as string, timestamp as string, nonce as string, req.body.toString());
+        const parser = new XMLParser();
+        const xml = parser.parse(decrypt).xml;
+        const componentVerifyTicket = xml.ComponentVerifyTicket;
+        this.setTicket(componentVerifyTicket);
+      }
+    }
+    res.send('success');
   }
 
   /**
@@ -126,7 +149,7 @@ export class ComponentService {
    * 
    */
   public decryptMessage (signature: string, timestamp: string, nonce: string, encryptXml: string) {
-    return MessageCrypto.decryptMessage(this.options.componentAppId, this.options.componentToken || '', this.options.componentEncodingAESKey || '', signature, timestamp, nonce, encryptXml);
+    return MessageCrypto.decryptMessage(this.options.componentToken || '', this.options.componentEncodingAESKey || '', signature, timestamp, nonce, encryptXml);
   }
 
 
