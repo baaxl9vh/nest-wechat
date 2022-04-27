@@ -56,11 +56,10 @@ describe('component service test', () => {
       componentEncodingAESKey: 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFG',
     });
     service.setTicket('ticket');
-    const ret = await service.getComponentToken();
-    console.log(ret);
+    const ret = await service.requestComponentToken();
     expect(ret.data).toBeDefined();
-    // 41004 no secret
-    expect(ret.data.errcode).toEqual(41004);
+    // 40125 invalid appsecret rid
+    expect(ret.data.errcode).toEqual(40125);
   });
 
 });
