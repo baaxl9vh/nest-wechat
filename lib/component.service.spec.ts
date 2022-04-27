@@ -48,7 +48,7 @@ describe('component service test', () => {
     expect(ret.data.errcode).toEqual(41004);
   });
 
-  it('Test get access token', async () => {
+  it('Test request access token', async () => {
     const service = new ComponentService({
       componentAppId: 'wxb11529c136998cb6',
       componentSecret: 'xxxxxx',

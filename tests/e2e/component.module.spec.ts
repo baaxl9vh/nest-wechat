@@ -11,7 +11,6 @@ import { WeChatComponentModule } from '../../lib/component.module';
 import { ComponentService } from '../../lib/component.service';
 import { ComponentController } from './component.controller.spec';
 
-
 describe('Component module Test', () => {
 
   let service: ComponentService;
@@ -83,6 +82,24 @@ describe('Component module Test', () => {
     const saveTicket = await service.getTicket();
     expect(ticket).toEqual(saveTicket);
 
+  });
+
+  it('create pre auth code', async () => {
+    // this must after push a ticket
+    const mockToken = 'my_mock_token';
+    const spy = jest.spyOn(axios, 'post');
+    service = app.get(ComponentService);
+    // remove cache first
+    service.cacheAdapter.remove(ComponentService.KEY_TOKEN);
+    // mock request access token
+    (spy as any).mockResolvedValueOnce({ data: { component_access_token: mockToken, expires_in: 7200 } });
+    // create pre auth code will request access token first, and save token to cache
+    const ret = await service.createPreAuthCode();
+    // 40001 access token invalid
+    expect(ret.data.errcode).toEqual(40001);
+    // token cached
+    const token = await service.cacheAdapter.get<{ componentAccessToken: string, expiresAt: number}>(ComponentService.KEY_TOKEN);
+    expect(token.componentAccessToken).toEqual(mockToken);
   });
 
   afterAll(async () => {

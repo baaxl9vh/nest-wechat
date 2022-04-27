@@ -14,6 +14,7 @@ import type { Request, Response } from 'express';
 export class ComponentService {
 
   public static KEY_TICKET = 'key_component_ticket';
+  public static KEY_TOKEN = 'key_component_access_token';
 
   protected _cacheAdapter: ICache = new MapCache();
 
@@ -64,7 +65,7 @@ export class ComponentService {
    */
   public async startPushTicket () {
     const url = 'https://api.weixin.qq.com/cgi-bin/component/api_start_push_ticket';
-    return axios.post<DefaultRequestResult & { msgid: string }>(url, {
+    return axios.post<DefaultRequestResult>(url, {
       // eslint-disable-next-line camelcase
       component_appid: this.options.componentAppId,
       // eslint-disable-next-line camelcase
@@ -78,20 +79,34 @@ export class ComponentService {
    * 
    * @returns {component_access_token: '', expires_in: 7200}
    * @throws
+   * @link https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/ThirdParty/token/component_access_token.html
    */
   public async requestComponentToken () {
     const ticket = await this.getTicket();
-    if (!ticket) {
-      throw new Error('component ticket not found');
-    }
     const url = 'https://api.weixin.qq.com/cgi-bin/component/api_component_token';
-    return axios.post<DefaultRequestResult & { msgid: string }>(url, {
+    return axios.post<DefaultRequestResult & { component_access_token: string, expires_in: number }>(url, {
       // eslint-disable-next-line camelcase
       component_appid: this.options.componentAppId,
       // eslint-disable-next-line camelcase
       component_appsecret: this.options.componentSecret,
       // eslint-disable-next-line camelcase
       component_verify_ticket: ticket,
+    });
+  }
+
+  /**
+   * 
+   * 获取预授权码
+   * 
+   * @returns 
+   * @link https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/ThirdParty/token/pre_auth_code.html
+   */
+  public async createPreAuthCode () {
+    const token = await this.getComponentAccessToken();
+    const url = `https://api.weixin.qq.com/cgi-bin/component/api_create_preauthcode?component_access_token=${token}`;
+    return axios.post<DefaultRequestResult & { pre_auth_code: string, expires_in: number }>(url, {
+      // eslint-disable-next-line camelcase
+      component_appid: this.options.componentAppId,
     });
   }
 
@@ -103,14 +118,28 @@ export class ComponentService {
     this.cacheAdapter.set(ComponentService.KEY_TICKET, ticket);
   }
 
-  // 解密推送ticket
-  // https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/ThirdParty/token/component_verify_ticket.html
-
-  // 获取令牌
-  // https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/ThirdParty/token/component_access_token.html
-
-  // 获取预授权码
-  // https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/ThirdParty/token/pre_auth_code.html
+  public async getComponentAccessToken () {
+    const token = await this.cacheAdapter.get<{ componentAccessToken: string, expiresAt: number}>(ComponentService.KEY_TOKEN);
+    if (token && token.expiresAt >= Date.now()) {
+      return token.componentAccessToken;
+    } else {
+      try {
+        const ret = await this.requestComponentToken();
+        if (ret && ret.data && ret.data.component_access_token) {
+          const token = {
+            componentAccessToken: ret.data.component_access_token,
+            expiresAt: Date.now() + (ret.data.expires_in - 100) * 1000,
+          };
+          this.cacheAdapter.set(ComponentService.KEY_TOKEN, token, ret.data.expires_in - 100);
+          return token.componentAccessToken;
+        } else {
+          return '';
+        }
+      } catch (error) {
+        return '';
+      }
+    }
+  }
 
   // 使用授权码获取授权信息
   // https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/ThirdParty/token/authorization_info.html
