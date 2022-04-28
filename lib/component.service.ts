@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import axios from 'axios';
 import { XMLParser } from 'fast-xml-parser';
 import getRawBody from 'raw-body';
@@ -12,6 +12,8 @@ import type { Request, Response } from 'express';
 
 @Injectable()
 export class ComponentService {
+
+  private readonly logger = new Logger(ComponentService.name);
 
   public static KEY_TICKET = 'key_component_ticket';
   public static KEY_TOKEN = 'key_component_access_token';
@@ -33,13 +35,25 @@ export class ComponentService {
     }
   }
 
+  /**
+   * 对微信第三方平台推送ticket的请求进行处理，
+   * 收到请求后，直接返回success，并从请求URL
+   * 参数和text body读取ticket加密数据进行解
+   * 密，解密后返回ticket并将其保存至cache。
+   * 
+   * @param req 
+   * @param res 
+   * @returns 
+   */
   public async pushTicket (req: Request, res: Response) {
 
     const timestamp = req.query && req.query.timestamp;
     const nonce = req.query && req.query.nonce;
-    const signature = req.query && req.query.signature;
+    const signature = req.query && req.query.msg_signature;
 
     const rawBody = await getRawBody(req);
+
+    let ticket = '';
 
     if (timestamp && nonce && signature && rawBody) {
       try {
@@ -48,11 +62,13 @@ export class ComponentService {
         const xml = parser.parse(decrypt).xml;
         const componentVerifyTicket = xml.ComponentVerifyTicket;
         this.setTicket(componentVerifyTicket);
+        ticket = componentVerifyTicket;
       } catch (error) {
-        console.log(ComponentService.name, 'pushTicket() error =', error);
+        this.logger.error((error as Error).message);
       }
     }
     res.send('success');
+    return ticket;
   }
 
   /**

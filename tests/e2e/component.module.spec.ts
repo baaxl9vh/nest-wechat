@@ -1,4 +1,4 @@
-import { CACHE_MANAGER, CacheModule, INestApplication } from '@nestjs/common';
+import { CACHE_MANAGER, CacheModule, INestApplication, ConsoleLogger } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Test } from '@nestjs/testing';
 import axios from 'axios';
@@ -6,7 +6,7 @@ import { Cache } from 'cache-manager';
 import * as redisStore from 'cache-manager-redis-store';
 import { XMLParser } from 'fast-xml-parser';
 
-import { RedisCache } from '../../lib';
+import { createNonceStr, RedisCache } from '../../lib';
 import { WeChatComponentModule } from '../../lib/component.module';
 import { ComponentService } from '../../lib/component.service';
 import { ComponentController } from './component.controller.spec';
@@ -48,7 +48,9 @@ describe('Component module Test', () => {
         }),
       ],
       controllers: [ComponentController],
-    }).compile();
+    })
+    .setLogger(new ConsoleLogger())
+    .compile();
     app = module.createNestApplication();
     // await app.init();
     await app.listen(3000);
@@ -62,7 +64,7 @@ describe('Component module Test', () => {
   it('push a ticket', async () => {
     const timestamp = '1409304348';
     const nonce = 'xxxxxx';
-    const ticket = 'ticket_for_test';
+    const ticket = 'ticket_for_test_' + createNonceStr();
     const text = `<xml><AppId>some_appid</AppId><CreateTime>1413192605</CreateTime><InfoType>component_verify_ticket</InfoType><ComponentVerifyTicket>${ticket}</ComponentVerifyTicket></xml>`;
     service = app.get(ComponentService);
     const encryptXml = service.encryptMessage(text, timestamp, nonce);
@@ -70,7 +72,7 @@ describe('Component module Test', () => {
     const signature = parser.parse(encryptXml).xml.MsgSignature;
 
     // push ticket
-    await axios.request({
+    const ret = await axios.request({
       url: `http://localhost:3000/component/push_ticket?timestamp=${timestamp}&nonce=${nonce}&msg_signature=${signature}`,
       method: 'POST',
       headers: {
@@ -78,6 +80,7 @@ describe('Component module Test', () => {
       },
       data: encryptXml,
     });
+    expect(ret.data).toEqual('success');
 
     const saveTicket = await service.getTicket();
     expect(ticket).toEqual(saveTicket);
