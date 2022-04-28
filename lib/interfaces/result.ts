@@ -105,3 +105,46 @@ export interface SessionResult {
    */
   errmsg?: string;
 }
+
+// =============================== 第三方开放平台 ===============================
+
+/**
+ * 使用授权码获取授权信息授回结果
+ */
+export interface AuthorizationResult {
+  authorization_info: {
+    authorizer_appid: string;
+    authorizer_access_token: string;
+    expires_in: number;
+    authorizer_refresh_token: string;
+    func_info: {[key: string]: { id: number }}[];
+  }
+}
+
+/**
+ * 获取授权帐号详情返回结果
+ */
+export interface AuthorizerInfo {
+  authorizer_info: {
+    nick_name: string;
+    head_img: string;
+    service_type_info: {
+      id: string;
+    };
+    verify_type_info: {
+      id: string;
+    };
+    user_name: string;
+    principal_name: string;
+    business_info: {
+      open_store: number;
+      open_scan: number;
+      open_pay: number;
+      open_card: number;
+      open_shake: number;
+    };
+    alias: string;
+    qrcode_url: string;
+    account_status: number;
+  }
+}

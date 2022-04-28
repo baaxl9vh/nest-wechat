@@ -19,4 +19,10 @@ export class ComponentController {
     this.logger.debug('pushTicket() ticket = ' + ticket);
   }
 
+  @Post('/auth_event')
+  async authChangedPush (@Req() req: Request, @Res() res: Response) {
+    const xml = await this.service.authChangedPush(req, res);
+    this.logger.debug('authChangedPush() code = ' + xml.AuthorizationCode);
+  }
+
 }

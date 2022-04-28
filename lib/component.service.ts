@@ -3,7 +3,7 @@ import axios from 'axios';
 import { XMLParser } from 'fast-xml-parser';
 import getRawBody from 'raw-body';
 
-import { DefaultRequestResult } from './interfaces';
+import { AuthorizationResult, AuthorizerInfo, DefaultRequestResult } from './interfaces';
 import { ComponentModuleOptions } from './types';
 import { ICache } from './types/utils';
 import { MapCache, MessageCrypto } from './utils';
@@ -126,6 +126,92 @@ export class ComponentService {
     });
   }
 
+  /**
+   * 
+   * 使用授权码获取授权信息
+   * 
+   * 管理员授权确认之后，授权页会自动跳转进入回调 URI，并在 URL 参数中返回授权码和过期时间(redirect_url?auth_code=xxx&expires_in=600)。
+   * 
+   * @param authCode 
+   * @returns 
+   * @link https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/ThirdParty/token/authorization_info.html
+   */
+  public async queryAuth (authCode: string) {
+    const token = await this.getComponentAccessToken();
+    const url = `https://api.weixin.qq.com/cgi-bin/component/api_query_auth?component_access_token=${token}`;
+    return axios.post<DefaultRequestResult & AuthorizationResult>(url, {
+      // eslint-disable-next-line camelcase
+      component_appid: this.options.componentAppId,
+      // eslint-disable-next-line camelcase
+      authorization_code: authCode,
+    });
+  }
+
+  /**
+   * 获取/刷新接口调用令牌
+   * @param authorizerAppid 
+   * @param authorizerRefreshToken 
+   * @returns 
+   * @link https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/ThirdParty/token/api_authorizer_token.html
+   */
+  public async requestAuthorizerToken (authorizerAppid: string, authorizerRefreshToken: string) {
+    const token = await this.getComponentAccessToken();
+    const url = `https://api.weixin.qq.com/cgi-bin/component/api_authorizer_token?component_access_token=${token}`;
+    return axios.post<DefaultRequestResult & { authorizer_access_token: string, expires_in: number, authorizer_refresh_token: string }>(url, {
+      // eslint-disable-next-line camelcase
+      component_appid: this.options.componentAppId,
+      // eslint-disable-next-line camelcase
+      authorizer_appid: authorizerAppid,
+      // eslint-disable-next-line camelcase
+      authorizer_refresh_token: authorizerRefreshToken,
+    });
+  }
+
+  /**
+   * 获取授权帐号详情
+   * @param authorizerAppid 
+   * @returns 
+   * @link https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/ThirdParty/token/api_get_authorizer_info.html
+   */
+  public async requestAuthorizerInfo (authorizerAppid: string) {
+    const token = await this.getComponentAccessToken();
+    const url = `https://api.weixin.qq.com/cgi-bin/component/api_get_authorizer_info?component_access_token=${token}`;
+    return axios.post<DefaultRequestResult & AuthorizerInfo>(url, {
+      // eslint-disable-next-line camelcase
+      component_appid: this.options.componentAppId,
+      // eslint-disable-next-line camelcase
+      authorizer_appid: authorizerAppid,
+    });
+  }
+
+  /**
+   * TODO:
+   * 
+   * 授权变更通知推送
+   * 
+   * @param req 
+   * @param res 
+   * @link https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/ThirdParty/token/authorize_event.html
+   */
+  public async authChangedPush (req: Request, res: Response) {
+    const timestamp = req.query && req.query.timestamp;
+    const nonce = req.query && req.query.nonce;
+    const signature = req.query && req.query.msg_signature;
+    const rawBody = await getRawBody(req);
+    let xml;
+    if (timestamp && nonce && signature && rawBody) {
+      try {
+        const decrypt = this.decryptMessage(signature as string, timestamp as string, nonce as string, rawBody.toString());
+        const parser = new XMLParser();
+        xml = parser.parse(decrypt).xml;
+      } catch (error) {
+        this.logger.error((error as Error).message);
+      }
+    }
+    res.send('success');
+    return xml;
+  }
+
   public getTicket () {
     return this.cacheAdapter.get<string>(ComponentService.KEY_TICKET);
   }
@@ -156,16 +242,6 @@ export class ComponentService {
       }
     }
   }
-
-  // 使用授权码获取授权信息
-  // https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/ThirdParty/token/authorization_info.html
-  // 步骤五、管理员授权确认之后，授权页会自动跳转进入回调 URI，并在 URL 参数中返回授权码和过期时间(redirect_url?auth_code=xxx&expires_in=600)。
-  
-  // 获取/刷新接口调用令牌
-  // https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/ThirdParty/token/api_authorizer_token.html
-
-  // 获取授权帐号详情
-  // https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/ThirdParty/token/api_get_authorizer_info.html
 
   /**
    * 
@@ -199,7 +275,5 @@ export class ComponentService {
   public decryptMessage (signature: string, timestamp: string, nonce: string, encryptXml: string) {
     return MessageCrypto.decryptMessage(this.options.componentToken || '', this.options.componentEncodingAESKey || '', signature, timestamp, nonce, encryptXml);
   }
-
-
 
 }
