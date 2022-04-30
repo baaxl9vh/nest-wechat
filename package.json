@@ -11,7 +11,7 @@
     "serve:docs": "docsify serve docs",
     "cpdocs": "cp README.md CHANGELOG.md ./docs/",
     "postversion": "git push --follow-tags",
-    "release:dry": "release-it --dry-run",
+    "release:dry": "release-it patch --dry-run",
     "release": "release-it patch",
     "prepare": "husky install"
   },
