@@ -3,7 +3,7 @@ import axios from 'axios';
 import { XMLParser } from 'fast-xml-parser';
 import getRawBody from 'raw-body';
 
-import { AuthorizationResult, AuthorizerInfo, DefaultRequestResult } from './interfaces';
+import { AuthorizationResult, AuthorizerInfo, AuthorizerListResult, DefaultRequestResult, SubmitAuditItemList } from './interfaces';
 import { ComponentModuleOptions } from './types';
 import { ICache } from './types/utils';
 import { MapCache, MessageCrypto } from './utils';
@@ -45,7 +45,7 @@ export class ComponentService {
    * @param res 
    * @returns 
    */
-  public async pushTicket (req: Request, res: Response) {
+  public async pushTicket (req: Request, res: Response): Promise<string> {
 
     const timestamp = req.query && req.query.timestamp;
     const nonce = req.query && req.query.nonce;
@@ -149,19 +149,19 @@ export class ComponentService {
 
   /**
    * 获取/刷新接口调用令牌
-   * @param authorizerAppid 
+   * @param authorizerAppId 
    * @param authorizerRefreshToken 
    * @returns 
    * @link https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/ThirdParty/token/api_authorizer_token.html
    */
-  public async requestAuthorizerToken (authorizerAppid: string, authorizerRefreshToken: string) {
+  public async requestAuthorizerToken (authorizerAppId: string, authorizerRefreshToken: string) {
     const token = await this.getComponentAccessToken();
     const url = `https://api.weixin.qq.com/cgi-bin/component/api_authorizer_token?component_access_token=${token}`;
     return axios.post<DefaultRequestResult & { authorizer_access_token: string, expires_in: number, authorizer_refresh_token: string }>(url, {
       // eslint-disable-next-line camelcase
       component_appid: this.options.componentAppId,
       // eslint-disable-next-line camelcase
-      authorizer_appid: authorizerAppid,
+      authorizer_appid: authorizerAppId,
       // eslint-disable-next-line camelcase
       authorizer_refresh_token: authorizerRefreshToken,
     });
@@ -169,23 +169,22 @@ export class ComponentService {
 
   /**
    * 获取授权帐号详情
-   * @param authorizerAppid 
+   * @param authorizerAppId 
    * @returns 
    * @link https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/ThirdParty/token/api_get_authorizer_info.html
    */
-  public async requestAuthorizerInfo (authorizerAppid: string) {
+  public async requestAuthorizerInfo (authorizerAppId: string) {
     const token = await this.getComponentAccessToken();
     const url = `https://api.weixin.qq.com/cgi-bin/component/api_get_authorizer_info?component_access_token=${token}`;
     return axios.post<DefaultRequestResult & AuthorizerInfo>(url, {
       // eslint-disable-next-line camelcase
       component_appid: this.options.componentAppId,
       // eslint-disable-next-line camelcase
-      authorizer_appid: authorizerAppid,
+      authorizer_appid: authorizerAppId,
     });
   }
 
   /**
-   * TODO:
    * 
    * 授权变更通知推送
    * 
@@ -193,7 +192,7 @@ export class ComponentService {
    * @param res 
    * @link https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/ThirdParty/token/authorize_event.html
    */
-  public async authChangedPush (req: Request, res: Response) {
+  public async authChangedPush<T> (req: Request, res: Response): Promise<T> {
     const timestamp = req.query && req.query.timestamp;
     const nonce = req.query && req.query.nonce;
     const signature = req.query && req.query.msg_signature;
@@ -211,6 +210,121 @@ export class ComponentService {
     res.send('success');
     return xml;
   }
+
+  /**
+   * 
+   * 清空api的调用quota
+   * errcode = 0, ok, 查询成功
+   * errcode = 48006, forbid to clear quota because of reaching the limit, 一个月10次的机会用完了
+   * errcode = 400130, invalid appid, appid写错了；或者填入的appid与access_token代表的账号的appid不一致
+   * @param authorizerAppId 
+   * @param authorizerAccessToken 
+   * @returns DefaultRequestResult
+   * @link https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/openApi/clear_quota.html
+   */
+  public async clearQuota (authorizerAppId: string, authorizerAccessToken: string) {
+    const url = `https://api.weixin.qq.com/cgi-bin/clear_quota?access_token=${authorizerAccessToken}`;
+    return axios.post<DefaultRequestResult>(url, {
+      // eslint-disable-next-line camelcase
+      appid: authorizerAppId,
+    });
+  }
+
+  /**
+   * 查询rid信息
+   * @param rid 
+   * @param authorizerAccessToken 
+   * @returns 
+   * @linkc https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/openApi/get_rid_info.html
+   */
+  public async getRid (rid: string, authorizerAccessToken: string) {
+    const url = `https://api.weixin.qq.com/cgi-bin/openapi/rid/get?access_token=${authorizerAccessToken}`;
+    return axios.post<DefaultRequestResult>(url, {
+      rid,
+    });
+  }
+
+  // ========== 授权方账号管理 ==========
+
+  public async getAuthorizerList (offset = 0, count = 100) {
+    const token = await this.getComponentAccessToken();
+    const url = `https://api.weixin.qq.com/cgi-bin/openapi/rid/get?access_token=${token}`;
+    return axios.post<DefaultRequestResult & AuthorizerListResult>(url, {
+      // eslint-disable-next-line camelcase
+      component_appid: this.options.componentAppId,
+      offset,
+      count,
+    });
+  }
+
+  // ========== 授权方账号管理 ==========
+
+  // ========== 小程序基础信息设置 ==========
+
+  public async getAccountBasicInfo (authorizerAccessToken: string) {
+    const url = `https://api.weixin.qq.com/cgi-bin/account/getaccountbasicinfo?access_token=${authorizerAccessToken}`;
+    return axios.get<DefaultRequestResult>(url);
+  }
+
+  // ========== 小程序基础信息设置 ==========
+
+  // ========== 小程序代码管理 ==========
+
+  /**
+   * 上传小程序代码并生成体验版
+   * @param authorizerAccessToken 
+   * @param templateId 
+   * @param extJson 
+   * @param userVersion 
+   * @param userDesc 
+   * @returns 
+   * @link https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/code/commit.html
+   */
+  public async codeCommit (authorizerAccessToken: string, templateId: string, extJson: string, userVersion: string, userDesc: string) {
+    const url = `https://api.weixin.qq.com/wxa/commit?access_token=${authorizerAccessToken}`;
+    return axios.post<DefaultRequestResult>(url, {
+      // eslint-disable-next-line camelcase
+      template_id: templateId,
+      // eslint-disable-next-line camelcase
+      ext_json: extJson,
+      // eslint-disable-next-line camelcase
+      user_version: userVersion,
+      // eslint-disable-next-line camelcase
+      user_desc: userDesc,
+    });
+  }
+
+  /**
+   * 提交审核
+   * @param authorizerAccessToken 
+   * @param itemList 
+   * @returns 
+   * @link https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/code/submit_audit.html
+   */
+  public async codeSubmitAudit (authorizerAccessToken: string, itemList: SubmitAuditItemList) {
+    const url = `https://api.weixin.qq.com/wxa/submit_audit?access_token=${authorizerAccessToken}`;
+    return axios.post<DefaultRequestResult & { auditid: number }>(url, {
+      // eslint-disable-next-line camelcase
+      item_list: itemList,
+    });
+  }
+  
+  /**
+   * 查询指定发布审核单的审核状态
+   * @param authorizerAccessToken 
+   * @param auditId 
+   * @returns 
+   * @link https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/code/get_auditstatus.html
+   */
+  public async codeAuditStatus (authorizerAccessToken: string, auditId: number) {
+    const url = `https://api.weixin.qq.com/wxa/get_auditstatus?access_token=${authorizerAccessToken}`;
+    return axios.post<DefaultRequestResult & { status: number, reason: string, screenshot: string }>(url, {
+      // eslint-disable-next-line camelcase
+      auditid: auditId,
+    });
+  }
+
+  // ========== 小程序代码管理 ==========
 
   public getTicket () {
     return this.cacheAdapter.get<string>(ComponentService.KEY_TICKET);

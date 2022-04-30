@@ -112,11 +112,29 @@ export interface SessionResult {
  * 使用授权码获取授权信息授回结果
  */
 export interface AuthorizationResult {
+  /**
+   * 授权信息
+   */
   authorization_info: {
+    /**
+     * 授权方 appid
+     */
     authorizer_appid: string;
+    /**
+     * 接口调用令牌（在授权的公众号/小程序具备 API 权限时，才有此返回值）
+     */
     authorizer_access_token: string;
+    /**
+     * authorizer_access_token 的有效期（在授权的公众号/小程序具备API权限时，才有此返回值），单位：秒
+     */
     expires_in: number;
+    /**
+     * 刷新令牌（在授权的公众号具备API权限时，才有此返回值），刷新令牌主要用于第三方平台获取和刷新已授权用户的 authorizer_access_token。一旦丢失，只能让用户重新授权，才能再次拿到新的刷新令牌。用户重新授权后，之前的刷新令牌会失效
+     */
     authorizer_refresh_token: string;
+    /**
+     * 授权给开发者的权限集列表
+     */
     func_info: {[key: string]: { id: number }}[];
   }
 }
@@ -125,17 +143,41 @@ export interface AuthorizationResult {
  * 获取授权帐号详情返回结果
  */
 export interface AuthorizerInfo {
+  /**
+   * 详见小程序帐号信息
+   */
   authorizer_info: {
+    /**
+     * 昵称
+     */
     nick_name: string;
+    /**
+     * 头像
+     */
     head_img: string;
+    /**
+     * 小程序类型
+     */
     service_type_info: {
       id: string;
     };
+    /**
+     * 小程序认证类型
+     */
     verify_type_info: {
       id: string;
     };
+    /**
+     * 原始 ID
+     */
     user_name: string;
+    /**
+     * 主体名称
+     */
     principal_name: string;
+    /**
+     * 用以了解功能的开通状况（0代表未开通，1代表已开通），详见business_info 说明
+     */
     business_info: {
       open_store: number;
       open_scan: number;
@@ -143,8 +185,46 @@ export interface AuthorizerInfo {
       open_card: number;
       open_shake: number;
     };
+    /**
+     * 
+     */
     alias: string;
+    /**
+     * 二维码图片的 URL，开发者最好自行也进行保存
+     */
     qrcode_url: string;
+    /**
+     * 帐号状态，该字段公众号也返回
+     */
     account_status: number;
+    /**
+     * 小程序配置，根据这个字段判断是否为小程序类型授权
+     */
+    MiniProgramInfo: object;
   }
+}
+
+/**
+ * 已授权的帐号列表
+ */
+export interface AuthorizerListResult {
+  /**
+   * 授权的帐号总数
+   */
+  total_count: number;
+  list: {
+    /**
+     * 已授权的 appid
+     */
+    authorizer_appid: string;
+    /**
+     * 刷新令牌authorizer_access_token
+     */
+    refresh_token: string;
+    /**
+     * 授权的时间
+     */
+    auth_time: number;
+  }[]
+
 }
