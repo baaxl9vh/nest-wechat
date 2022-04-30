@@ -160,6 +160,13 @@ describe('Component module Test', () => {
     expect(ret.data.authorization_info.authorizer_appid).toEqual(data.authorization_info.authorizer_appid);
   });
 
+  it('get account basic info', async () => {
+    service = app.get(ComponentService);
+    const authorizerAccessToken = 'app_invalid_token';
+    const ret = await service.getAccountBasicInfo(authorizerAccessToken);
+    expect(ret.data.errcode).toEqual(40001);
+  });
+
   afterAll(async () => {
     if (app) {
       if (service) {
