@@ -17,3 +17,13 @@ export function createNonceStr (length = 16): string {
   }
   return str;
 }
+
+/**
+ * 从error message中截取rid
+ * @param errMsg 
+ * @returns 
+ */
+export function parseRid (errMsg: string): string {
+  const index = errMsg.indexOf('rid:');
+  return errMsg.substring(index + 5);
+}
