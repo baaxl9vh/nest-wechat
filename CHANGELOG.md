@@ -1,3 +1,16 @@
+## [0.2.4](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.3...v0.2.4) (2022-04-30)
+
+
+### Features
+
+* component service 添加缓存接口 ([9369d44](https://github.com/baaxl9vh/nest-wechat/commit/9369d44c0644fbe7c12b88f1cfe0616f899e44fe))
+* component service 添加读取token接口,添加请求预授权码接口 ([f481e2f](https://github.com/baaxl9vh/nest-wechat/commit/f481e2f124475f5fd7dcfec5c47ed6734e20aaf7))
+* wechat service消息加解密方法以及单元测试 ([16390e3](https://github.com/baaxl9vh/nest-wechat/commit/16390e3690538b8b89a39e91f6a4730dcb988ce6))
+* 添加微信公众平台推送ticket处理方法以及对应的e2e测试 ([396247b](https://github.com/baaxl9vh/nest-wechat/commit/396247b529e5565ce0fdd1839ebb328f32f77222))
+* 添加截取rid util ([41ed91e](https://github.com/baaxl9vh/nest-wechat/commit/41ed91e603ad1abce92f5f54b570e76acbccbc68))
+* 添加第三方平台接口 ([055adce](https://github.com/baaxl9vh/nest-wechat/commit/055adce7d941a4dea9090116c25846ae65a01a1e))
+* 添加部分小程序基础信息接口,部分代码管理接口 ([5679253](https://github.com/baaxl9vh/nest-wechat/commit/56792533bf803fe43f345ee14c4a9621b2947553))
+
 ## [0.2.3](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.2...v0.2.3) (2022-04-02)
 
 
