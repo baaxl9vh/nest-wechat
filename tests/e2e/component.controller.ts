@@ -10,7 +10,7 @@ export class ComponentController {
 
   private readonly logger = new Logger(ComponentController.name);
 
-  constructor(private readonly service: ComponentService) {
+  constructor (private readonly service: ComponentService) {
   }
 
   @Post('/push_ticket')
@@ -21,6 +21,7 @@ export class ComponentController {
 
   @Post('/auth_event')
   async authChangedPush (@Req() req: Request, @Res() res: Response) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const xml = await this.service.authChangedPush<any>(req, res);
     this.logger.debug('authChangedPush() xml.AuthorizerAppid = ' + xml.AuthorizerAppid);
   }

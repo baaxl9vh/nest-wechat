@@ -9,7 +9,7 @@ import { XMLParser } from 'fast-xml-parser';
 import { AuthorizationResult, createNonceStr, RedisCache } from '../../lib';
 import { WeChatComponentModule } from '../../lib/component.module';
 import { ComponentService } from '../../lib/component.service';
-import { ComponentController } from './component.controller.spec';
+import { ComponentController } from './component.controller';
 
 describe('Component module Test', () => {
 
