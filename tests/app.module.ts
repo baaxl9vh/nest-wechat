@@ -22,7 +22,7 @@ export class AppModule {
         WeChatModule.forRootAsync({
           imports: [
             ConfigModule.forRoot({
-              envFilePath: '.env.test.local',
+              envFilePath: ['.env.test.local', '.env.test'],
             }),
             CacheModule.registerAsync({
               isGlobal: true,
