@@ -24,6 +24,13 @@ export function createNonceStr (length = 16): string {
  * @returns 
  */
 export function parseRid (errMsg: string): string {
+  if (typeof errMsg !== 'string') {
+    return '';
+  }
   const index = errMsg.indexOf('rid:');
-  return errMsg.substring(index + 5);
+  if (index >= 0) {
+    return errMsg.substring(index + 5);
+  } else {
+    return '';
+  }
 }

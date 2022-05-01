@@ -7,6 +7,9 @@ describe('Test utils', () => {
     const errMsg = `invalid credential, access_token is invalid or not latest rid: ${rid}`;
     const result = parseRid(errMsg);
     expect(result).toStrictEqual(rid);
+
+    expect(parseRid({} as any)).toStrictEqual('');
+    expect(parseRid('no rid to parse')).toStrictEqual('');
   });
 
 });
