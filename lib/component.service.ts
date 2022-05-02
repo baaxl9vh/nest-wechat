@@ -64,7 +64,7 @@ export class ComponentService {
       this.setTicket(componentVerifyTicket);
       ticket = componentVerifyTicket;
     }
-    
+
     if (res && typeof res.send === 'function') {
       res.send('success');
     }
@@ -119,7 +119,7 @@ export class ComponentService {
    */
   public async createPreAuthCode () {
     const token = await this.getComponentAccessToken();
-    const url = `https://api.weixin.qq.com/cgi-bin/component/api_create_preauthcode?component_access_token=${token}`;
+    const url = `https://api.weixin.qq.com/cgi-bin/component/api_create_preauthcode?component_access_token=${token.componentAccessToken}`;
     return axios.post<DefaultRequestResult & { pre_auth_code: string, expires_in: number }>(url, {
       // eslint-disable-next-line camelcase
       component_appid: this.options.componentAppId,
@@ -138,7 +138,7 @@ export class ComponentService {
    */
   public async queryAuth (authCode: string) {
     const token = await this.getComponentAccessToken();
-    const url = `https://api.weixin.qq.com/cgi-bin/component/api_query_auth?component_access_token=${token}`;
+    const url = `https://api.weixin.qq.com/cgi-bin/component/api_query_auth?component_access_token=${token.componentAccessToken}`;
     return axios.post<DefaultRequestResult & AuthorizationResult>(url, {
       // eslint-disable-next-line camelcase
       component_appid: this.options.componentAppId,
@@ -156,7 +156,7 @@ export class ComponentService {
    */
   public async requestAuthorizerToken (authorizerAppId: string, authorizerRefreshToken: string) {
     const token = await this.getComponentAccessToken();
-    const url = `https://api.weixin.qq.com/cgi-bin/component/api_authorizer_token?component_access_token=${token}`;
+    const url = `https://api.weixin.qq.com/cgi-bin/component/api_authorizer_token?component_access_token=${token.componentAccessToken}`;
     return axios.post<DefaultRequestResult & { authorizer_access_token: string, expires_in: number, authorizer_refresh_token: string }>(url, {
       // eslint-disable-next-line camelcase
       component_appid: this.options.componentAppId,
@@ -175,7 +175,7 @@ export class ComponentService {
    */
   public async requestAuthorizerInfo (authorizerAppId: string) {
     const token = await this.getComponentAccessToken();
-    const url = `https://api.weixin.qq.com/cgi-bin/component/api_get_authorizer_info?component_access_token=${token}`;
+    const url = `https://api.weixin.qq.com/cgi-bin/component/api_get_authorizer_info?component_access_token=${token.componentAccessToken}`;
     return axios.post<DefaultRequestResult & AuthorizerInfo>(url, {
       // eslint-disable-next-line camelcase
       component_appid: this.options.componentAppId,
@@ -248,7 +248,7 @@ export class ComponentService {
 
   public async getAuthorizerList (offset = 0, count = 100) {
     const token = await this.getComponentAccessToken();
-    const url = `https://api.weixin.qq.com/cgi-bin/openapi/rid/get?access_token=${token}`;
+    const url = `https://api.weixin.qq.com/cgi-bin/openapi/rid/get?access_token=${token.componentAccessToken}`;
     return axios.post<DefaultRequestResult & AuthorizerListResult>(url, {
       // eslint-disable-next-line camelcase
       component_appid: this.options.componentAppId,
@@ -337,22 +337,22 @@ export class ComponentService {
   public async getComponentAccessToken () {
     const token = await this.cacheAdapter.get<{ componentAccessToken: string, expiresAt: number}>(ComponentService.KEY_TOKEN);
     if (token && token.expiresAt >= Date.now()) {
-      return token.componentAccessToken;
+      return token;
     } else {
-      try {
-        const ret = await this.requestComponentToken();
-        if (ret && ret.data && ret.data.component_access_token) {
+      const ret = await this.requestComponentToken();
+      if (ret && ret.data) {
+        if (ret.data.component_access_token) {
           const token = {
             componentAccessToken: ret.data.component_access_token,
             expiresAt: Date.now() + (ret.data.expires_in - 100) * 1000,
           };
           this.cacheAdapter.set(ComponentService.KEY_TOKEN, token, ret.data.expires_in - 100);
-          return token.componentAccessToken;
+          return token;
         } else {
-          return '';
+          throw new Error('no token in request result');
         }
-      } catch (error) {
-        return '';
+      } else {
+        throw new Error('http request error');
       }
     }
   }
