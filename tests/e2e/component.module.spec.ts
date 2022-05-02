@@ -37,12 +37,12 @@ describe('Component module Test', () => {
               }),
             }),
           ],
-          inject: [CACHE_MANAGER],
-          useFactory: (cache: Cache) => ({
-            componentAppId: 'wxb11529c136998cb6',
-            componentSecret: '',
-            componentToken: 'pamtest',
-            componentEncodingAESKey: 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFG',
+          inject: [ConfigService, CACHE_MANAGER],
+          useFactory: (config: ConfigService, cache: Cache) => ({
+            componentAppId: config.get('COMPONENT_APPID') || '',
+            componentSecret: config.get('COMPONENT_APPSECRET') || '',
+            componentToken: config.get('COMPONENT_TOKEN'),
+            componentEncodingAESKey: config.get('COMPONENT_AESKEY'),
             cacheAdapter: new RedisCache(cache),
           }),
         }),
