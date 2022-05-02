@@ -1,3 +1,33 @@
+## [0.2.6](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.5...v0.2.6) (2022-05-02)
+
+
+### Bug Fixes
+
+* 优化parseRid方法 ([841b462](https://github.com/baaxl9vh/nest-wechat/commit/841b462e5e59bedf22c97a90ad9ce6d88127c68e))
+* 票据推送不catch异常,不传res时不调send ([9f8edc8](https://github.com/baaxl9vh/nest-wechat/commit/9f8edc83cb8eab156b897f7a4355c25ecf8e0a7b))
+
+## [0.2.5](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.4...v0.2.5) (2022-04-30)
+
+## [0.2.4](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.3...v0.2.4) (2022-04-30)
+
+
+### Features
+
+* component service 添加缓存接口 ([9369d44](https://github.com/baaxl9vh/nest-wechat/commit/9369d44c0644fbe7c12b88f1cfe0616f899e44fe))
+* component service 添加读取token接口,添加请求预授权码接口 ([f481e2f](https://github.com/baaxl9vh/nest-wechat/commit/f481e2f124475f5fd7dcfec5c47ed6734e20aaf7))
+* wechat service消息加解密方法以及单元测试 ([16390e3](https://github.com/baaxl9vh/nest-wechat/commit/16390e3690538b8b89a39e91f6a4730dcb988ce6))
+* 添加微信公众平台推送ticket处理方法以及对应的e2e测试 ([396247b](https://github.com/baaxl9vh/nest-wechat/commit/396247b529e5565ce0fdd1839ebb328f32f77222))
+* 添加截取rid util ([41ed91e](https://github.com/baaxl9vh/nest-wechat/commit/41ed91e603ad1abce92f5f54b570e76acbccbc68))
+* 添加第三方平台接口 ([055adce](https://github.com/baaxl9vh/nest-wechat/commit/055adce7d941a4dea9090116c25846ae65a01a1e))
+* 添加部分小程序基础信息接口,部分代码管理接口 ([5679253](https://github.com/baaxl9vh/nest-wechat/commit/56792533bf803fe43f345ee14c4a9621b2947553))
+
+## [0.2.3](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.2...v0.2.3) (2022-04-02)
+
+
+### Bug Fixes
+
+* 订正方法名称 ([a93037c](https://github.com/baaxl9vh/nest-wechat/commit/a93037ca72577f9d0f3f0bd45b7d380516b07d7c))
+
 ## [0.2.2](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.1...v0.2.2) (2022-04-02)
 
 
