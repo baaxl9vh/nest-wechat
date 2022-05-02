@@ -44,8 +44,9 @@ export class ComponentService {
    * @param req 
    * @param res 
    * @returns 
+   * @throws
    */
-  public async pushTicket (req: Request, res: Response): Promise<string> {
+  public async pushTicket (req: Request, res?: Response): Promise<string> {
 
     const timestamp = req.query && req.query.timestamp;
     const nonce = req.query && req.query.nonce;
@@ -56,18 +57,17 @@ export class ComponentService {
     let ticket = '';
 
     if (timestamp && nonce && signature && rawBody) {
-      try {
-        const decrypt = this.decryptMessage(signature as string, timestamp as string, nonce as string, rawBody.toString());
-        const parser = new XMLParser();
-        const xml = parser.parse(decrypt).xml;
-        const componentVerifyTicket = xml.ComponentVerifyTicket;
-        this.setTicket(componentVerifyTicket);
-        ticket = componentVerifyTicket;
-      } catch (error) {
-        this.logger.error((error as Error).message);
-      }
+      const decrypt = this.decryptMessage(signature as string, timestamp as string, nonce as string, rawBody.toString());
+      const parser = new XMLParser();
+      const xml = parser.parse(decrypt).xml;
+      const componentVerifyTicket = xml.ComponentVerifyTicket;
+      this.setTicket(componentVerifyTicket);
+      ticket = componentVerifyTicket;
     }
-    res.send('success');
+    
+    if (res && typeof res.send === 'function') {
+      res.send('success');
+    }
     return ticket;
   }
 
