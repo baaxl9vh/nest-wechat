@@ -334,6 +334,17 @@ export class ComponentService {
     this.cacheAdapter.set(ComponentService.KEY_TICKET, ticket);
   }
 
+  /**
+   * 
+   * 读取平台access token
+   * 缓存有值且未过期时，返回缓存结果
+   * 没有缓存时，向微信服务器发起请求，
+   * 请求结果正常时，保存token到缓存，
+   * 并且返回，其他情况抛出异常。
+   * 
+   * @returns 
+   * @throws
+   */
   public async getComponentAccessToken () {
     const token = await this.cacheAdapter.get<{ componentAccessToken: string, expiresAt: number}>(ComponentService.KEY_TOKEN);
     if (token && token.expiresAt >= Date.now()) {
@@ -349,10 +360,10 @@ export class ComponentService {
           this.cacheAdapter.set(ComponentService.KEY_TOKEN, token, ret.data.expires_in - 100);
           return token;
         } else {
-          throw new Error('no token in request result');
+          throw new Error(ret.data.errcode + ',' + ret.data.errmsg);
         }
       } else {
-        throw new Error('http request error');
+        throw new Error('http no response data');
       }
     }
   }
