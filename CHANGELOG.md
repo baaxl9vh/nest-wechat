@@ -1,3 +1,11 @@
+## [0.2.6](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.5...v0.2.6) (2022-05-02)
+
+
+### Bug Fixes
+
+* 优化parseRid方法 ([841b462](https://github.com/baaxl9vh/nest-wechat/commit/841b462e5e59bedf22c97a90ad9ce6d88127c68e))
+* 票据推送不catch异常,不传res时不调send ([9f8edc8](https://github.com/baaxl9vh/nest-wechat/commit/9f8edc83cb8eab156b897f7a4355c25ecf8e0a7b))
+
 ## [0.2.5](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.4...v0.2.5) (2022-04-30)
 
 ## [0.2.4](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.3...v0.2.4) (2022-04-30)
