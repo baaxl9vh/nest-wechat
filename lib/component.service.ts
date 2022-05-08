@@ -3,7 +3,7 @@ import axios from 'axios';
 import { XMLParser } from 'fast-xml-parser';
 import getRawBody from 'raw-body';
 
-import { AuthorizationResult, AuthorizerInfo, AuthorizerListResult, DefaultRequestResult, SubmitAuditItemList } from './interfaces';
+import { AuthorizationResult, AuthorizerInfo, AuthorizerListResult, DefaultRequestResult, ParamRegisterWeApp, SubmitAuditItemList } from './interfaces';
 import { ComponentModuleOptions } from './types';
 import { ICache } from './types/utils';
 import { MapCache, MessageCrypto } from './utils';
@@ -69,6 +69,35 @@ export class ComponentService {
       res.send('success');
     }
     return ticket;
+  }
+  
+  /**
+   * TODO:
+   * 事件推送URL处理程序
+   * @param req 
+   * @param res 
+   * @returns 
+   */
+  public async eventPushHandler (req: Request, res?: Response) {
+
+    const timestamp = req.query && req.query.timestamp;
+    const nonce = req.query && req.query.nonce;
+    const signature = req.query && req.query.msg_signature;
+    const rawBody = await getRawBody(req);
+
+    if (timestamp && nonce && signature && rawBody) {
+      const decrypt = this.decryptMessage(signature as string, timestamp as string, nonce as string, rawBody.toString());
+      const parser = new XMLParser();
+      const xml = parser.parse(decrypt).xml;
+      const infoType = xml.InfoType;
+      this.logger.debug(`eventPushHandler infoType = ${infoType}`);
+    }
+
+    if (res && typeof res.send === 'function') {
+      res.send('success');
+    }
+
+    return '';
   }
 
   /**
@@ -266,6 +295,26 @@ export class ComponentService {
     return axios.get<DefaultRequestResult>(url);
   }
 
+  /**
+   * TODO:
+   * 设置名称
+   * @returns 
+   * @link https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/Mini_Program_Basic_Info/setnickname.html
+   */
+  public async setNickname () {
+    const token = await this.getComponentAccessToken();
+    const url = `https://api.weixin.qq.com/wxa/setnickname?access_token=${token.componentAccessToken}`;
+    return axios.post<DefaultRequestResult & { wording: string, audit_id: number }>(url, {
+      // eslint-disable-next-line camelcase
+      nick_name: this.options.componentAppId,
+      // eslint-disable-next-line camelcase
+      id_card: '',
+      license: '',
+      // eslint-disable-next-line camelcase
+      naming_other_stuff_1: '',
+    });
+  }
+
   // ========== 小程序基础信息设置 ==========
 
   // ========== 小程序代码管理 ==========
@@ -325,6 +374,65 @@ export class ComponentService {
   }
 
   // ========== 小程序代码管理 ==========
+
+  // ========== 其他小程序业务代码 ==========
+
+  public async code2session (authorizerAppId: string, code: string) {
+    const token = await this.getComponentAccessToken();
+    const url = `https://api.weixin.qq.com/sns/component/jscode2session?appid=${authorizerAppId}&js_code=${code}&grant_type=authorization_code&component_appid=${this.options.componentAppId}&component_access_token=${token}`;
+    return axios.get<DefaultRequestResult & { openid: string, session_key: string, unionid: string }>(url);
+  }
+
+  // ========== 其他小程序业务代码 ==========
+
+  // ========== 代商家注册小程序 ==========
+
+  /**
+   * 
+   * 快速注册企业小程序
+   * 
+   * @param info 
+   * @returns 
+   * @link https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/Register_Mini_Programs/Fast_Registration_Interface_document.html
+   */
+  public async fastRegisterWeApp (info: ParamRegisterWeApp) {
+    const token = await this.getComponentAccessToken();
+    const url = `https://api.weixin.qq.com/cgi-bin/component/fastregisterweapp?action=create&component_access_token=${token}`;
+    return axios.post<DefaultRequestResult>(url, {
+      // eslint-disable-next-line camelcase
+      name: info.name,
+      code: info.code,
+      // eslint-disable-next-line camelcase
+      code_type: info.codeType || 1,
+      // eslint-disable-next-line camelcase
+      legal_persona_wechat: info.legalPersonaWechat,
+      // eslint-disable-next-line camelcase
+      legal_persona_name: info.legalPersonaName,
+      // eslint-disable-next-line camelcase
+      component_phone: info.componentPhone,
+    });
+  }
+
+  /**
+   * 查询创建任务状态
+   * @param info 
+   * @returns 
+   * @link https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/Register_Mini_Programs/Fast_Registration_Interface_document.html#二、查询创建任务状态
+   */
+  public async checkFastRegisterWeApp (info: Pick<ParamRegisterWeApp, 'name' | 'legalPersonaWechat' | 'legalPersonaName'>) {
+    const token = await this.getComponentAccessToken();
+    const url = `https://api.weixin.qq.com/cgi-bin/component/fastregisterweapp?action=search&component_access_token=${token}`;
+    return axios.post<DefaultRequestResult>(url, {
+      // eslint-disable-next-line camelcase
+      name: info.name,
+      // eslint-disable-next-line camelcase
+      legal_persona_wechat: info.legalPersonaWechat,
+      // eslint-disable-next-line camelcase
+      legal_persona_name: info.legalPersonaName,
+    });
+  }
+
+  // ========== 代商家注册小程序 ==========
 
   public getTicket () {
     return this.cacheAdapter.get<string>(ComponentService.KEY_TICKET);

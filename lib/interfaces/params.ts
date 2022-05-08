@@ -61,3 +61,45 @@ export interface SubmitAuditItemList {
   feedback_stuff?: string;
   ugc_declare?: object;
 }
+
+export interface ParamRegisterWeApp {
+  /**
+   * 企业名（需与工商部门登记信息一致）
+   * 如果是“无主体名称个体工商户”则填“个体户+法人姓名”，例如“个体户张三”
+   */
+  name: string;
+  /**
+   * 企业代码
+   */
+  code: string;
+  /**
+   * 企业代码类型 1：统一社会信用代码（18 位） 2：组织机构代码（9 位 xxxxxxxx-x） 3：营业执照注册号(15 位)
+   */
+  codeType: string;
+  /**
+   * 法人微信号
+   */
+  legalPersonaWechat: string;
+  /**
+   * 法人姓名（绑定银行卡）
+   */
+  legalPersonaName: string;
+  /**
+   * 第三方联系电话
+   */
+  componentPhone?: string;
+}
+
+/**
+ * 创建二维码参数
+ */
+export interface ParamCreateQRCode {
+  scene: string;
+  page?: string;
+  check_path?: boolean;
+  env_version?: string;
+  width?: number;
+  auto_color?: boolean;
+  line_color?: { r: number, g: number, b: number };
+  is_hyaline?: boolean;
+}
