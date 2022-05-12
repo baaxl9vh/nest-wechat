@@ -1,9 +1,16 @@
+import { Logger, Req, Res } from '@nestjs/common';
 import axios from 'axios';
 
 import { DefaultRequestResult, ParamCreateQRCode, SessionResult } from './interfaces';
 import { WeChatModuleOptions } from './types';
 
+import type { Request, Response } from 'express';
+import { MessageCrypto } from './utils';
+
 export class MiniProgramService {
+
+  private readonly logger = new Logger(MiniProgramService.name);
+
   constructor (private options: WeChatModuleOptions) {}
 
   /**
@@ -35,4 +42,33 @@ export class MiniProgramService {
     return axios.post<DefaultRequestResult>(url, params);
   }
 
+  /**
+   * 小程序消息推送配置时，推送处理方法
+   * @param req Express.Request
+   * @param res Express.Response，当res有传时，会调用send响应微信服务器
+   * @param token 小程序token，默认使用service实例化时的token，
+   * @returns string | false 验证通过时，返回echostr，验证不通过时，返回false
+   * @link https://developers.weixin.qq.com/miniprogram/dev/framework/server-ability/message-push.html
+   */
+  public verifyMessagePush (@Req() req: Request, @Res() res: Response, token?: string) {
+    token = token || this.options.token;
+    this.logger.debug(`verifyMessagePush() token = ${token}`);
+    this.logger.debug(`verifyMessagePush() query = ${JSON.stringify(req.query)}`);
+    const signature = (req.query && req.query.signature) || '';
+    const timestamp = (req.query && req.query.timestamp) || '';
+    const nonce = (req.query && req.query.nonce) || '';
+    const echostr = (req.query && req.query.echostr) || '';
+    const my = MessageCrypto.sha1(token || '', timestamp as string, nonce as string);
+    if (my === signature) {
+      if (res && typeof res.send === 'function') {
+        res.send(echostr);
+      }
+      return echostr;
+    } else {
+      if (res && typeof res.send === 'function') {
+        res.send('fail');
+      }
+      return false;
+    }
+  }
 }
