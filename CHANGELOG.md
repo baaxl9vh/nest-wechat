@@ -1,3 +1,10 @@
+## [0.2.10](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.9...v0.2.10) (2022-05-12)
+
+
+### Features
+
+* 添加小程序消息推送配置验证处理方法以及e2e测试 ([306bf58](https://github.com/baaxl9vh/nest-wechat/commit/306bf5871130828f70a3a6d206015ebd9a7fb30d))
+
 ## [0.2.9](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.8...v0.2.9) (2022-05-11)
 
 ## [0.2.8](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.7...v0.2.8) (2022-05-02)
