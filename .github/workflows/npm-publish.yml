@@ -22,7 +22,15 @@ jobs:
         with:
           redis-version: 5
       - run: npm ci
-      - run: npx cross-env NODE_ENV=ci TEST_APPID=${{secrets.TEST_APP_ID}} TEST_SECRET=${{secrets.TEST_APP_SECRET}} TEST_JSSDK_URL=${{secrets.TEST_JSSDK_URL}} jest --config ./tests/jest-e2e.json --runInBand
+      - run: |
+             npx cross-env \
+             NODE_ENV=ci \
+             TEST_APPID=${{secrets.TEST_APP_ID}} \
+             TEST_SECRET=${{secrets.TEST_APP_SECRET}} \
+             TEST_JSSDK_URL=${{secrets.TEST_JSSDK_URL}} \
+             TEST_TOKEN=pamtest \
+             TEST_AESKEY=abcdefghijklmnopqrstuvwxyz0123456789ABCDEFG \
+             jest --config ./tests/jest-e2e.json --runInBand
       - run: npm run build
       - run: npm publish
         env:
