@@ -1,3 +1,10 @@
+## [0.2.12](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.11...v0.2.12) (2022-05-23)
+
+
+### Features
+
+* can register wechat module and component module to global ([419bb73](https://github.com/baaxl9vh/nest-wechat/commit/419bb73b64948ba2b456b3d319981cf113f1c854))
+
 ## [0.2.11](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.10...v0.2.11) (2022-05-12)
 
 ## [0.2.10](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.9...v0.2.10) (2022-05-12)
