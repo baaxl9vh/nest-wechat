@@ -9,6 +9,7 @@ export class WeChatComponentModule {
 
   public static register (options: ComponentModuleOptions) : DynamicModule {
     return {
+      global: options.isGlobal,
       module: WeChatComponentModule,
       providers: [{
         provide: ComponentService,
@@ -35,6 +36,7 @@ export class WeChatComponentModule {
       },
     });
     return {
+      global: options.isGlobal,
       module: WeChatComponentModule,
       imports: options.imports,
       providers,

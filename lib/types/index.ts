@@ -5,6 +5,7 @@ import { ModuleMetadata } from '@nestjs/common';
  * WeChatModule Options
  */
 export interface WeChatModuleOptions {
+  isGlobal?: boolean;
   /**
    * 微信公众号APP ID
    * WeChat official account APP ID
@@ -37,6 +38,7 @@ export interface WeChatModuleOptions {
  * WeChatComponentModule Options
  */
 export interface ComponentModuleOptions {
+  isGlobal?: boolean;
   /**
    * 第三方平台APP ID
    * WeChat official account APP ID
@@ -69,6 +71,7 @@ export interface WeChatModuleRootOptions extends Pick<ModuleMetadata, 'imports'>
   useFactory: (...args: any[]) => Promise<WeChatModuleOptions> | WeChatModuleOptions;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   inject: any[];
+  isGlobal?: boolean;
 }
 
 export interface ComponentModuleRootOptions extends Pick<ModuleMetadata, 'imports'> {
@@ -76,6 +79,7 @@ export interface ComponentModuleRootOptions extends Pick<ModuleMetadata, 'import
   useFactory: (...args: any[]) => Promise<ComponentModuleOptions> | ComponentModuleOptions;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   inject: any[];
+  isGlobal?: boolean;
 }
 
 /**
