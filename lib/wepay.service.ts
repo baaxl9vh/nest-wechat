@@ -163,10 +163,44 @@ export interface TransactionOrder {
   }
 }
 
+export interface MiniProgramPaymentParameters {
+  /**
+   * 时间戳，单位：秒（10位数字）
+   */
+  timeStamp: string;
+  /**
+   * 随机字符串，长度32
+   */
+  nonceStr: string;
+  /**
+   * 订单详情扩展字符串，长度：128，如：
+   * prepay_id=wx201410272009395522657a690389285100
+   */
+  package: string;
+  signType: 'RSA',
+  /**
+   * 签名，长度512
+   */
+  paySign: string;
+
+}
+
 @Injectable()
 export class WePayService {
 
   private readonly logger = new Logger(WePayService.name);
+
+  async getPlatformCertificates (mchId: string, serialNo: string, privateKey: Buffer | string) {
+    // TODO:
+    const nonceStr = createNonceStr();
+    const timestamp = Math.floor(Date.now() / 1000);
+    let url = '/v3/certificates';
+    const signature = this.generateSignature('POST', url, timestamp, nonceStr, privateKey);
+    url = 'https://api.mch.weixin.qq.com' + url;
+    return await axios.get(url, {
+      headers: this.generateHeader(mchId, nonceStr, timestamp, serialNo, signature),
+    });
+  }
 
   /**
    * JSAPI下单
@@ -179,13 +213,98 @@ export class WePayService {
   async transactionsJsapi (order: TransactionOrder, serialNo: string, privateKey: Buffer | string) {
     const nonceStr = createNonceStr();
     const timestamp = Math.floor(Date.now() / 1000);
-    const message = `POST\n/v3/pay/transactions/jsapi\n${timestamp}\n${nonceStr}\n${JSON.stringify(order)}\n`;
-    const signature = crypto.createSign('sha256WithRSAEncryption').update(message).sign(privateKey, 'base64');
-    const url = 'https://api.mch.weixin.qq.com/v3/pay/transactions/jsapi';
+    let url = '/v3/pay/transactions/jsapi';
+    const signature = this.generateSignature('POST', url, timestamp, nonceStr, privateKey, order);
+    url = 'https://api.mch.weixin.qq.com' + url;
     return await axios.post(url, order, {
-      headers: {
-        'Authorization': `WECHATPAY2-SHA256-RSA2048 mchid="${order.mchid}",nonce_str="${nonceStr}",signature="${signature}",timestamp="${timestamp}",serial_no="${serialNo}"`,
-      },
+      headers: this.generateHeader(order.mchid, nonceStr, timestamp, serialNo, signature),
     });
+  }
+
+  /**
+   * 商户订单号查询订单
+   * @param id 
+   * @param mchId 
+   * @param serialNo 
+   * @param privateKey 
+   * @returns 
+   */
+  async getTransactionsId (id: string, mchId: string, serialNo: string, privateKey: Buffer | string) {
+    const nonceStr = createNonceStr();
+    const timestamp = Math.floor(Date.now() / 1000);
+    let url = `/v3/pay/transactions/id/${id}?mchid=${mchId}`;
+    const signature = this.generateSignature('POST', url, timestamp, nonceStr, privateKey);
+    url = 'https://api.mch.weixin.qq.com' + url;
+    return await axios.get(url, {
+      headers: this.generateHeader(mchId, nonceStr, timestamp, serialNo, signature),
+    });
+  }
+
+  /**
+   * 微信支付订单号查询订单
+   * @param outTradeNo 
+   * @param mchId 
+   * @param serialNo 
+   * @param privateKey 
+   * @returns 
+   */
+  async getTransactionsOutTradeNo (outTradeNo: string, mchId: string, serialNo: string, privateKey: Buffer | string) {
+    const nonceStr = createNonceStr();
+    const timestamp = Math.floor(Date.now() / 1000);
+    let url = `/v3/pay/transactions/out-trade-no/${outTradeNo}?mchid=${mchId}`;
+    const signature = this.generateSignature('POST', url, timestamp, nonceStr, privateKey);
+    url = 'https://api.mch.weixin.qq.com' + url;
+    return await axios.get(url, {
+      headers: this.generateHeader(mchId, nonceStr, timestamp, serialNo, signature),
+    });
+  }
+
+  /**
+   * 构造小程序调起支付参数
+   * @param appId String 小程序APPID
+   * @param prepayId String JSAPI下单生成的prepay_id
+   * @param privateKey String 微信支付私钥
+   * @returns MiniProgramPaymentParameters
+   * @link https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter3_5_4.shtml
+   */
+  buildMiniProgramPayment (appId: string, prepayId: string, privateKey: Buffer | string): MiniProgramPaymentParameters {
+    const nonceStr = createNonceStr();
+    const timestamp = Math.floor(Date.now() / 1000);
+    const message = `${appId}\n${timestamp}\n${nonceStr}\nprepay_id=${prepayId}\n`;
+    const paySign = crypto.createSign('sha256WithRSAEncryption').update(message).sign(privateKey, 'base64');
+    return {
+      timeStamp: timestamp.toString(),
+      nonceStr,
+      package: `prepay_id=${prepayId}`,
+      signType: 'RSA',
+      paySign,
+    };
+  }
+
+  generateHeader (mchId: string, nonceStr: string, timestamp: number, serialNo: string, signature: string) {
+    return {
+      'Authorization': `WECHATPAY2-SHA256-RSA2048 mchid="${mchId}",nonce_str="${nonceStr}",signature="${signature}",timestamp="${timestamp}",serial_no="${serialNo}"`,
+    };
+  }
+  /**
+   * 生成请求签名串
+   * @param method 
+   * @param url 
+   * @param timestamp 
+   * @param nonceStr 
+   * @param privateKey 
+   * @param body 
+   * @returns 
+   */
+  generateSignature (method: 'GET' | 'POST', url: string, timestamp: number, nonceStr: string, privateKey: Buffer | string, body?: object): string {
+    let message = `${method}\n${url}\n${timestamp}\n${nonceStr}\n\n`;
+
+    if (method === 'POST') {
+      if (!body) {
+        body = {};
+      }
+      message = `${method}\n${url}\n${timestamp}\n${nonceStr}\n${JSON.stringify(body)}\n`;
+    }
+    return crypto.createSign('sha256WithRSAEncryption').update(message).sign(privateKey, 'base64');
   }
 }
