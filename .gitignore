@@ -106,3 +106,9 @@ dist
 *.local
 
 demo.ts
+
+# wepay private key
+apiclient_key.pem
+
+# This has secret data
+wepay.service.spec.ts

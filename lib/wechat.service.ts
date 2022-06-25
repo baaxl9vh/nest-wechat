@@ -16,6 +16,7 @@ import {
 import { MiniProgramService } from './miniprogram.service';
 import { ICache } from './types/utils';
 import { MapCache } from './utils/cache';
+import { WePayService } from './wepay.service';
 
 @Injectable()
 export class WeChatService {
@@ -26,6 +27,12 @@ export class WeChatService {
   protected _cacheAdapter: ICache = new MapCache();
 
   public mp: MiniProgramService;
+  /**
+   * WePay Service
+   * @type {WePayService}
+   * @memberof WeChatService
+   */
+  public pay: WePayService;
 
   public set cacheAdapter (adapter: ICache) {
     if (adapter) {
@@ -38,6 +45,7 @@ export class WeChatService {
 
   constructor (private options: WeChatModuleOptions) {
     this.mp = new MiniProgramService(options);
+    this.pay = new WePayService();
     if (options && options.cacheAdapter) {
       this.cacheAdapter = options.cacheAdapter as ICache;
     }
