@@ -1,3 +1,10 @@
+## [0.2.14](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.13...v0.2.14) (2022-06-26)
+
+
+### Bug Fixes
+
+* add return types of interfaces ([2581c94](https://github.com/baaxl9vh/nest-wechat/commit/2581c940360ad5e277f52f6f3da36fbdb75f39f7))
+
 ## [0.2.13](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.12...v0.2.13) (2022-06-26)
 
 
