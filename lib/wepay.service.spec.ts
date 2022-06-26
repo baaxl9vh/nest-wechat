@@ -20,7 +20,10 @@ describe('WePayService Test(Unit)', () => {
   let privateKey: Buffer;
   let publicKey: Buffer;
 
+  let outTradeNo = '';
+
   beforeAll(() => {
+    outTradeNo = mchId + Math.random().toString().slice(3);
     service = new WePayService();
     privateKey = fs.readFileSync(path.join(__dirname, '..', 'apiclient_key.pem'));
     publicKey = fs.readFileSync(path.join(__dirname, '..', 'apiclient_cert.pem'));
@@ -36,7 +39,7 @@ describe('WePayService Test(Unit)', () => {
       appid: appId,
       mchid: mchId,
       description: '测试商品',
-      out_trade_no: '2022062518371669087377437861',
+      out_trade_no: outTradeNo,
       notify_url: notifyUrl,
       amount: {
         total: 1,
@@ -68,6 +71,17 @@ describe('WePayService Test(Unit)', () => {
     expect(certs).toBeDefined();
     expect(Array.isArray(certs)).toStrictEqual(true);
     expect(certs[0].sn).toBeDefined();
+  });
+
+  it('Should get one trade by out trade no', async () => {
+    const ret = await service.getTransactionByOutTradeNo(outTradeNo, mchId, serial, privateKey);
+    expect(ret.data).toBeDefined();
+    expect(ret.data.out_trade_no).toStrictEqual(outTradeNo);
+  });
+
+  it('Should close one trade', async () => {
+    const ret = await service.close(outTradeNo, mchId, serial, privateKey);
+    expect(ret.status).toStrictEqual(204);
   });
 
 });

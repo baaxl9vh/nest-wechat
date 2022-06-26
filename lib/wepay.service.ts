@@ -4,7 +4,15 @@ import * as crypto from 'crypto';
 import forge from 'node-forge';
 import getRawBody from 'raw-body';
 
-import { CallbackResource, CertificateResult, MiniProgramPaymentParameters, Trade, TransactionOrder } from './types';
+import {
+  CallbackResource,
+  CertificateResult,
+  MiniProgramPaymentParameters,
+  RefundParameters,
+  RefundResult,
+  Trade,
+  TransactionOrder,
+} from './types';
 import { createNonceStr } from './utils';
 
 import type { Request, Response } from 'express';
@@ -56,7 +64,7 @@ export class WePayService {
     let url = '/v3/pay/transactions/jsapi';
     const signature = this.generateSignature('POST', url, timestamp, nonceStr, privateKey, order);
     url = 'https://api.mch.weixin.qq.com' + url;
-    return await axios.post<{ prepay_id: string }>(url, order, {
+    return axios.post<{ prepay_id: string }>(url, order, {
       headers: this.generateHeader(order.mchid, nonceStr, timestamp, serialNo, signature),
     });
   }
@@ -81,7 +89,7 @@ export class WePayService {
     let url = `/v3/pay/transactions/id/${id}?mchid=${mchId}`;
     const signature = this.generateSignature('GET', url, timestamp, nonceStr, privateKey);
     url = 'https://api.mch.weixin.qq.com' + url;
-    return await axios.get<Trade>(url, {
+    return axios.get<Trade>(url, {
       headers: this.generateHeader(mchId, nonceStr, timestamp, serialNo, signature),
     });
   }
@@ -100,7 +108,7 @@ export class WePayService {
     let url = `/v3/pay/transactions/out-trade-no/${outTradeNo}?mchid=${mchId}`;
     const signature = this.generateSignature('GET', url, timestamp, nonceStr, privateKey);
     url = 'https://api.mch.weixin.qq.com' + url;
-    return await axios.get<Trade>(url, {
+    return axios.get<Trade>(url, {
       headers: this.generateHeader(mchId, nonceStr, timestamp, serialNo, signature),
     });
   }
@@ -115,21 +123,35 @@ export class WePayService {
    * @link https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter3_5_3.shtml
    */
   async close (outTradeNo: string, mchId: string, serialNo: string, privateKey: Buffer | string) {
+    const data = { mchid: mchId };
     const nonceStr = createNonceStr();
     const timestamp = Math.floor(Date.now() / 1000);
     let url = `/v3/pay/transactions/out-trade-no/${outTradeNo}/close`;
-    const signature = this.generateSignature('POST', url, timestamp, nonceStr, privateKey);
+    const signature = this.generateSignature('POST', url, timestamp, nonceStr, privateKey, data);
     url = 'https://api.mch.weixin.qq.com' + url;
-    return await axios.post(url, { mchid: mchId }, {
+    return axios.post(url, data, {
       headers: this.generateHeader(mchId, nonceStr, timestamp, serialNo, signature),
     });
   }
 
-  private async refund () {
-    // 申请退款
-    // https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter3_5_9.shtml
-    // https://api.mch.weixin.qq.com/v3/refund/domestic/refunds
-    // POST
+  /**
+   * 申请退款
+   * @param refund 
+   * @param mchId 
+   * @param serialNo 
+   * @param privateKey 
+   * @returns 
+   * @link https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter3_5_9.shtml
+   */
+  async refund (refund: RefundParameters, mchId: string, serialNo: string, privateKey: Buffer | string) {
+    const nonceStr = createNonceStr();
+    const timestamp = Math.floor(Date.now() / 1000);
+    let url = '/v3/refund/domestic/refunds';
+    const signature = this.generateSignature('POST', url, timestamp, nonceStr, privateKey, refund);
+    url = 'https://api.mch.weixin.qq.com' + url;
+    return axios.post<RefundResult>(url, refund, {
+      headers: this.generateHeader(mchId, nonceStr, timestamp, serialNo, signature),
+    });
   }
 
   private async getRefund () {
