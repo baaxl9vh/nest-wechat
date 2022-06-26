@@ -1,3 +1,12 @@
+## [0.2.13](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.12...v0.2.13) (2022-06-26)
+
+
+### Features
+
+* add query order of wechat pay ([d8d0fe6](https://github.com/baaxl9vh/nest-wechat/commit/d8d0fe6c90f4d161f459e37573ac3505058b4e09))
+* add wechat pay transaction jsapi order v3 interface ([4de65d0](https://github.com/baaxl9vh/nest-wechat/commit/4de65d03b960b10c649c80e2ae381ecc7410bf9a))
+* **wepay:** add wechat pay inteface of mini program ([0b0275e](https://github.com/baaxl9vh/nest-wechat/commit/0b0275e66dbe758fa0c4959b3bee035f7807a9ce))
+
 ## [0.2.12](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.11...v0.2.12) (2022-05-23)
 
 
