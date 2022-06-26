@@ -4,7 +4,7 @@ import * as crypto from 'crypto';
 import forge from 'node-forge';
 import getRawBody from 'raw-body';
 
-import { CallbackResource, CertificateResult, MiniProgramPaymentParameters, TransactionOrder } from './types';
+import { CallbackResource, CertificateResult, MiniProgramPaymentParameters, Trade, TransactionOrder } from './types';
 import { createNonceStr } from './utils';
 
 import type { Request, Response } from 'express';
@@ -56,7 +56,7 @@ export class WePayService {
     let url = '/v3/pay/transactions/jsapi';
     const signature = this.generateSignature('POST', url, timestamp, nonceStr, privateKey, order);
     url = 'https://api.mch.weixin.qq.com' + url;
-    return await axios.post(url, order, {
+    return await axios.post<{ prepay_id: string }>(url, order, {
       headers: this.generateHeader(order.mchid, nonceStr, timestamp, serialNo, signature),
     });
   }
@@ -81,7 +81,7 @@ export class WePayService {
     let url = `/v3/pay/transactions/id/${id}?mchid=${mchId}`;
     const signature = this.generateSignature('GET', url, timestamp, nonceStr, privateKey);
     url = 'https://api.mch.weixin.qq.com' + url;
-    return await axios.get(url, {
+    return await axios.get<Trade>(url, {
       headers: this.generateHeader(mchId, nonceStr, timestamp, serialNo, signature),
     });
   }
@@ -100,7 +100,7 @@ export class WePayService {
     let url = `/v3/pay/transactions/out-trade-no/${outTradeNo}?mchid=${mchId}`;
     const signature = this.generateSignature('GET', url, timestamp, nonceStr, privateKey);
     url = 'https://api.mch.weixin.qq.com' + url;
-    return await axios.get(url, {
+    return await axios.get<Trade>(url, {
       headers: this.generateHeader(mchId, nonceStr, timestamp, serialNo, signature),
     });
   }
