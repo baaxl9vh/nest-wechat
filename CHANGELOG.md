@@ -1,3 +1,10 @@
+## [0.2.15](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.14...v0.2.15) (2022-06-26)
+
+
+### Features
+
+* **wepay:** add refund interface ([e8a36fc](https://github.com/baaxl9vh/nest-wechat/commit/e8a36fcdd56a2ff10872f99280e403862a7bee2e))
+
 ## [0.2.14](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.13...v0.2.14) (2022-06-26)
 
 
