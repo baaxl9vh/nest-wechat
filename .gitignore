@@ -109,6 +109,7 @@ demo.ts
 
 # wepay private key
 apiclient_key.pem
+apiclient_cert.pem
 
 # This has secret data
-wepay.service.spec.ts
+*.local.spec.ts

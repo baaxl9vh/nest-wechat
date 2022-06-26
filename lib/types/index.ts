@@ -1,4 +1,6 @@
 import { ModuleMetadata } from '@nestjs/common';
+export * from './utils';
+export * from './wepay';
 
 /**
  * WeChatModule 配置项
