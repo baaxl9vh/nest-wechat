@@ -210,7 +210,7 @@ export class WePayService {
     this.logger.debug(`Wechatpay-Serial = ${platformSerial}`);
     this.logger.debug(`Wechatpay-Timestamp = ${timestamp}`);
     this.logger.debug(`Wechatpay-Nonce = ${nonce}`);
-    this.logger.debug(`Body = ${rawBody}`);
+    this.logger.debug(`Body = ${typeof rawBody === 'string' ? rawBody : JSON.stringify(rawBody)}`);
     let verified = false;
     const responseData = { code: 'FAIL', message: '' };
     let result: Trade = {} as Trade;
@@ -221,10 +221,10 @@ export class WePayService {
         const resource: CallbackResource = JSON.parse(rawBody.toString());
         result = this.decryptCipherText<Trade>(apiKey, resource.ciphertext, resource.associated_data, resource.nonce);
       } else {
-        responseData.message = 'verify signature fail';
+        responseData.message = 'VERIFY SIGNATURE FAIL';
       }
     } else {
-      responseData.message = 'serial incorrect';
+      responseData.message = 'SERIAL INCORRECT';
     }
 
     if (verified && res && typeof res.send === 'function') {
