@@ -196,7 +196,21 @@ export class WePayService {
     const platformSerial = req.headers['Wechatpay-Serial'];
     const timestamp = req.headers['Wechatpay-Timestamp'];
     const nonce = req.headers['Wechatpay-Nonce'];
-    const rawBody = await getRawBody(req);
+    let rawBody;
+    try {
+      rawBody = await getRawBody(req);
+    } catch (error) {
+      const message = (error as Error).message as string;
+      this.logger.debug(message);
+      if (message === 'stream is not readable') {
+        rawBody = req.body;
+      }
+    }
+    this.logger.debug(`Wechatpay-Signature = ${signature}`);
+    this.logger.debug(`Wechatpay-Serial = ${platformSerial}`);
+    this.logger.debug(`Wechatpay-Timestamp = ${timestamp}`);
+    this.logger.debug(`Wechatpay-Nonce = ${nonce}`);
+    this.logger.debug(`Body = ${rawBody}`);
     let verified = false;
     const responseData = { code: 'FAIL', message: '' };
     let result: Trade = {} as Trade;
