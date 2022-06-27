@@ -191,7 +191,7 @@ export class WePayService {
    * @returns 
    * @link https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter3_5_5.shtml
    */
-  async paidCallback (publicKey: Buffer | string, apiKey: string, req: Request, res: Response) {
+  async paidCallback (publicKey: Buffer | string, apiKey: string, req: Request, res: Response): Promise<Trade> {
     const signature = req.headers['Wechatpay-Signature'];
     const platformSerial = req.headers['Wechatpay-Serial'];
     const timestamp = req.headers['Wechatpay-Timestamp'];
@@ -199,13 +199,13 @@ export class WePayService {
     const rawBody = await getRawBody(req);
     let verified = false;
     const responseData = { code: 'FAIL', message: '' };
-    let result = {};
+    let result: Trade = {} as Trade;
     const serial = this.getCertificateSn(publicKey);
     if (serial === platformSerial) {
       verified = this.verifySignature(publicKey, timestamp as string, nonce as string, rawBody, signature as string);
       if (verified) {
         const resource: CallbackResource = JSON.parse(rawBody.toString());
-        result = this.decryptCipherText(apiKey, resource.ciphertext, resource.associated_data, resource.nonce);
+        result = this.decryptCipherText<Trade>(apiKey, resource.ciphertext, resource.associated_data, resource.nonce);
       } else {
         responseData.message = 'verify signature fail';
       }
