@@ -1,3 +1,10 @@
+## [0.2.16](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.15...v0.2.16) (2022-06-27)
+
+
+### Bug Fixes
+
+* add retrun type to paid callback function ([a53c47a](https://github.com/baaxl9vh/nest-wechat/commit/a53c47ae12cac756025605195fb00ab5a6ad690d))
+
 ## [0.2.15](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.14...v0.2.15) (2022-06-26)
 
 
