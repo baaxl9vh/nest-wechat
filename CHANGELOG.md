@@ -1,3 +1,10 @@
+## [0.2.17](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.16...v0.2.17) (2022-06-28)
+
+
+### Features
+
+* add get refund function ([ec8a13d](https://github.com/baaxl9vh/nest-wechat/commit/ec8a13d495799d7589cc7c54f83cfaf2ab943ff9))
+
 ## [0.2.16](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.15...v0.2.16) (2022-06-27)
 
 
