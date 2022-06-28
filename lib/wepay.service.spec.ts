@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { TransactionOrder } from './types';
+import { RefundParameters, RequireOnlyOne, TransactionOrder } from './types';
 import { WePayService } from './wepay.service';
 
 jest.setTimeout(20000);
@@ -79,9 +79,37 @@ describe('WePayService Test(Unit)', () => {
     expect(ret.data.out_trade_no).toStrictEqual(outTradeNo);
   });
 
+  it('Should refund fail', async () => {
+    const refundParameters: RequireOnlyOne<RefundParameters, 'transaction_id' | 'out_trade_no'> = {
+      out_trade_no: outTradeNo,
+      out_refund_no: outTradeNo,
+      amount: {
+        refund: 1,
+        total: 1,
+        currency: 'CNY',
+      },
+    };
+    try {
+      const ret = await service.refund(refundParameters, mchId, serial, privateKey);
+      expect(ret).toBeUndefined();
+    } catch (error) {
+      const response = (error as any).response;
+      expect(response).toBeDefined();
+      expect(response.data).toBeDefined();
+      expect(response.data.code).toStrictEqual('RESOURCE_NOT_EXISTS');
+    }
+  });
+
   it('Should close one trade', async () => {
     const ret = await service.close(outTradeNo, mchId, serial, privateKey);
     expect(ret.status).toStrictEqual(204);
+  });
+
+  it('Should get one refund by refund no', async () => {
+    const no = '2022062819392033311872879963';
+    const ret = await service.getRefund(no, mchId, serial, privateKey);
+    expect(ret.data).toBeDefined();
+    expect(ret.data.out_refund_no).toStrictEqual(no);
   });
 
 });

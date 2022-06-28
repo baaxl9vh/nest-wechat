@@ -1,6 +1,20 @@
 import { ModuleMetadata } from '@nestjs/common';
+
 export * from './utils';
 export * from './wepay';
+
+/**
+ * At least one property required of keys of type T，e.g.
+ * 指定类型 T 的属性中最少要有一个，比如:
+ * RequireOnlyOne<RefundParameters, 'transaction_id' | 'out_trade_no'>
+ */
+export type RequireAtLeastOne<T, Keys extends keyof T = keyof T> = Pick<T, Exclude<keyof T, Keys>> & { [K in Keys]-?: Required<Pick<T, K>> & Partial<Pick<T, Exclude<Keys, K>>>}[Keys]
+/**
+ * Only one property required of keys of type T，e.g.
+ * 指定类型 T 的属性中只选一，比如:
+ * RequireOnlyOne<RefundParameters, 'transaction_id' | 'out_trade_no'>
+ */
+export type RequireOnlyOne<T, Keys extends keyof T = keyof T> = Pick<T, Exclude<keyof T, Keys>> & { [K in Keys]-?: Required<Pick<T, K>> & Partial<Record<Exclude<Keys, K>, undefined>>}[Keys]
 
 /**
  * WeChatModule 配置项

@@ -10,6 +10,7 @@ import {
   MiniProgramPaymentParameters,
   RefundParameters,
   RefundResult,
+  RequireOnlyOne,
   Trade,
   TransactionOrder,
 } from './types';
@@ -18,6 +19,8 @@ import { createNonceStr } from './utils';
 import type { Request, Response } from 'express';
 @Injectable()
 export class WePayService {
+
+  public API_ROOT = 'https://api.mch.weixin.qq.com';
 
   private readonly logger = new Logger(WePayService.name);
 
@@ -143,7 +146,7 @@ export class WePayService {
    * @returns 
    * @link https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter3_5_9.shtml
    */
-  async refund (refund: RefundParameters, mchId: string, serialNo: string, privateKey: Buffer | string) {
+  async refund (refund: RequireOnlyOne<RefundParameters, 'transaction_id' | 'out_trade_no'>, mchId: string, serialNo: string, privateKey: Buffer | string) {
     const nonceStr = createNonceStr();
     const timestamp = Math.floor(Date.now() / 1000);
     let url = '/v3/refund/domestic/refunds';
@@ -154,11 +157,24 @@ export class WePayService {
     });
   }
 
-  private async getRefund () {
-    // 查询单笔退款
-    // https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter3_5_10.shtml
-    // https://api.mch.weixin.qq.com/v3/refund/domestic/refunds/{out_refund_no}
-    // GET
+  /**
+   * 查询单笔退款
+   * @param outRefundNo 
+   * @param mchId 
+   * @param serialNo 
+   * @param privateKey 
+   * @returns 
+   * @link https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter3_5_10.shtml
+   */
+  async getRefund (outRefundNo: string, mchId: string, serialNo: string, privateKey: Buffer | string) {
+    const nonceStr = createNonceStr();
+    const timestamp = Math.floor(Date.now() / 1000);
+    let url = `/v3/refund/domestic/refunds/${outRefundNo}`;
+    const signature = this.generateSignature('GET', url, timestamp, nonceStr, privateKey);
+    url = this.API_ROOT + url;
+    return axios.get<RefundResult>(url, {
+      headers: this.generateHeader(mchId, nonceStr, timestamp, serialNo, signature),
+    });
   }
 
   private async refundedCallback () {
