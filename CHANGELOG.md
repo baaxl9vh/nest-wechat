@@ -1,3 +1,10 @@
+## [0.2.18](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.17...v0.2.18) (2022-07-07)
+
+
+### Features
+
+* **mp:** add mp get phone number function ([f003582](https://github.com/baaxl9vh/nest-wechat/commit/f0035820d7b818c37476fe2594febc73af59b437))
+
 ## [0.2.17](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.16...v0.2.17) (2022-06-28)
 
 
