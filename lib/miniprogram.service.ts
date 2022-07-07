@@ -1,7 +1,7 @@
 import { Logger, Req, Res } from '@nestjs/common';
 import axios from 'axios';
 
-import { DefaultRequestResult, ParamCreateQRCode, SessionResult } from './interfaces';
+import { DefaultRequestResult, ParamCreateQRCode, PhoneNumberResult, SessionResult } from './interfaces';
 import { WeChatModuleOptions } from './types';
 
 import type { Request, Response } from 'express';
@@ -22,8 +22,8 @@ export class MiniProgramService {
    * @link https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/login/auth.code2Session.html
    */
   public async code2Session (code: string, appId?: string, secret?: string): Promise<SessionResult> {
-    appId = appId || this.options.appId;
-    secret = secret || this.options.secret;
+    appId = appId || this.options?.appId;
+    secret = secret || this.options?.secret;
     if (!appId || !secret) {
       throw new Error(`${MiniProgramService.name}': No appId or secret.`);
     } else {
@@ -43,6 +43,19 @@ export class MiniProgramService {
   }
 
   /**
+   * 获取手机号
+   * @param {string} accessToken 小程序调用token，第三方可通过使用authorizer_access_token代商家进行调用
+   * @param {string} code 手机号获取凭证，小程序端获取
+   * @returns 
+   * @link https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/user-info/phone-number/getPhoneNumber.html
+   * @link https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/getPhoneNumber.html
+   */
+  public async getPhoneNumber (code: string, accessToken: string) {
+    const url = `https://api.weixin.qq.com/wxa/business/getuserphonenumber?access_token=${accessToken}`;
+    return axios.post<PhoneNumberResult>(url, { code });
+  }
+
+  /**
    * 小程序消息推送配置时，推送处理方法
    * @param req Express.Request
    * @param res Express.Response，当res有传时，会调用send响应微信服务器
@@ -51,7 +64,7 @@ export class MiniProgramService {
    * @link https://developers.weixin.qq.com/miniprogram/dev/framework/server-ability/message-push.html
    */
   public verifyMessagePush (@Req() req: Request, @Res() res: Response, token?: string) {
-    token = token || this.options.token;
+    token = token || this.options?.token;
     this.logger.debug(`verifyMessagePush() token = ${token}`);
     this.logger.debug(`verifyMessagePush() query = ${JSON.stringify(req.query)}`);
     const signature = (req.query && req.query.signature) || '';

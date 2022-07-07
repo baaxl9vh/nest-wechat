@@ -31,10 +31,10 @@ export class AppModule {
 + forRoot配置注册
 
 ```javascript
-import { Module } from '@nestjs/common';
+import { CACHE_MANAGER, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-
-import { WeChatModule } from 'nest-wechat';
+import { Cache } from 'cache-manager';
+import { RedisCache, WeChatModule } from 'nest-wechat';
 
 @Module({
   imports: [
@@ -43,12 +43,13 @@ import { WeChatModule } from 'nest-wechat';
     }),
     WeChatModule.forRootAsync({
       imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
+      inject: [ConfigService, CACHE_MANAGER],
+      useFactory: (configService: ConfigService, cache: Cache) => ({
         appId: configService.get('WX_APPID'),
         secret: configService.get('WX_SECRET'),
         token: configService.get('WX_TOKEN'),
         encodingAESKey: configService.get('WX_AESKEY'),
+        cacheAdapter: new RedisCache(cache),
       }),
     }),
   ]
@@ -219,6 +220,12 @@ export interface ICache {
 ```
 
 > [参考文档](https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/login/auth.code2Session.html)
+
+### 获取手机号码
+
+```javascript
+mp.getPhoneNumber(code: string, accessToken: string): Promise<PhoneNumberResult>;
+```
 
 ### Run Test
 

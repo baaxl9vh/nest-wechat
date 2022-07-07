@@ -225,6 +225,41 @@ export interface AuthorizerListResult {
      * 授权的时间
      */
     auth_time: number;
-  }[]
+  }[];
+}
 
+/**
+ * 获取手机号码返回结果
+ */
+export interface PhoneNumberResult extends DefaultRequestResult {
+  /**
+   * 用户手机号信息
+   */
+  phone_info: {
+    /**
+     * 用户绑定的手机号（国外手机号会有区号）
+     */
+    phoneNumber: string;
+    /**
+     * 没有区号的手机号
+     */
+    purePhoneNumber: string;
+    /**
+     * 区号
+     */
+    countryCode: number;
+    /**
+     * 数据水印
+     */
+    watermark: {
+      /**
+       * 用户获取手机号操作的时间戳
+       */
+      timestamp: number;
+      /**
+       * 小程序appid
+       */
+      appid: string;
+    };
+  };
 }
