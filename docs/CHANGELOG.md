@@ -1,3 +1,69 @@
+## [0.2.18](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.17...v0.2.18) (2022-07-07)
+
+
+### Features
+
+* **mp:** add mp get phone number function ([f003582](https://github.com/baaxl9vh/nest-wechat/commit/f0035820d7b818c37476fe2594febc73af59b437))
+
+## [0.2.17](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.16...v0.2.17) (2022-06-28)
+
+
+### Features
+
+* add get refund function ([ec8a13d](https://github.com/baaxl9vh/nest-wechat/commit/ec8a13d495799d7589cc7c54f83cfaf2ab943ff9))
+
+## [0.2.16](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.15...v0.2.16) (2022-06-27)
+
+
+### Bug Fixes
+
+* add retrun type to paid callback function ([a53c47a](https://github.com/baaxl9vh/nest-wechat/commit/a53c47ae12cac756025605195fb00ab5a6ad690d))
+
+## [0.2.15](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.14...v0.2.15) (2022-06-26)
+
+
+### Features
+
+* **wepay:** add refund interface ([e8a36fc](https://github.com/baaxl9vh/nest-wechat/commit/e8a36fcdd56a2ff10872f99280e403862a7bee2e))
+
+## [0.2.14](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.13...v0.2.14) (2022-06-26)
+
+
+### Bug Fixes
+
+* add return types of interfaces ([2581c94](https://github.com/baaxl9vh/nest-wechat/commit/2581c940360ad5e277f52f6f3da36fbdb75f39f7))
+
+## [0.2.13](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.12...v0.2.13) (2022-06-26)
+
+
+### Features
+
+* add query order of wechat pay ([d8d0fe6](https://github.com/baaxl9vh/nest-wechat/commit/d8d0fe6c90f4d161f459e37573ac3505058b4e09))
+* add wechat pay transaction jsapi order v3 interface ([4de65d0](https://github.com/baaxl9vh/nest-wechat/commit/4de65d03b960b10c649c80e2ae381ecc7410bf9a))
+* **wepay:** add wechat pay inteface of mini program ([0b0275e](https://github.com/baaxl9vh/nest-wechat/commit/0b0275e66dbe758fa0c4959b3bee035f7807a9ce))
+
+## [0.2.12](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.11...v0.2.12) (2022-05-23)
+
+
+### Features
+
+* can register wechat module and component module to global ([419bb73](https://github.com/baaxl9vh/nest-wechat/commit/419bb73b64948ba2b456b3d319981cf113f1c854))
+
+## [0.2.11](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.10...v0.2.11) (2022-05-12)
+
+## [0.2.10](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.9...v0.2.10) (2022-05-12)
+
+
+### Features
+
+* 添加小程序消息推送配置验证处理方法以及e2e测试 ([306bf58](https://github.com/baaxl9vh/nest-wechat/commit/306bf5871130828f70a3a6d206015ebd9a7fb30d))
+
+## [0.2.9](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.8...v0.2.9) (2022-05-11)
+
+## [0.2.8](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.7...v0.2.8) (2022-05-02)
+
+## [0.2.7](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.6...v0.2.7) (2022-05-02)
+
 ## [0.2.6](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.5...v0.2.6) (2022-05-02)
 
 

@@ -31,10 +31,10 @@ export class AppModule {
 + forRoot配置注册
 
 ```javascript
-import { Module } from '@nestjs/common';
+import { CACHE_MANAGER, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-
-import { WeChatModule } from 'nest-wechat';
+import { Cache } from 'cache-manager';
+import { RedisCache, WeChatModule } from 'nest-wechat';
 
 @Module({
   imports: [
@@ -43,12 +43,13 @@ import { WeChatModule } from 'nest-wechat';
     }),
     WeChatModule.forRootAsync({
       imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
+      inject: [ConfigService, CACHE_MANAGER],
+      useFactory: (configService: ConfigService, cache: Cache) => ({
         appId: configService.get('WX_APPID'),
         secret: configService.get('WX_SECRET'),
         token: configService.get('WX_TOKEN'),
         encodingAESKey: configService.get('WX_AESKEY'),
+        cacheAdapter: new RedisCache(cache),
       }),
     }),
   ]
@@ -219,6 +220,64 @@ export interface ICache {
 ```
 
 > [参考文档](https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/login/auth.code2Session.html)
+
+### 获取手机号码
+
+```javascript
+mp.getPhoneNumber(code: string, accessToken: string): Promise<PhoneNumberResult>;
+```
+
+## 微信支付
+
+### 小程序
+
+#### JSAPI下单
+
+```javascript
+pay.jsapi (order: TransactionOrder, serialNo: string, privateKey: Buffer | string): Promise<{prepay_id: string}>;
+```
+
+#### 商户订单号查询订单
+
+```javascript
+pay.getTransactionById (id: string, mchId: string, serialNo: string, privateKey: Buffer | string): Promise<Trade>;
+```
+
+#### 微信支付订单号查询订单
+
+```javascript
+pay.getTransactionByOutTradeNo (outTradeNo: string, mchId: string, serialNo: string, privateKey: Buffer | string): Promise<Trade>;
+```
+
+#### 关闭订单
+
+```javascript
+pay.close (outTradeNo: string, mchId: string, serialNo: string, privateKey: Buffer | string);
+```
+
+#### 申请请退
+
+```javascript
+pay.refund (refund: RequireOnlyOne<RefundParameters, 'transaction_id' | 'out_trade_no'>, mchId: string, serialNo: string, privateKey: Buffer | string): Promise<RefundResult>;
+```
+
+#### 查询单笔退款
+
+```javascript
+pay.getRefund (outRefundNo: string, mchId: string, serialNo: string, privateKey: Buffer | string): Promise<RefundResult>;
+```
+
+#### 构造小程序调起支付参数
+
+```javascript
+pay.buildMiniProgramPayment (appId: string, prepayId: string, privateKey: Buffer | string): MiniProgramPaymentParameters;
+```
+
+#### 支付通知处理程序
+
+```javascript
+pay.paidCallback (publicKey: Buffer | string, apiKey: string, req: Request, res: Response): Promise<Trade>;
+```
 
 ### Run Test
 
