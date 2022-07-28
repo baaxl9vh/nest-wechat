@@ -2,6 +2,7 @@
   "eslint.enable": true,
   "cSpell.words": [
     "commitlint",
+    "errcode",
     "jsapi",
     "jssdk",
     "nestjs",

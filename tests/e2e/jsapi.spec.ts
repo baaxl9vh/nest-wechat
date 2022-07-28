@@ -38,7 +38,7 @@ describe('jsapi', () => {
       // eslint-disable-next-line camelcase
       expires_in: Date.now() / 1000 + 10000,
     };
-    service.cacheAdapter.set(WeChatService.KEY_ACCESS_TOKEN, incorrectToken);
+    service.cacheAdapter.set(`${WeChatService.KEY_ACCESS_TOKEN}_${service.config.appId}`, incorrectToken);
     const ret = await service.getJSApiTicket();
     expect(ret).toHaveProperty('errcode', 40001);
   });
@@ -88,9 +88,9 @@ describe('jsapi', () => {
     const ticket = retTicket.ticket;
 
     // cache must be the same
-    expect(accessToken).toEqual((await service.cacheAdapter.get<AccountAccessTokenResult>(WeChatService.KEY_ACCESS_TOKEN)).access_token);
+    expect(accessToken).toEqual((await service.cacheAdapter.get<AccountAccessTokenResult>(`${WeChatService.KEY_ACCESS_TOKEN}_${process.env.TEST_APPID}`)).access_token);
     expect(service.cacheAdapter.get).toBeCalledTimes(2);
-    expect(ticket).toEqual((await service.cacheAdapter.get<TicketResult>(WeChatService.KEY_TICKET)).ticket);
+    expect(ticket).toEqual((await service.cacheAdapter.get<TicketResult>(`${WeChatService.KEY_TICKET}_${process.env.TEST_APPID}`)).ticket);
     expect(service.cacheAdapter.get).toBeCalledTimes(3);
 
     // to sign a url and use the ticket in cache
@@ -106,20 +106,20 @@ describe('jsapi', () => {
     expect(sign.signature).toBeTruthy();
 
     // throw error when no url
-    expect(service.jssdkSignature('')).resolves.toThrow();
+    expect(service.jssdkSignature('')).rejects.toThrowError(new Error(`${WeChatService.name}: JS-SDK signature must provide url param.`));
 
     // request an access token and a ticket
     expect(axios.get).toBeCalledTimes(2);
 
     // make the ticket and the token expire
-    const ticketInCache = await service.cacheAdapter.get<TicketResult>(WeChatService.KEY_TICKET);
+    const ticketInCache = await service.cacheAdapter.get<TicketResult>(`${WeChatService.KEY_TICKET}_${process.env.TEST_APPID}`);
     // eslint-disable-next-line camelcase
     ticketInCache.expires_in -= 10800;
-    service.cacheAdapter.set(WeChatService.KEY_TICKET, ticketInCache);
-    const tokenInCache = await service.cacheAdapter.get<AccountAccessTokenResult>(WeChatService.KEY_ACCESS_TOKEN);
+    service.cacheAdapter.set(`${WeChatService.KEY_TICKET}_${process.env.TEST_APPID}`, ticketInCache);
+    const tokenInCache = await service.cacheAdapter.get<AccountAccessTokenResult>(`${WeChatService.KEY_ACCESS_TOKEN}_${process.env.TEST_APPID}`);
     // eslint-disable-next-line camelcase
     tokenInCache.expires_in -= 10800;
-    service.cacheAdapter.set(WeChatService.KEY_ACCESS_TOKEN, tokenInCache);
+    service.cacheAdapter.set(`${WeChatService.KEY_ACCESS_TOKEN}_${process.env.TEST_APPID}`, tokenInCache);
 
     // now they are expired
 
@@ -144,10 +144,10 @@ describe('jsapi', () => {
 
     // eslint-disable-next-line camelcase
     ticketInCache.expires_in += 10800;
-    service.cacheAdapter.set(WeChatService.KEY_TICKET, ticketInCache);
+    service.cacheAdapter.set(`${WeChatService.KEY_TICKET}_${process.env.TEST_APPID}`, ticketInCache);
     // eslint-disable-next-line camelcase
     tokenInCache.expires_in += 10800;
-    service.cacheAdapter.set(WeChatService.KEY_ACCESS_TOKEN, tokenInCache);
+    service.cacheAdapter.set(`${WeChatService.KEY_ACCESS_TOKEN}_${process.env.TEST_APPID}`, tokenInCache);
 
     // now token and ticket are valid
     const message: TemplateMessage = {

@@ -22,8 +22,11 @@ export class MiniProgramService {
    * @link https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/login/auth.code2Session.html
    */
   public async code2Session (code: string, appId?: string, secret?: string): Promise<SessionResult> {
-    appId = appId || this.options?.appId;
-    secret = secret || this.options?.secret;
+    if (!appId || !secret) {
+      appId = this.options?.appId;
+      secret = this.options?.secret;
+    }
+    
     if (!appId || !secret) {
       throw new Error(`${MiniProgramService.name}': No appId or secret.`);
     } else {

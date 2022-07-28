@@ -24,8 +24,8 @@ describe('Test module register', () => {
     jest.spyOn(service.cacheAdapter, 'set');
     jest.spyOn(service.cacheAdapter, 'get');
 
-    expect(service.cacheAdapter.remove(WeChatService.KEY_TICKET)).toBeTruthy();
-    expect(service.cacheAdapter.remove(WeChatService.KEY_ACCESS_TOKEN)).toBeTruthy();
+    expect(service.cacheAdapter.remove(`${WeChatService.KEY_TICKET}_${service.config.appId}`)).toBeTruthy();
+    expect(service.cacheAdapter.remove(`${WeChatService.KEY_ACCESS_TOKEN}_${service.config.appId}`)).toBeTruthy();
 
     // to sign a url and use the ticket in cache
     let sign = await service.jssdkSignature(process.env.TEST_JSSDK_URL || '').catch(err => err);
