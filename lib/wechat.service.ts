@@ -327,15 +327,11 @@ export class WeChatService {
    * @returns 
    * @tutorial https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Template_Message_Interface.html#5
    */
-  public async sendTemplateMessage (message: TemplateMessage, appId?: string, secret?: string): Promise<DefaultRequestResult & { msgid: string } | Error> {
+  public async sendTemplateMessage (message: TemplateMessage, appId?: string, secret?: string): Promise<DefaultRequestResult & { msgid: string }> {
     const token = await this.getToken(appId, secret);
     const url = `https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=${token}`;
-    try {
-      const ret = await axios.post<DefaultRequestResult & { msgid: string }>(url, message);
-      return ret.data;
-    } catch (error) {
-      return (error as Error);
-    }
+    const ret = await axios.post<DefaultRequestResult & { msgid: string }>(url, message);
+    return ret.data;
   }
 
   /**
