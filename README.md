@@ -2,7 +2,7 @@
 
 微信公众号、微信程序开、微信小游戏、微信支付以及企业微信等服务端API nestjs 模块封装。也可以直接当工具类使用。
 
-写nest-wechat的目的是自用，有用到的api就会先写，如果你需要用的api还没实现，可以提 [issues](https://github.com/baaxl9vh/nest-wechat/issues) 给我，我会尽快补上。
+nest-wechat的目的是自用，有用到的api就会先写，如果你需要用的api还没有，可以提 [issues](https://github.com/baaxl9vh/nest-wechat/issues) 给我，我会尽快补上。
 
 ## 快速开始
 
@@ -101,12 +101,11 @@ export interface ICache {
 
 #### getAccessTokenByCode
 
-+ 参数：
-  + {string} code 微信客户端打开授权页跳转后获取到的code
-+ 返回值
-  + Promise&lt;AccessTokenResult&gt; 调用后返回Promise
+```typescript
+public async getAccessTokenByCode (code: string, _appId?: string, _secret?: string): Promise<UserAccessTokenResult>;
+```
 
-正确时返回
+正确返回
 
 ```json
 {
@@ -118,7 +117,7 @@ export interface ICache {
 }
 ```
 
-错误时返回
+错误返回
 
 ```json
 {
@@ -133,10 +132,11 @@ export interface ICache {
 
 #### getAccountAccessToken
 
-+ 返回值
-  + Promise&lt;AccountAccessTokenResult&gt; 调用后返回Promise
+```typescript
+public async getAccountAccessToken (_appId?: string, _secret?: string): Promise<AccountAccessTokenResult>;
+```
 
-正确时返回
+正确返回
 
 ```json
 {
@@ -145,7 +145,7 @@ export interface ICache {
 }
 ```
 
-错误时返回
+错误返回
 
 ```json
 {
@@ -160,8 +160,9 @@ export interface ICache {
 
 #### getJSApiTicket
 
-+ 返回值
-  + Promise&lt;TicketResult&gt; 调用后返回Promise
+```typescript
+public async getJSApiTicket (_appId?: string, _secret?: string): Promise<TicketResult>;
+```
 
 返回数据
 
@@ -180,10 +181,10 @@ export interface ICache {
 
 #### jssdkSignature
 
-+ 参数：
-  + {string} url 参与签名计算的url
-+ 返回值
-  + Promise&lt;SignatureResult&gt; 调用后返回Promise
+```typescript
+public async jssdkSignature (url: string): Promise<SignatureResult>;
+public async jssdkSignature (url: string, appId: string, secret:string): Promise<SignatureResult>;
+```
 
 > [参考文档](https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/JS-SDK.html#65)
 
@@ -191,10 +192,9 @@ export interface ICache {
 
 #### sendTemplateMessage
 
-+ 参数：
-  + {TemplateMessage} message 模板消息参数类型
-+ 返回值
-  + Promise&lt;DefaultRequestResult & { msgid: string }&gt; 调用后返回Promise
+```typescript
+public async sendTemplateMessage (message: TemplateMessage, appId?: string, secret?: string): Promise<DefaultRequestResult & { msgid: string }>;
+```
 
 > [参考文档](https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Template_Message_Interface.html#5)
 
@@ -204,8 +204,9 @@ export interface ICache {
 
 #### mp.code2Session
 
-+ 返回值
-  + Promise&lt;SessionResult&gt; 调用后返回Promise
+```typescript
+public async code2Session (code: string, appId?: string, secret?: string): Promise<SessionResult>;
+```
 
 返回数据
 
