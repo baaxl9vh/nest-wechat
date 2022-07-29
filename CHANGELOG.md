@@ -1,3 +1,10 @@
+## [0.2.19](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.18...v0.2.19) (2022-07-29)
+
+
+### Features
+
+* wechat service接口支持传appid和secret,适合多公众号多小程序情景 ([d91d1f0](https://github.com/baaxl9vh/nest-wechat/commit/d91d1f045628734202ef85f829463c34a1968ff9))
+
 ## [0.2.18](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.17...v0.2.18) (2022-07-07)
 
 
