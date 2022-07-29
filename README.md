@@ -222,11 +222,21 @@ public async code2Session (code: string, appId?: string, secret?: string): Promi
 
 > [参考文档](https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/login/auth.code2Session.html)
 
+### 获取小程序码
+
+```typescript
+public async getUnlimited (accessToken: string, params: ParamCreateQRCode);
+```
+
+> [参考文档](https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/qr-code/wxacode.getUnlimited.html)
+
 ### 获取手机号码
 
 ```javascript
-mp.getPhoneNumber(code: string, accessToken: string): Promise<PhoneNumberResult>;
+public async getPhoneNumber (code: string, accessToken: string);
 ```
+
+> [参考文档](https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/user-info/phone-number/getPhoneNumber.html)
 
 ## 微信支付
 
