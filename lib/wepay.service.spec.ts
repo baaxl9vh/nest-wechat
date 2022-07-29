@@ -56,7 +56,6 @@ describe('WePayService Test(Unit)', () => {
       expect(ret.data.prepay_id).toBeDefined();
       prepayId = ret.data.prepay_id;
     } catch (error) {
-      console.log(error);
     }
   });
 

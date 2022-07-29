@@ -108,7 +108,7 @@ export class WeChatService {
     const ret = res && res.data;
     if (ret.access_token) {
       // eslint-disable-next-line camelcase
-      ret.expires_in += (Date.now() / 1000 - 120);
+      ret.expires_in += (Math.floor(Date.now() / 1000) - 120);
       if (this.cacheAdapter) {
         this.cacheAdapter.set(`${WeChatService.KEY_ACCESS_TOKEN}_${appId}`, ret, 7100);
       }
@@ -189,7 +189,7 @@ export class WeChatService {
     const ret = await axios.get<TicketResult>(url);
     if (ret.data.errcode === 0) {
       // eslint-disable-next-line camelcase
-      ret.data.expires_in += (Date.now() / 1000 - 120);
+      ret.data.expires_in += (Math.floor(Date.now() / 1000) - 120);
       if (this.cacheAdapter) {
         this.cacheAdapter.set(`${WeChatService.KEY_TICKET}_${appId}`, ret.data, 7100);
       }
