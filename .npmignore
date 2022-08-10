@@ -20,6 +20,11 @@ tsconfig.json
 .eslintignore
 
 .env.test
+.env.test.local
 .release-it.json
 .vscode/settings.json
 commitlint.config.js
+
+*.pem
+
+jest.config.ts
