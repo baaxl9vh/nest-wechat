@@ -2,16 +2,48 @@ import { Logger, Req, Res } from '@nestjs/common';
 import axios from 'axios';
 
 import { DefaultRequestResult, ParamCreateQRCode, PhoneNumberResult, SessionResult } from './interfaces';
+import { CreateQRCode, GenerateNFCScheme, GenerateScheme, GenerateUrlLink, QRCode } from './miniprogram.params';
+import { RidInfo, SchemeInfo, SchemeQuota, UrlLinkResult } from './miniprogram.result';
 import { WeChatModuleOptions } from './types';
-
-import type { Request, Response } from 'express';
 import { MessageCrypto } from './utils';
 
+import type { Request, Response } from 'express';
 export class MiniProgramService {
 
   private readonly logger = new Logger(MiniProgramService.name);
 
   constructor (private options: WeChatModuleOptions) {}
+
+  /**
+   * 查询rid信息
+   * @param {string} rid 
+   * @param {string} accessToken 
+   * @returns 
+   * @link https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/openApi/get_rid_info.html
+   */
+  public async getRid (rid: string, accessToken: string) {
+    const url = `https://api.weixin.qq.com/cgi-bin/openapi/rid/get?access_token=${accessToken}`;
+    return axios.post<RidInfo>(url, {
+      rid,
+    });
+  }
+
+  /**
+   * 获取插件用户openpid
+   * 
+   * 通过 wx.pluginLogin 接口获得插件用户标志凭证 code 后传到开发者服务器，开发者服务器调用此接口换取插件用户的唯一标识 openpid。
+   * 
+   * @param {string} code
+   * @param {string} accessToken
+   * @returns
+   * @link https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/user-info/basic-info/getPluginOpenPId.html
+   */
+  public async getPluginOpenPId (code: string, accessToken: string) {
+    const url = `https://api.weixin.qq.com/wxa/getpluginopenpid?access_token=${accessToken}`;
+    return axios.post<DefaultRequestResult & { openpid: string }>(url, {
+      code,
+    });
+  }
 
   /**
    * 登录
@@ -36,6 +68,27 @@ export class MiniProgramService {
   }
 
   /**
+   * 
+   * 获取小程序码
+   * 
+   * 该接口用于获取小程序码，适用于需要的码数量较少的业务场景。通过该接口生成的小程序码，永久有效，有数量限制，详见获取小程序码。
+   * 
+   * + 如果调用成功，会直接返回图片二进制内容，如果请求失败，会返回 JSON 格式的数据。
+   * + POST 参数需要转成 JSON 字符串，不支持 form 表单提交。
+   * + 接口只能生成已发布的小程序码
+   * + 与 createQRCode 总共生成的码数量限制为 100,000，请谨慎调用。
+   * 
+   * @link https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/qrcode-link/qr-code/getQRCode.html
+   */
+  public async getQRCode (params: QRCode, accessToken: string) {
+    const url = `https://api.weixin.qq.com/wxa/getwxacode?access_token=${accessToken}`;
+    return axios.post<DefaultRequestResult & { contentType: string, buffer: Buffer }>(url, params);
+  }
+
+  /**
+   * 
+   * 获取不限制的小程序码
+   * 
    * 获取小程序码，适用于需要的码数量极多的业务场景。通过该接口生成的小程序码，永久有效，数量暂无限制。
    * @param accessToken 
    * @link https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/qr-code/wxacode.getUnlimited.html
@@ -43,6 +96,119 @@ export class MiniProgramService {
   public async getUnlimited (accessToken: string, params: ParamCreateQRCode) {
     const url = `https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=${accessToken}`;
     return axios.post<DefaultRequestResult>(url, params);
+  }
+
+  /**
+   * 获取小程序二维码
+   * 
+   * 获取小程序二维码，适用于需要的码数量较少的业务场景。通过该接口生成的小程序码，永久有效，有数量限制，详见获取二维码。
+   * 
+   * 注意事项
+   * 
+   * + POST 参数需要转成 JSON 字符串，不支持 form 表单提交。
+   * + 接口只能生成已发布的小程序的二维码。开发版的带参二维码可以在开发者工具预览时生成。
+   * + 与 wxacode.get 总共生成的码数量限制为 100,000，请谨慎调用。
+   *
+   * @link https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/qrcode-link/qr-code/createQRCode.html
+   */
+  public async createQRCode (params: CreateQRCode, accessToken: string) {
+    const url = `https://api.weixin.qq.com/cgi-bin/wxaapp/createwxaqrcode?access_token=n=${accessToken}`;
+    return axios.post<DefaultRequestResult & { contentType: string, buffer: Buffer }>(url, params);
+  }
+
+  /**
+   * 查询 scheme 码
+   * 
+   * 该接口用于查询小程序 scheme 码，及长期有效 quota。
+   * 
+   * @param scheme 
+   * @param accessToken 
+   * @returns 
+   * @link https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/qrcode-link/url-scheme/queryScheme.html
+   */
+  public async queryScheme (scheme: string, accessToken: string) {
+    const url = `https://api.weixin.qq.com/wxa/queryscheme?access_token=${accessToken}`;
+    return axios.post<DefaultRequestResult & { scheme_info: SchemeInfo, scheme_quota: SchemeQuota }>(url, { scheme });
+  }
+
+  /**
+   * 获取 scheme 码
+   * 
+   * 该接口用于获取小程序 scheme 码，适用于短信、邮件、外部网页、微信内等拉起小程序的业务场景。通过该接口，可以选择生成到期失效和永久有效的小程序码，有数量限制，目前仅针对国内非个人主体的小程序开放，详见获取 URL scheme。
+   * 
+   * 调用上限
+   * 
+   * Scheme 将根据是否为到期有效与失效时间参数，分为短期有效 Scheme 与长期有效Scheme：
+   * + 单个小程序每日生成 Scheme 上限为50万个（包含短期有效 Scheme 与长期有效 Scheme）
+   * + 有效时间超过180天的 Scheme 或永久有效的 Scheme 为长期有效Scheme，单个小程序总共可生成长期有效 Scheme 上限为10万个，请谨慎调用
+   * + 有效时间不超过180天的 Scheme 为短期有效Scheme，单个小程序生成短期有效 Scheme 不设上限
+   * 
+   * 其他注意事项
+   * + 微信内的网页如需打开小程序请使用微信开放标签 - 小程序跳转按钮，无公众号也可以直接使用小程序身份开发网页并免鉴权跳转小程序，见云开发静态网站跳转小程序。符合开放范围的小程序可以下发支持打开小程序的短信
+   * + 该功能基本覆盖当前用户正在使用的微信版本，开发者无需进行低版本兼容
+   * + 只能生成已发布的小程序的 URL Scheme
+   * + 通过 URL Scheme 跳转到微信时，可能会触发系统弹框询问，若用户选择不跳转，则无法打开小程序。请开发者妥善处理用户选择不跳转的场景
+   * + 部分浏览器会限制打开网页直接跳转，可参考示例网页设置跳转按钮
+   * 
+   * @link https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/qrcode-link/url-scheme/generateScheme.html
+   */
+  public async generateScheme (params: GenerateScheme, accessToken: string) {
+    const url = `https://api.weixin.qq.com/wxa/generatescheme?access_token=${accessToken}`;
+    return axios.post<DefaultRequestResult & { openlink: string }>(url, params);
+  }
+
+  /**
+   * 获取 NFC 的小程序 scheme
+   * 
+   * 该接口用于获取用于 NFC 的小程序 scheme 码，适用于 NFC 拉起小程序的业务场景。目前仅针对国内非个人主体的小程序开放，详见 NFC 标签打开小程序。
+   * 
+   * @link https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/qrcode-link/url-scheme/generateNFCScheme.html
+   */
+  public async generateNFCScheme (params: GenerateNFCScheme, accessToken: string) {
+    const url = `https://api.weixin.qq.com/wxa/generatenfcscheme?access_token=${accessToken}`;
+    return axios.post<DefaultRequestResult & { openlink: string }>(url, params);
+  }
+  
+  /**
+   * 获取 URL Link
+   * 
+   * 获取小程序 URL Link，适用于短信、邮件、网页、微信内等拉起小程序的业务场景。通过该接口，可以选择生成到期失效和永久有效的小程序链接，有数量限制，目前仅针对国内非个人主体的小程序开放，详见获取 URL Link
+   * 
+   * 调用上限
+   * 
+   * Link 将根据是否为到期有效与失效时间参数，分为短期有效Link 与 长期有效Link：
+   * + 单个小程序每日生成 Link 上限为50万个（包含短期有效 Link 与长期有效 Link ）
+   * + 有效时间超过180天的 Link 或永久有效的 Link 为长期有效Link，单个小程序总共可生成长期有效 Link 上限为10万个，请谨慎调用
+   * + 有效时间不超过180天的 Link 为短期有效Link，单个小程序生成短期有效 Link 不设上限
+   * 
+   * 返回值说明
+   * + 如果调用成功，会直接返回生成的小程序 URL Link。如果请求失败，会返回 JSON 格式的数据。
+   * 
+   * 其他注意事项
+   * + 只能生成已发布的小程序的 URL Link。
+   * + 在微信内或者安卓手机打开 URL Link 时，默认会先跳转官方 H5 中间页，如果需要定制 H5 内容，可以使用云开发静态网站。
+   * 
+   * @link https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/qrcode-link/url-link/generateUrlLink.html
+   */
+  public async generateUrlLink (params: GenerateUrlLink, accessToken: string) {
+    const url = `https://api.weixin.qq.com/wxa/generate_urllink?access_token=${accessToken}`;
+    return axios.post<DefaultRequestResult & { url_link: string }>(url, params);
+  }
+
+  /**
+   * 查询 URL Link
+   * 
+   * 该接口用于查询小程序 url_link 配置，及长期有效 quota
+   * 
+   * @param urlLink 
+   * @param accessToken 
+   * @returns 
+   * @link https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/qrcode-link/url-link/queryUrlLink.html
+   */
+  public queryUrlLink (urlLink: string, accessToken: string) {
+    const url = `https://api.weixin.qq.com/wxa/query_urllink?access_token=${accessToken}`;
+    // eslint-disable-next-line camelcase
+    return axios.post<UrlLinkResult>(url, { url_link: urlLink });
   }
 
   /**

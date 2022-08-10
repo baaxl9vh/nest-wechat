@@ -264,7 +264,7 @@ export class ComponentService {
    * @param rid 
    * @param authorizerAccessToken 
    * @returns 
-   * @linkc https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/openApi/get_rid_info.html
+   * @link https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/openApi/get_rid_info.html
    */
   public async getRid (rid: string, authorizerAccessToken: string) {
     const url = `https://api.weixin.qq.com/cgi-bin/openapi/rid/get?access_token=${authorizerAccessToken}`;
