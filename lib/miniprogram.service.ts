@@ -2,8 +2,30 @@ import { Logger, Req, Res } from '@nestjs/common';
 import axios from 'axios';
 
 import { DefaultRequestResult, ParamCreateQRCode, PhoneNumberResult, SessionResult } from './interfaces';
-import { CreateQRCode, GenerateNFCScheme, GenerateScheme, GenerateUrlLink, QRCode } from './miniprogram.params';
-import { RidInfo, SchemeInfo, SchemeQuota, UrlLinkResult } from './miniprogram.result';
+import {
+  CreateActivityId,
+  CreateQRCode,
+  GenerateNFCScheme,
+  GenerateScheme,
+  GenerateShortLink,
+  GenerateUrlLink,
+  MessageTemplate,
+  PubTemplateTitleList,
+  QRCode,
+  SendMessage,
+  SendUniformMessage,
+  UpdatableMsg,
+} from './miniprogram.params';
+import {
+  ActivityIdResult,
+  MessageTemplateListResult,
+  PubTemplateKeyWords,
+  PubTemplateTitleListResult,
+  RidInfo,
+  SchemeInfo,
+  SchemeQuota,
+  UrlLinkResult,
+} from './miniprogram.result';
 import { WeChatModuleOptions } from './types';
 import { MessageCrypto } from './utils';
 
@@ -65,6 +87,19 @@ export class MiniProgramService {
       const url = `https://api.weixin.qq.com/sns/jscode2session?appid=${appId}&secret=${secret}&js_code=${code}&grant_type=authorization_code`;
       return (await axios.get<SessionResult>(url)).data;
     }
+  }
+
+  /**
+   * 获取手机号
+   * @param {string} accessToken 小程序调用token，第三方可通过使用authorizer_access_token代商家进行调用
+   * @param {string} code 手机号获取凭证，小程序端获取
+   * @returns 
+   * @link https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/user-info/phone-number/getPhoneNumber.html
+   * @link https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/getPhoneNumber.html
+   */
+  public async getPhoneNumber (code: string, accessToken: string) {
+    const url = `https://api.weixin.qq.com/wxa/business/getuserphonenumber?access_token=${accessToken}`;
+    return axios.post<PhoneNumberResult>(url, { code });
   }
 
   /**
@@ -212,16 +247,171 @@ export class MiniProgramService {
   }
 
   /**
-   * 获取手机号
-   * @param {string} accessToken 小程序调用token，第三方可通过使用authorizer_access_token代商家进行调用
-   * @param {string} code 手机号获取凭证，小程序端获取
+   * 获取 Short Link
+   * 
+   * 获取小程序 Short Link，适用于微信内拉起小程序的业务场景。目前只开放给电商类目(具体包含以下一级类目：电商平台、商家自营、跨境电商)。通过该接口，可以选择生成到期失效和永久有效的小程序短链，详见获取 Short Link。
+   * 
+   * 调用上限
+   * 
+   * Link 将根据是否为到期有效与失效时间参数，分为**短期有效ShortLink ** 与 **永久有效ShortLink **：
+   * 
+   * + 单个小程序每日生成 ShortLink 上限为50万个（包含短期有效 ShortLink 与长期有效 ShortLink ）
+   * + 单个小程序总共可生成永久有效 ShortLink 上限为10万个，请谨慎调用。
+   * + 短期有效ShortLink 有效时间为30天，单个小程序生成短期有效ShortLink 不设上限。
+   * 
+   * @param params 
+   * @param accessToken 
    * @returns 
-   * @link https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/user-info/phone-number/getPhoneNumber.html
-   * @link https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/getPhoneNumber.html
+   * @link https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/qrcode-link/short-link/generateShortLink.html
    */
-  public async getPhoneNumber (code: string, accessToken: string) {
-    const url = `https://api.weixin.qq.com/wxa/business/getuserphonenumber?access_token=${accessToken}`;
-    return axios.post<PhoneNumberResult>(url, { code });
+  public generateShortLink (params: GenerateShortLink, accessToken: string) {
+    const url = `https://api.weixin.qq.com/wxa/genwxashortlink?access_token=${accessToken}`;
+    return axios.post<DefaultRequestResult & { link: string }>(url, params);
+  }
+
+  /**
+   * 下发统一消息
+   * 
+   * 该接口用于下发小程序和公众号统一的服务消息。
+   * 
+   * @param params 
+   * @param accessToken 
+   * @returns 
+   * @link https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/mp-message-management/uniform-message/sendUniformMessage.html
+   */
+  public sendUniformMessage (params: SendUniformMessage, accessToken: string) {
+    const url = `https://api.weixin.qq.com/cgi-bin/message/wxopen/template/uniform_send?access_token=${accessToken}`;
+    return axios.post<DefaultRequestResult>(url, params);
+  }
+
+  /**
+   * 创建activity_id
+   * 
+   * 该接口用于创建被分享动态消息或私密消息的 activity_id。详见动态消息。
+   * 
+   * @param params 
+   * @param accessToken 
+   * @returns
+   * @link https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/mp-message-management/updatable-message/createActivityId.html
+   */
+  public createActivityId (params: CreateActivityId, accessToken: string) {
+    const url = `https://api.weixin.qq.com/cgi-bin/message/wxopen/activityid/create?access_token=${accessToken}`;
+    return axios.post<ActivityIdResult>(url, params);
+  }
+
+  /**
+   * 修改动态消息
+   * 
+   * 该接口用于修改被分享的动态消息。详见动态消息。
+   * 
+   * @param params 
+   * @param accessToken 
+   * @returns 
+   * @link https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/mp-message-management/updatable-message/setUpdatableMsg.html
+   */
+  public setUpdatableMsg (params: UpdatableMsg, accessToken: string) {
+    const url = `https://api.weixin.qq.com/cgi-bin/message/wxopen/updatablemsg/send?access_token=${accessToken}`;
+    return axios.post<DefaultRequestResult>(url, params);
+  }
+
+  /**
+   * 删除模板
+   * 
+   * 该接口用于删除帐号下的个人模板。
+   * 
+   * @param priTmplId 
+   * @param accessToken 
+   * @returns 
+   * @link https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/mp-message-management/subscribe-message/deleteMessageTemplate.html
+   */
+  public deleteMessageTemplate (priTmplId: string, accessToken: string) {
+    const url = `https://api.weixin.qq.com/wxaapi/newtmpl/deltemplate?access_token=${accessToken}`;
+    return axios.post<DefaultRequestResult>(url, { priTmplId });
+  }
+
+  /**
+   * 获取类目
+   * 
+   * 该接口用于获取小程序账号的类目。
+   * 
+   * @param accessToken 
+   * @returns 
+   * @link https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/mp-message-management/subscribe-message/getCategory.html
+   */
+  public getCategory (accessToken: string) {
+    const url = `https://api.weixin.qq.com/wxaapi/newtmpl/getcategory?access_token=${accessToken}`;
+    return axios.get<DefaultRequestResult & { data: {id: number, name: string}[] }>(url);
+  }
+
+  /**
+   * 获取关键词列表
+   * 
+   * 该接口用于获取模板标题下的关键词列表。
+   * 
+   * @param tid 
+   * @param accessToken 
+   * @returns 
+   * @link https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/mp-message-management/subscribe-message/getPubTemplateKeyWordsById.html
+   */
+  public getPubTemplateKeyWordsById (tid: number, accessToken: string) {
+    const url = `https://api.weixin.qq.com/wxaapi/newtmpl/getpubtemplatekeywords?access_token=${accessToken}&tid=${tid}`;
+    return axios.get<PubTemplateKeyWords>(url);
+  }
+
+  /**
+   * 获取所属类目下的公共模板
+   * 
+   * 该接口用于获取帐号所属类目下的公共模板标题。
+   * 
+   * @param params 
+   * @param accessToken 
+   * @returns 
+   * @link https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/mp-message-management/subscribe-message/getPubTemplateTitleList.html
+   */
+  public getPubTemplateTitleList (params: PubTemplateTitleList, accessToken: string) {
+    const url = `https://api.weixin.qq.com/wxaapi/newtmpl/getpubtemplatetitles?access_token=${accessToken}&ids=${params.ids}&start=${params.start}&limit=${params.limit}`;
+    return axios.get<PubTemplateTitleListResult>(url);
+  }
+
+  /**
+   * 获取个人模板列表
+   * 
+   * 该接口用于获取当前帐号下的个人模板列表。
+   * 
+   * @param accessToken 
+   * @returns 
+   * @link https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/mp-message-management/subscribe-message/getMessageTemplateList.html
+   */
+  public getMessageTemplateList (accessToken: string) {
+    const url = `https://api.weixin.qq.com/wxaapi/newtmpl/gettemplate?access_token=${accessToken}`;
+    return axios.get<MessageTemplateListResult>(url);
+  }
+  /**
+   * 发送订阅消息
+   * 
+   * 该接口用于发送订阅消息。
+   * @param params 
+   * @param accessToken 
+   * @returns 
+   * @link https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/mp-message-management/subscribe-message/sendMessage.html
+   */
+  public sendMessage (params: SendMessage, accessToken: string) {
+    const url = `https://api.weixin.qq.com/cgi-bin/message/subscribe/send?access_token=${accessToken}`;
+    return axios.post<DefaultRequestResult>(url, params);
+  }
+  /**
+   * 添加模板
+   * 
+   * 该接口用于组合模板并添加至帐号下的个人模板库。
+   * 
+   * @param params 
+   * @param accessToken 
+   * @returns 
+   * @link https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/mp-message-management/subscribe-message/addMessageTemplate.html
+   */
+  public addMessageTemplate (params: MessageTemplate, accessToken: string) {
+    const url = `https://api.weixin.qq.com/wxaapi/newtmpl/addtemplate?access_token=${accessToken}`;
+    return axios.post<DefaultRequestResult & { priTmplId: string }>(url, params);
   }
 
   /**

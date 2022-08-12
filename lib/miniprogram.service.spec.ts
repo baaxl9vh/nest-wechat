@@ -23,4 +23,10 @@ describe('mini program service test', () => {
     }
   });
 
+  it('Should get a short link', async () => {
+    const token = '';
+    const ret = await service.generateShortLink({ page_url: 'pages/index/index' }, token);
+    console.log(ret.data.link);
+  });
+
 });

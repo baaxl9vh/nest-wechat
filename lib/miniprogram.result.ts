@@ -104,3 +104,105 @@ export interface UrlLinkResult extends DefaultRequestResult {
   url_link_quota: UrlLinkQuota;
   visit_openid: string;
 }
+
+export interface ActivityIdResult extends DefaultRequestResult {
+  /**
+   * 动态消息的 ID
+   */
+  activity_id: string;
+  /**
+   * activity_id 的过期时间戳。默认24小时后过期。
+   */
+  expiration_time: number;
+}
+
+export interface PubTemplateKeyWords extends DefaultRequestResult {
+  /**
+   * 模版标题列表总数
+   */
+  count: number;
+  data: {
+    /**
+     * 关键词 id，选用模板时需要
+     */
+    kid: number;
+    /**
+     * 关键词内容
+     */
+    name: string;
+    /**
+     * 关键词内容对应的示例
+     */
+    example: string;
+    /**
+     * 参数类型
+     */
+    rule: string;
+  }[];
+}
+
+export interface PubTemplateTitleListResult extends DefaultRequestResult {
+  /**
+   * 模版标题列表总数
+   */
+  count: number;
+  /**
+   * 模板标题列表
+   */
+  data: {
+    /**
+     * 模版标题 id
+     */
+    tid: string;
+    /**
+     * 模版标题
+     */
+    title: string;
+    /**
+     * 模版类型，2 为一次性订阅，3 为长期订阅
+     */
+    type: string;
+    /**
+     * 模版所属类目 id
+     */
+    categoryId: string;
+  }[];
+}
+
+export interface MessageTemplateListResult extends DefaultRequestResult {
+  data: {
+    /**
+     * 添加至帐号下的模板 id，发送小程序订阅消息时所需
+     */
+    priTmplId: string;
+    /**
+     * 模版标题
+     */
+    title: string;
+    /**
+     * 模版内容
+     */
+    content: string;
+    /**
+     * 模板内容示例
+     */
+    example: string;
+    /**
+     * 模版类型，2 为一次性订阅，3 为长期订阅
+     */
+    type: number;
+    /**
+     * 枚举参数值范围
+     */
+    keywordEnumValueList: {
+      /**
+       * 枚举参数的 key
+       */
+      keywordCode: string;
+      /**
+       * 枚举参数值范围列表
+       */
+      enumValueList: string[];
+    }[];
+  }[];
+}
