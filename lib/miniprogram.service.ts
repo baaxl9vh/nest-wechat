@@ -9,6 +9,7 @@ import {
   GenerateScheme,
   GenerateShortLink,
   GenerateUrlLink,
+  GetUnlimitedQRCode,
   MessageTemplate,
   PubTemplateTitleList,
   QRCode,
@@ -17,6 +18,7 @@ import {
   UpdatableMsg,
 } from './miniprogram.params';
 import {
+  AccessTokenResult,
   ActivityIdResult,
   MessageTemplateListResult,
   PubTemplateKeyWords,
@@ -35,6 +37,25 @@ export class MiniProgramService {
   private readonly logger = new Logger(MiniProgramService.name);
 
   constructor (private options: WeChatModuleOptions) {}
+
+  /**
+   * 获取接口调用凭据
+   * 
+   * 获取小程序全局唯一后台接口调用凭据，token有效期为7200s，开发者需要进行妥善保存。
+   * 
+   * @param appId 
+   * @param secret 
+   * @returns 
+   */
+  public getAccessToken (appId?: string, secret?: string) {
+    if (!appId || !secret) {
+      appId = this.options?.appId;
+      secret = this.options?.secret;
+    }
+    const url = 'https://api.weixin.qq.com/cgi-bin/token';
+    // eslint-disable-next-line camelcase
+    return axios.get<AccessTokenResult>(url, { params: { grant_type: 'client_credential', appid: appId, secret } });
+  }
 
   /**
    * 查询rid信息
@@ -127,10 +148,35 @@ export class MiniProgramService {
    * 获取小程序码，适用于需要的码数量极多的业务场景。通过该接口生成的小程序码，永久有效，数量暂无限制。
    * @param accessToken 
    * @link https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/qr-code/wxacode.getUnlimited.html
+   * @deprecated 统一方法名，请使用 #getUnlimitedQRCode
    */
   public async getUnlimited (accessToken: string, params: ParamCreateQRCode) {
     const url = `https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=${accessToken}`;
-    return axios.post<DefaultRequestResult>(url, params);
+    return axios.post<DefaultRequestResult & { buffer: Buffer }>(url, params);
+  }
+
+  /**
+   * 获取不限制的小程序码
+   * 
+   * 该接口用于获取小程序码，适用于需要的码数量极多的业务场景。通过该接口生成的小程序码，永久有效，数量暂无限制。 更多用法详见 获取小程序码。
+   * 
+   * 注意事项
+   * + 如果调用成功，会直接返回图片二进制内容，如果请求失败，会返回 JSON 格式的数据。
+   * + POST 参数需要转成 JSON 字符串，不支持 form 表单提交。
+   * + 接口只能生成已发布的小程序码
+   * + 调用分钟频率受限（5000次/分钟），如需大量小程序码，建议预生成
+   * 
+   * 获取 scene 值
+   * + scene 字段的值会作为 query 参数传递给小程序/小游戏。用户扫描该码进入小程序/小游戏后，开发者可以获取到二维码中的 scene 值，再做处理逻辑。
+   * + 调试阶段可以使用开发工具的条件编译自定义参数 scene=xxxx 进行模拟，开发工具模拟时的 scene 的参数值需要进行 encodeURIComponent
+   * 
+   * @param params 
+   * @param accessToken 
+   * @returns 
+   */
+  public getUnlimitedQRCode (params: GetUnlimitedQRCode, accessToken: string) {
+    const url = `https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=${accessToken}`;
+    return axios.post<DefaultRequestResult & { buffer: Buffer }>(url, params);
   }
 
   /**

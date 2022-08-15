@@ -17,6 +17,19 @@ export interface CreateQRCode {
   width?: number;
 }
 
+/**
+ * 获取不限制的小程序码参数
+ */
+export interface GetUnlimitedQRCode {
+  scene: string;
+  page?: string;
+  check_path?: boolean;
+  env_version?: string;
+  width?: number;
+  auto_color?: boolean;
+  line_color?: { r: number, g: number, b: number };
+  is_hyaline?: boolean;
+}
 
 export interface JumpTarget {
   /**
