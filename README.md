@@ -200,9 +200,31 @@ public async sendTemplateMessage (message: TemplateMessage, appId?: string, secr
 
 ## 微信小程序
 
-### 登录code2Session
+### 获取接口调用凭据
 
-#### mp.code2Session
+```typescript
+public getAccessToken (appId?: string, secret?: string): Promise<AccessTokenResult>;
+```
+
+```typescript
+const service = new WeChatService({ appId: 'your app id', secret: 'your secret'});
+const res = await service.mp.getAccessToken();
+console.log(res.data.access_token);
+```
+
+### 查询rid信息
+
+```typescript
+public async getRid (rid: string, accessToken: string): Promise<RidInfo>;
+```
+
+### 获取插件用户openpid
+
+```typescript
+public async getPluginOpenPId (code: string, accessToken: string): Promise<DefaultRequestResult & { openpid: string }>;
+```
+
+### 登录code2Session
 
 ```typescript
 public async code2Session (code: string, appId?: string, secret?: string): Promise<SessionResult>;
@@ -222,14 +244,6 @@ public async code2Session (code: string, appId?: string, secret?: string): Promi
 
 > [参考文档](https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/login/auth.code2Session.html)
 
-### 获取小程序码
-
-```typescript
-public async getUnlimited (accessToken: string, params: ParamCreateQRCode);
-```
-
-> [参考文档](https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/qr-code/wxacode.getUnlimited.html)
-
 ### 获取手机号码
 
 ```javascript
@@ -237,6 +251,120 @@ public async getPhoneNumber (code: string, accessToken: string);
 ```
 
 > [参考文档](https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/user-info/phone-number/getPhoneNumber.html)
+
+### 获取小程序码
+
+```typescript
+public async getQRCode (params: QRCode, accessToken: string): Promise<DefaultRequestResult & { contentType: string, buffer: Buffer }>;
+```
+
+### 获取不限制的小程序码
+
+```typescript
+public getUnlimitedQRCode (params: GetUnlimitedQRCode, accessToken: string): Promise<DefaultRequestResult & { buffer: Buffer }>;
+```
+
+### 获取小程序二维码
+
+```typescript
+public async createQRCode (params: CreateQRCode, accessToken: string): Promise<DefaultRequestResult & { contentType: string, buffer: Buffer }>;
+```
+
+### 查询scheme码
+
+```typescript
+public async queryScheme (scheme: string, accessToken: string): Promise<DefaultRequestResult & { scheme_info: SchemeInfo, scheme_quota: SchemeQuota }>;
+```
+
+### 获取scheme码
+
+```typescript
+public generateScheme (params: GenerateScheme, accessToken: string): Promise<DefaultRequestResult & { openlink: string >;
+```
+
+### 获取NFC的小程序scheme
+
+```typescript
+public generateNFCScheme (params: GenerateNFCScheme, accessToken: string): Promise<DefaultRequestResult & { openlink: string }>;
+```
+
+### 获取URLLink
+
+```typescript
+public generateUrlLink (params: GenerateUrlLink, accessToken: string): Promise<DefaultRequestResult & { url_link: string }>;
+```
+
+### 查询URLLink
+
+```typescript
+public queryUrlLink (urlLink: string, accessToken: string): Promise<UrlLinkResult>;
+```
+
+### 获取ShortLink
+
+```typescript
+public generateShortLink (params: GenerateShortLink, accessToken: string): Promise<DefaultRequestResult & { link: string }>;
+```
+
+### 下发统一消息
+
+```typescript
+public sendUniformMessage (params: SendUniformMessage, accessToken: string): Promise<DefaultRequestResult>;
+```
+
+### 创建activity_id
+
+```typescript
+public createActivityId (params: CreateActivityId, accessToken: string): Promise<ActivityIdResult>;
+```
+
+### 修改动态消息
+
+```typescript
+public setUpdatableMsg (params: UpdatableMsg, accessToken: string): Promise<DefaultRequestResult>;
+```
+
+### 删除模板
+
+```typescript
+public deleteMessageTemplate (priTmplId: string, accessToken: string): Promise<DefaultRequestResult>;
+```
+
+### 获取类目
+
+```typescript
+public getCategory (accessToken: string): Promise<DefaultRequestResult & { data: {id: number, name: string}[] }>;
+```
+
+### 获取关键词列表
+
+```typescript
+public getPubTemplateKeyWordsById (tid: number, accessToken: string): Promise<PubTemplateKeyWords>;
+```
+
+### 获取所属类目下的公共模板
+
+```typescript
+public getPubTemplateTitleList (params: PubTemplateTitleList, accessToken: string): Promise<PubTemplateTitleListResult>;
+```
+
+### 获取个人模板列表
+
+```typescript
+public getMessageTemplateList (accessToken: string): Promise<MessageTemplateListResult>;
+```
+
+### 发送订阅消息
+
+```typescript
+public sendMessage (params: SendMessage, accessToken: string): Promise<DefaultRequestResult>;
+```
+
+### 添加模板
+
+```typescript
+public addMessageTemplate (params: MessageTemplate, accessToken: string): Promise<DefaultRequestResult & { priTmplId: string }>;
+```
 
 ## 微信支付
 

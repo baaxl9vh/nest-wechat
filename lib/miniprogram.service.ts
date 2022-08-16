@@ -64,7 +64,7 @@ export class MiniProgramService {
    * @returns 
    * @link https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/openApi/get_rid_info.html
    */
-  public async getRid (rid: string, accessToken: string) {
+  public getRid (rid: string, accessToken: string) {
     const url = `https://api.weixin.qq.com/cgi-bin/openapi/rid/get?access_token=${accessToken}`;
     return axios.post<RidInfo>(url, {
       rid,
@@ -81,7 +81,7 @@ export class MiniProgramService {
    * @returns
    * @link https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/user-info/basic-info/getPluginOpenPId.html
    */
-  public async getPluginOpenPId (code: string, accessToken: string) {
+  public getPluginOpenPId (code: string, accessToken: string) {
     const url = `https://api.weixin.qq.com/wxa/getpluginopenpid?access_token=${accessToken}`;
     return axios.post<DefaultRequestResult & { openpid: string }>(url, {
       code,
@@ -118,7 +118,7 @@ export class MiniProgramService {
    * @link https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/user-info/phone-number/getPhoneNumber.html
    * @link https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/getPhoneNumber.html
    */
-  public async getPhoneNumber (code: string, accessToken: string) {
+  public getPhoneNumber (code: string, accessToken: string) {
     const url = `https://api.weixin.qq.com/wxa/business/getuserphonenumber?access_token=${accessToken}`;
     return axios.post<PhoneNumberResult>(url, { code });
   }
@@ -136,7 +136,7 @@ export class MiniProgramService {
    * 
    * @link https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/qrcode-link/qr-code/getQRCode.html
    */
-  public async getQRCode (params: QRCode, accessToken: string) {
+  public getQRCode (params: QRCode, accessToken: string) {
     const url = `https://api.weixin.qq.com/wxa/getwxacode?access_token=${accessToken}`;
     return axios.post<DefaultRequestResult & { contentType: string, buffer: Buffer }>(url, params);
   }
@@ -150,7 +150,7 @@ export class MiniProgramService {
    * @link https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/qr-code/wxacode.getUnlimited.html
    * @deprecated 统一方法名，请使用 #getUnlimitedQRCode
    */
-  public async getUnlimited (accessToken: string, params: ParamCreateQRCode) {
+  public getUnlimited (accessToken: string, params: ParamCreateQRCode) {
     const url = `https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=${accessToken}`;
     return axios.post<DefaultRequestResult & { buffer: Buffer }>(url, params);
   }
@@ -192,7 +192,7 @@ export class MiniProgramService {
    *
    * @link https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/qrcode-link/qr-code/createQRCode.html
    */
-  public async createQRCode (params: CreateQRCode, accessToken: string) {
+  public createQRCode (params: CreateQRCode, accessToken: string) {
     const url = `https://api.weixin.qq.com/cgi-bin/wxaapp/createwxaqrcode?access_token=n=${accessToken}`;
     return axios.post<DefaultRequestResult & { contentType: string, buffer: Buffer }>(url, params);
   }
@@ -207,7 +207,7 @@ export class MiniProgramService {
    * @returns 
    * @link https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/qrcode-link/url-scheme/queryScheme.html
    */
-  public async queryScheme (scheme: string, accessToken: string) {
+  public queryScheme (scheme: string, accessToken: string) {
     const url = `https://api.weixin.qq.com/wxa/queryscheme?access_token=${accessToken}`;
     return axios.post<DefaultRequestResult & { scheme_info: SchemeInfo, scheme_quota: SchemeQuota }>(url, { scheme });
   }
@@ -233,7 +233,7 @@ export class MiniProgramService {
    * 
    * @link https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/qrcode-link/url-scheme/generateScheme.html
    */
-  public async generateScheme (params: GenerateScheme, accessToken: string) {
+  public generateScheme (params: GenerateScheme, accessToken: string) {
     const url = `https://api.weixin.qq.com/wxa/generatescheme?access_token=${accessToken}`;
     return axios.post<DefaultRequestResult & { openlink: string }>(url, params);
   }
@@ -245,7 +245,7 @@ export class MiniProgramService {
    * 
    * @link https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/qrcode-link/url-scheme/generateNFCScheme.html
    */
-  public async generateNFCScheme (params: GenerateNFCScheme, accessToken: string) {
+  public generateNFCScheme (params: GenerateNFCScheme, accessToken: string) {
     const url = `https://api.weixin.qq.com/wxa/generatenfcscheme?access_token=${accessToken}`;
     return axios.post<DefaultRequestResult & { openlink: string }>(url, params);
   }
@@ -271,7 +271,7 @@ export class MiniProgramService {
    * 
    * @link https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/qrcode-link/url-link/generateUrlLink.html
    */
-  public async generateUrlLink (params: GenerateUrlLink, accessToken: string) {
+  public generateUrlLink (params: GenerateUrlLink, accessToken: string) {
     const url = `https://api.weixin.qq.com/wxa/generate_urllink?access_token=${accessToken}`;
     return axios.post<DefaultRequestResult & { url_link: string }>(url, params);
   }
