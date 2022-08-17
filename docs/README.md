@@ -459,6 +459,27 @@ pay.buildMiniProgramPayment (appId: string, prepayId: string, privateKey: Buffer
 pay.paidCallback (publicKey: Buffer | string, apiKey: string, req: Request, res: Response): Promise<Trade>;
 ```
 
+## 微信消息加解密签名工具类
+
+```typescript
+import { MessageCrypto } from 'nest-wechat';
+const sha1 = MessageCrypto.sha1('string to hash');
+```
+
+静态方法：
+
++ sha1 (...args: string[]): string;
++ md5 (text: string): string;
++ getAESKey (encodingAESKey: string): Buffer;
++ getAESKeyIV (aesKey: Buffer): Buffer;
++ PKCS7Encoder (buff: Buffer): Buffer;
++ PKCS7Decoder (buff: Buffer): Buffer;
++ decrypt (aesKey: Buffer, iv: Buffer, str: string): string;
++ encrypt (aesKey: Buffer, iv: Buffer, msg: string, appId: string): string;
++ createNonceStr (length = 16): string;
++ encryptMessage (appId: string, token: string, encodingAESKey: string, message: string, timestamp: string, nonce: string): string;
++ decryptMessage (token: string, encodingAESKey: string, signature: string, timestamp: string, nonce: string, encryptXml: string);
+
 ### Run Test
 
 Create .env.test.local file, and save your test appid and secret in the file.
