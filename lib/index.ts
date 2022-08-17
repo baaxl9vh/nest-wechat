@@ -8,3 +8,6 @@ export * from './interfaces';
 export * from './miniprogram.service';
 export * from './miniprogram.params';
 export * from './miniprogram.result';
+export * from './mobile.module';
+export * from './mobile.service';
+export * from './mobile.types';

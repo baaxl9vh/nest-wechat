@@ -366,6 +366,47 @@ public sendMessage (params: SendMessage, accessToken: string): Promise<DefaultRe
 public addMessageTemplate (params: MessageTemplate, accessToken: string): Promise<DefaultRequestResult & { priTmplId: string }>;
 ```
 
+## 移动应用
+
+Module导入
+
+```typescript
+import { Module } from '@nestjs/common';
+
+import { WeChatMobileModule } from 'nest-wechat';
+
+@Module({
+  imports: [WeChatMobileModule.register()],
+})
+export class AppModule {
+}
+```
+
+工具类引入
+
+```typescript
+import { MobileService } from 'nest-wechat';
+const service = new MobileService();
+```
+
+### 通过code获取access_token
+
+```typescript
+public getAccessToken (code: string, appId: string, secret: string): Promise<AxiosResponse<MobileAppAccessTokenResult, any>>;
+```
+
+### 刷新或续期access_token
+
+```typescript
+public refreshAccessToken (appId: string, refreshToken: string): Promise<AxiosResponse<MobileAppAccessTokenResult, any>>;
+```
+
+### 检验access_token
+
+```typescript
+public checkAccessToken (openId: string, accessToken: string): Promise<AxiosResponse<DefaultRequestResult, any>>;
+```
+
 ## 微信支付
 
 ### 小程序
