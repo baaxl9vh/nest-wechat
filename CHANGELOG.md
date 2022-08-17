@@ -1,3 +1,11 @@
+## [0.2.22](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.21...v0.2.22) (2022-08-17)
+
+
+### Features
+
+* 添加微信移动应用登录封装 ([af89671](https://github.com/baaxl9vh/nest-wechat/commit/af896718d092cae516eab7aff10d10a56fc539e8))
+* 添加微信移动应用登录封装 ([94582bd](https://github.com/baaxl9vh/nest-wechat/commit/94582bdd3cf2862112eeb8317dfe8dd7ee0b9a12))
+
 ## [0.2.21](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.20...v0.2.21) (2022-08-16)
 
 ## [0.2.20](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.19...v0.2.20) (2022-08-16)
