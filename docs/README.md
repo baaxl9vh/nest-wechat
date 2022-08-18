@@ -1,14 +1,16 @@
-<div align='center'>
-  <h1>nest-wechat</h1>
+<div>
+  <div align='center'>
+    <h1>nest-wechat</h1>
+  </div>
   <div>
     <p>微信公众号、微信程序开、微信小游戏、微信支付以及企业微信等服务端API nestjs 模块封装。也可以直接当工具类使用。</p>
-    <p>nest-wechat是自用业务的封装，如果你需要用到的api还没有，可以提 [issues](https://github.com/baaxl9vh/nest-wechat/issues) 给我，我会尽快补上。</p>
-    <div>
+    <p>nest-wechat是自用业务的封装，如果你需要用到的api还没有，可以提 <a href='https://github.com/baaxl9vh/nest-wechat/issues'>issues</a> 给我，我会尽快补上。</p>
+    <div align='center'>
       <br />
       <sub><a href='https://baaxl9vh.github.io/nest-wechat/'>中文文档<a/></sub>
     </div>
   </div>
-  <br /><br />
+  <br />
 </div>
 
 ## 快速开始
