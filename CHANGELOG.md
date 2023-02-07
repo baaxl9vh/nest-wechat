@@ -1,3 +1,10 @@
+## [0.2.23](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.22...v0.2.23) (2023-02-07)
+
+
+### Features
+
+* 新增 即时配送 相关接口 ([f50fe01](https://github.com/baaxl9vh/nest-wechat/commit/f50fe0113907c07ef25c4ef6bd6392bae79652df))
+
 ## [0.2.22](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.21...v0.2.22) (2022-08-17)
 
 
