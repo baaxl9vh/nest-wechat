@@ -16,6 +16,13 @@ import {
   SendMessage,
   SendUniformMessage,
   UpdatableMsg,
+  ExpressLocalPreAddOrder,
+  ExpressLocalPreCancelOrder,
+  ExpressLocalGetLocalOrder,
+  ExpressLocalAbnormalConfirm,
+  ExpressLocalCancelOrder,
+  ExpressLocalAddTips,
+  ExpressLocalAddLocalOrder,
 } from './miniprogram.params';
 import {
   AccessTokenResult,
@@ -27,6 +34,13 @@ import {
   SchemeInfo,
   SchemeQuota,
   UrlLinkResult,
+  ExpressLocalPreAddOrderResult,
+  ExpressLocalGetBindAccountResult,
+  ExpressLocalPreCancelOrderResult,
+  ExpressLocalGetLocalOrderResult,
+  ExpressLocalResult,
+  ExpressLocalCancelOrderResult,
+  ExpressLocalAddLocalOrderResult,
 } from './miniprogram.result';
 import { WeChatModuleOptions } from './types';
 import { MessageCrypto } from './utils';
@@ -36,7 +50,7 @@ export class MiniProgramService {
 
   private readonly logger = new Logger(MiniProgramService.name);
 
-  constructor (private options: WeChatModuleOptions) {}
+  constructor (private options: WeChatModuleOptions) { }
 
   /**
    * 获取接口调用凭据
@@ -101,7 +115,7 @@ export class MiniProgramService {
       appId = this.options?.appId;
       secret = this.options?.secret;
     }
-    
+
     if (!appId || !secret) {
       throw new Error(`${MiniProgramService.name}': No appId or secret.`);
     } else {
@@ -249,7 +263,7 @@ export class MiniProgramService {
     const url = `https://api.weixin.qq.com/wxa/generatenfcscheme?access_token=${accessToken}`;
     return axios.post<DefaultRequestResult & { openlink: string }>(url, params);
   }
-  
+
   /**
    * 获取 URL Link
    * 
@@ -386,7 +400,7 @@ export class MiniProgramService {
    */
   public getCategory (accessToken: string) {
     const url = `https://api.weixin.qq.com/wxaapi/newtmpl/getcategory?access_token=${accessToken}`;
-    return axios.get<DefaultRequestResult & { data: {id: number, name: string}[] }>(url);
+    return axios.get<DefaultRequestResult & { data: { id: number, name: string }[] }>(url);
   }
 
   /**
@@ -489,4 +503,145 @@ export class MiniProgramService {
       return false;
     }
   }
+
+
+
+  /**
+   * 即时配送 获取配送公司列表
+   * @param accessToken 
+   * @returns 
+   */
+  public expressLocalgetAllImmeDelivery (accessToken: string) {
+    const url = `https://api.weixin.qq.com/cgi-bin/express/local/business/order/getallimme?access_token=${accessToken}`;
+    return axios.post<DefaultRequestResult & { list: { delivery_id: string, delivery_name: string }[] }>(url);
+  }
+
+  /**
+   * 即时配送 预下配送单
+   * 
+   * 商家可调用本接口查询配送公司是否可接单、预计多久接单、运费预估等。预估运费可作为展示给用户的运费参考值。
+   * 
+   * 说明：本接口非必须调用接口，若不需要获取配送公司是否可接单、预计多久接单、运费预估等，也可不调用本接口，直接下配送单。
+   * 
+     顺丰同城可返回配送费用、配送距离、预计骑手接单时间，不支持返回delivery_token。
+
+     闪送可返回配送费用、配送距离、预计骑手接单时间，不支持返回delivery_token。
+
+     美团配送返回0时表示校验通过，不支持返回配送费用、配送距离、预计骑手接单时间和delivery_token。
+
+     达达支持预下单查询配送费用、配送距离、预计骑手接单时间和delivery_token(有效期3分钟)
+   * @param params 
+   * @param accessToken 
+   * @returns 
+   */
+  public expressLocalPreAddOrder (params: ExpressLocalPreAddOrder, accessToken: string) {
+    const url = `https://api.weixin.qq.com/cgi-bin/express/local/business/order/pre_add?access_token=${accessToken}`;
+    return axios.post<ExpressLocalPreAddOrderResult>(url, params);
+  }
+
+  /**
+   * 即时配送 拉取已绑定账号
+   * 
+   * 商家可通过本接口查询自己已经在小程序后台绑定的和配送公司签约的账号；
+   * @param accessToken 
+   * @returns 
+   */
+  public expressLocalGetBindAccount (accessToken: string) {
+    const url = `https://api.weixin.qq.com/cgi-bin/express/local/business/shop/get?access_token=${accessToken}`;
+    return axios.post<ExpressLocalGetBindAccountResult>(url);
+  }
+
+  /**
+   * 即时配送 预取消配送单
+   * 
+   * 在正式取消配送单前，商家可调用本接口查询该订单是否可以取消，取消订单配送公司需要扣除的费用是多少。各家取消规则如下：
+   * 
+     顺丰同城急送：配送完成前任意节点可取消配送单
+
+     闪送：配送完成前任意节点可取消配送单
+
+     美团配送：配送完成前任意节点可取消配送单
+
+     达达：骑手取货之前可取消配送单
+
+   * @param params 
+   * @param accessToken 
+   * @returns 
+   */
+  public expressLocalPreCancelOrder (params: ExpressLocalPreCancelOrder, accessToken: string) {
+    const url = `https://api.weixin.qq.com/cgi-bin/express/local/business/order/precancel?access_token=${accessToken}`;
+    return axios.post<ExpressLocalPreCancelOrderResult>(url, params);
+  }
+
+
+  /**
+   * 即时配送 取消配送单
+   * 
+   * !!该接口与 预取消配送单不同
+   * 
+     顺丰同城急送：配送完成前任意节点可取消配送单
+
+     闪送：配送完成前任意节点可取消配送单
+
+     美团配送：配送完成前任意节点可取消配送单
+
+     达达：骑手取货之前可取消配送单
+
+   * @param params 
+   * @param accessToken 
+   * @returns 
+   */
+  public expressLocalCancelOrder (params: ExpressLocalCancelOrder, accessToken: string) {
+    const url = `https://api.weixin.qq.com/cgi-bin/express/local/business/order/cancel?access_token=${accessToken}`;
+    return axios.post<ExpressLocalCancelOrderResult>(url, params);
+  }
+
+  /**
+   * 即时配送 拉取配送单信息
+   * 
+   * 商家可使用本接口查询某一配送单的配送状态，便于商家掌握配送情况
+   * 
+   * @param params 
+   * @param accessToken 
+   * @returns 
+   */
+  public expressLocalGetLocalOrder (params: ExpressLocalGetLocalOrder, accessToken: string) {
+    const url = `https://api.weixin.qq.com/cgi-bin/express/local/business/order/get?access_token=${accessToken}`;
+    return axios.post<ExpressLocalGetLocalOrderResult>(url, params);
+  }
+
+  /**
+   * 即时配送 异常件退回商家确认
+   * 
+   * 该接口用于异常件退回商家后商家确认收货。使用场景为，当订单配送异常，骑手把货物退还给商家，商家收货以后调用本接口返回确认收货
+   * @param params 
+   * @param accessToken 
+   * @returns 
+   */
+  public expressLocalAbnormalConfirm (params: ExpressLocalAbnormalConfirm, accessToken: string) {
+    const url = `https://api.weixin.qq.com/cgi-bin/express/local/business/order/confirm_return?access_token=${accessToken}`;
+    return axios.post<ExpressLocalResult>(url, params);
+  }
+
+  /**
+   * 即时配送 添加小费
+   * 
+   * 该接口可以对待接单状态的订单增加小费。需要注意：订单的小费，以最新一次加小费动作的金额为准，故下一次增加小费额必须大于上一次小费额。
+   * [额外说明](https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/immediate-delivery/deliver-by-business/addTips.html#使用场景)
+   * @param params 
+   * @param accessToken 
+   * @returns 
+   */
+  public expressLocalAddTips (params: ExpressLocalAddTips, accessToken: string) {
+    const url = `https://api.weixin.qq.com/cgi-bin/express/local/business/order/addtips?access_token=${accessToken}`;
+    return axios.post<ExpressLocalResult>(url, params);
+  }
+
+
+  public expressLocalAddLocalOrder (params: ExpressLocalAddLocalOrder, accessToken: string) {
+    const url = `https://api.weixin.qq.com/cgi-bin/express/local/business/order/add?access_token=${accessToken}`;
+    return axios.post<ExpressLocalAddLocalOrderResult>(url, params);
+  }
+
+
 }

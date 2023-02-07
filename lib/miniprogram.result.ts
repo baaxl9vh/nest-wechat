@@ -225,3 +225,165 @@ export interface MessageTemplateListResult extends DefaultRequestResult {
     }[];
   }[];
 }
+
+export interface ExpressLocalResult {
+  /**
+   * 运力返回的错误码
+   */
+  resultcode: number;
+  /**
+   * 运力返回的错误描述
+   */
+  resultmsg: string;
+}
+
+export interface ExpressLocalPreAddOrderResult extends ExpressLocalResult {
+  /**
+   * 实际运费(单位：元)，运费减去优惠券费用
+   */
+  fee: number;
+  /**
+   * 运费(单位：元)
+   */
+  deliverfee: number;
+  /**
+   * 优惠券费用(单位：元)
+   */
+  couponFee: number;
+  /**
+   * 小费(单位：元)
+   */
+  tips: number;
+  /**
+   * 保价费(单位：元)
+   */
+  insurancefee: number;
+  /**
+   * 配送距离(单位：米)预计骑手接单时间，单位秒，比如5分钟，就填300, 无法预计填0
+   */
+  distance: number;
+  /**
+   * 配送公司可以返回此字段，当用户下单时候带上这个字段，保证在一段时间内运费不变
+   */
+  delivery_token: string;
+  /**
+   * 预计骑手接单时间，单位秒，比如5分钟，就填300, 无法预计填0
+   */
+  dispatch_duration: number;
+}
+
+export interface ExpressLocalGetBindAccountResult extends ExpressLocalResult {
+
+  /**
+   * 绑定的商家签约账号列表
+   */
+  shop_list: {
+    shopid: string;
+    delivery_id: string;
+    /**
+     * 审核状态.0表示审核通过；1表示审核中；2表示审核不通过。
+     */
+    audit_result: number;
+  }[]
+}
+
+export interface ExpressLocalPreCancelOrderResult extends ExpressLocalResult {
+  /**
+   * 预计扣除的违约金(单位：元)，精确到分
+   */
+  deduct_fee: number;
+  /**
+   * 说明
+   */
+  desc: string;
+}
+
+export interface ExpressLocalGetLocalOrderResult extends ExpressLocalResult {
+  /**
+   * 配送状态 [详见](https://developers.weixin.qq.com/miniprogram/dev/platform-capabilities/industry/immediate-delivery/order_status.html)
+   */
+  order_status: number;
+  /**
+   * 配送单号
+   */
+  waybill_id: string;
+  /**
+   * 骑手姓名
+   */
+  rider_name: string;
+  /**
+   * 骑手电话
+   */
+  rider_phone: string;
+  /**
+   * 骑手位置经度, 配送中时返回
+   */
+  rider_lng?: number;
+  /**
+   * 骑手位置纬度, 配送中时返回
+   */
+  rider_lat?: number;
+  /**
+   * 预计还剩多久送达时间, 配送中时返回，单位秒， 已取货配送中需返回，比如5分钟后送达，填300
+   */
+  reach_time?: number;
+}
+
+export interface ExpressLocalCancelOrderResult extends ExpressLocalResult {
+  /**
+   * 实际扣除的违约金(单位：元)，精确到分
+   */
+  deduct_fee: number;
+  /**
+   * 说明
+   */
+  desc: string;
+}
+
+export interface ExpressLocalAddLocalOrderResult extends ExpressLocalResult {
+  /**
+   * 实际运费(单位：元)，运费减去优惠券费用
+   */
+  fee: number;
+  /**
+   * 运费(单位：元)
+   */
+  deliverfee: number;
+  /**
+   * 优惠券费用(单位：元)
+   */
+  couponfee: number;
+  /**
+   * 小费(单位：元)
+   */
+  tips: number;
+  /**
+   * 保价费(单位：元)
+   */
+  insurancefee: number;
+  /**
+   * 配送距离(整数单位：米)
+   */
+  distance: number;
+  /**
+   * 配送单号
+   */
+  waybill_id: string;
+  /**
+   * 配送状态 [详见](https://developers.weixin.qq.com/miniprogram/dev/platform-capabilities/industry/immediate-delivery/order_status.html)
+   */
+  order_status: number;
+  /**
+   * 收货码
+   */
+  finish_code: number;
+  /**
+   * 取货码
+   */
+  pickup_code: number;
+  /**
+   * 预计骑手接单时间，单位秒，比如5分钟，就填300, 无法预计填0
+   */
+  dispatch_duration: number;
+
+}
