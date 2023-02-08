@@ -104,7 +104,7 @@ dist
 .tern-port
 
 *.local
-
+.DS_Store
 demo.ts
 
 # wepay private key

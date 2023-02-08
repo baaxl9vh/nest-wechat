@@ -34,20 +34,19 @@ export class WePayService {
    * @link https://pay.weixin.qq.com/wiki/doc/apiv3/apis/wechatpay5_1.shtml
    */
   async getPlatformCertificates (mchId: string, serialNo: string, privateKey: Buffer | string, apiKey: string) {
-    const certs: { sn: string, publicKey: string}[] = [];
+    const certs: Map<string, string> = new Map();
     const nonceStr = createNonceStr();
     const timestamp = Math.floor(Date.now() / 1000);
     let url = '/v3/certificates';
     const signature = this.generateSignature('GET', url, timestamp, nonceStr, privateKey);
     url = 'https://api.mch.weixin.qq.com' + url;
     const ret = await axios.get<{ data: CertificateResult[] }>(url, { headers: this.generateHeader(mchId, nonceStr, timestamp, serialNo, signature) });
-    // console.log('ret.data.data =', ret.data.data);
     if (ret && ret.status === 200 && ret.data) {
       const certificates = ret.data.data;
       for (const cert of certificates) {
         const publicKey = this.decryptCipherText(apiKey, cert.encrypt_certificate.ciphertext, cert.encrypt_certificate.associated_data, cert.encrypt_certificate.nonce) as string;
         const sn = this.getCertificateSn(publicKey);
-        certs.push({ sn, publicKey });
+        certs.set(sn, publicKey);
       }
     }
     return certs;
@@ -200,18 +199,18 @@ export class WePayService {
 
   /**
    * 支付通知处理程序
-   * @param publicKey 
+   * @param certs 微信支付平台证书
    * @param apiKey 
    * @param req 
    * @param res 
    * @returns 
    * @link https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter3_5_5.shtml
    */
-  async paidCallback (publicKey: Buffer | string, apiKey: string, req: Request, res: Response): Promise<Trade> {
-    const signature = req.headers['Wechatpay-Signature'];
-    const platformSerial = req.headers['Wechatpay-Serial'];
-    const timestamp = req.headers['Wechatpay-Timestamp'];
-    const nonce = req.headers['Wechatpay-Nonce'];
+  async paidCallback (certs: Map<string, string>, apiKey: string, req: Request, res: Response): Promise<Trade> {
+    const signature = req.headers['Wechatpay-Signature'] || req.headers['Wechatpay-Signature'.toLowerCase()];
+    const platformSerial = req.headers['Wechatpay-Serial'] || req.headers['Wechatpay-Serial'.toLowerCase()];
+    const timestamp = req.headers['Wechatpay-Timestamp'] || req.headers['Wechatpay-Timestamp'.toLowerCase()];
+    const nonce = req.headers['Wechatpay-Nonce'] || req.headers['Wechatpay-Nonce'.toLowerCase()];
     let rawBody;
     try {
       rawBody = await getRawBody(req);
@@ -230,17 +229,20 @@ export class WePayService {
     let verified = false;
     const responseData = { code: 'FAIL', message: '' };
     let result: Trade = {} as Trade;
-    const serial = this.getCertificateSn(publicKey);
-    if (serial === platformSerial) {
+
+    const publicKey = certs.get(platformSerial as string);
+
+    if (publicKey) {
       verified = this.verifySignature(publicKey, timestamp as string, nonce as string, rawBody, signature as string);
       if (verified) {
-        const resource: CallbackResource = JSON.parse(rawBody.toString());
+        const resource: CallbackResource = JSON.parse(JSON.stringify(rawBody)).resource;
         result = this.decryptCipherText<Trade>(apiKey, resource.ciphertext, resource.associated_data, resource.nonce);
       } else {
         responseData.message = 'VERIFY SIGNATURE FAIL';
       }
     } else {
-      responseData.message = 'SERIAL INCORRECT';
+      // 没有平台证书
+      responseData.message = 'PLATFORM CERTIFICATES NOT FOUND';
     }
 
     if (verified && res && typeof res.send === 'function') {

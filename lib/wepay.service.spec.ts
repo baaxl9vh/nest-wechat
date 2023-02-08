@@ -68,8 +68,8 @@ describe('WePayService Test(Unit)', () => {
   it('Should get platform certificates', async () => {
     const certs = await service.getPlatformCertificates(mchId, serial, privateKey, apiKey);
     expect(certs).toBeDefined();
-    expect(Array.isArray(certs)).toStrictEqual(true);
-    expect(certs[0].sn).toBeDefined();
+    expect(certs).toBeDefined();
+    expect(certs.size).toBeGreaterThan(0);
   });
 
   it('Should get one trade by out trade no', async () => {
