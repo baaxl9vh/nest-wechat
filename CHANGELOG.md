@@ -1,3 +1,10 @@
+## [0.2.24](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.23...v0.2.24) (2023-02-08)
+
+
+### Bug Fixes
+
+* 更新微信支付回调逻辑,更新平台证书返回结果结构 ([eec3027](https://github.com/baaxl9vh/nest-wechat/commit/eec3027959ab63304647c3ff582174b29106ebf2))
+
 ## [0.2.23](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.22...v0.2.23) (2023-02-07)
 
 
