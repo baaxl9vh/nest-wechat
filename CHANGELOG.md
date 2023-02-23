@@ -1,3 +1,10 @@
+## [0.2.26](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.25...v0.2.26) (2023-02-23)
+
+
+### Features
+
+* 可向获取不限制的小程序码方法传递axios请求配置 ([405aa07](https://github.com/baaxl9vh/nest-wechat/commit/405aa0736ca329c2cc1693c1dc86b9a69b4bc68f))
+
 ## [0.2.25](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.24...v0.2.25) (2023-02-08)
 
 ## [0.2.24](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.23...v0.2.24) (2023-02-08)
