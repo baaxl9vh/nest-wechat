@@ -53,7 +53,11 @@ describe('mini program service test', () => {
   });
 
   it('Should got one unlimited qr code', async () => {
-    const ret = await service.getUnlimitedQRCode({ scene: 'test-spec' }, accessToken);
+    let ret = await service.getUnlimitedQRCode({ scene: 'test-spec' }, accessToken);
+    expect(ret.headers['content-type']).toEqual('image/jpeg');
+    ret = await service.getUnlimitedQRCode({ scene: 'test-spec' }, accessToken, { responseEncoding: 'base64' });
+    expect(ret.headers['content-type']).toEqual('image/jpeg');
+    expect(ret.config.responseEncoding).toStrictEqual('base64');
   });
 
   it('Should generate one scheme', async () => {

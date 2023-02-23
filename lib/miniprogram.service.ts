@@ -1,5 +1,5 @@
 import { Logger, Req, Res } from '@nestjs/common';
-import axios from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
 
 import { DefaultRequestResult, ParamCreateQRCode, PhoneNumberResult, SessionResult } from './interfaces';
 import {
@@ -188,9 +188,9 @@ export class MiniProgramService {
    * @param accessToken 
    * @returns 
    */
-  public getUnlimitedQRCode (params: GetUnlimitedQRCode, accessToken: string) {
+  public getUnlimitedQRCode (params: GetUnlimitedQRCode, accessToken: string, config?: AxiosRequestConfig) {
     const url = `https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=${accessToken}`;
-    return axios.post<DefaultRequestResult & { buffer: Buffer }>(url, params);
+    return axios.post<DefaultRequestResult | Buffer | string >(url, params, config);
   }
 
   /**
