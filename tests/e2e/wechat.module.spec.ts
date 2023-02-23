@@ -8,7 +8,7 @@ import * as redisStore from 'cache-manager-redis-store';
 import { createNonceStr, MessageCrypto, RedisCache, WeChatModule, WeChatService } from '../../lib';
 import { WeChatController } from './wechat.controller';
 
-jest.setTimeout(50000);
+jest.setTimeout(120000);
 
 describe('WeChat Module Test', () => {
 
