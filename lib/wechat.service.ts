@@ -1,9 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import axios from 'axios';
 import { createHash } from 'crypto';
 
 import {
   AccountAccessTokenResult,
+  AccountCreateQRCode,
+  AccountCreateQRCodeResult,
   createNonceStr,
   DefaultRequestResult,
   MessageCrypto,
@@ -20,6 +22,8 @@ import { WePayService } from './wepay.service';
 
 @Injectable()
 export class WeChatService {
+
+  private readonly logger = new Logger(WeChatService.name);
 
   /**
    * key_access_token
@@ -106,10 +110,53 @@ export class WeChatService {
     const url = `https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=${appId}&secret=${secret}`;
     const res = await axios.get<AccountAccessTokenResult>(url);
     const ret = res && res.data;
+    this.logger.debug(`请求公众号或者小程序access_token:[errcode=${ret.errcode}][errmsg=${ret.errmsg}]`);
     if (ret.access_token) {
       // eslint-disable-next-line camelcase
       ret.expires_in += (Math.floor(Date.now() / 1000) - 120);
       if (this.cacheAdapter) {
+        this.logger.debug(`保存access_token到缓存[${WeChatService.KEY_ACCESS_TOKEN}_${appId}]`);
+        this.cacheAdapter.set(`${WeChatService.KEY_ACCESS_TOKEN}_${appId}`, ret, 7100);
+      }
+    }
+    return ret;
+  }
+
+  /**
+   * 
+   * # 获取稳定版接口调用凭据
+   * 
+   * ## 功能描述
+   * 
+   * + 获取公众号全局后台接口调用凭据，有效期最长为7200s，开发者需要进行妥善保存；
+   * + 有两种调用模式: 1. 普通模式，access_token 有效期内重复调用该接口不会更新 access_token，绝大部分场景下使用该模式；2. 强制刷新模式，会导致上次获取的 access_token 失效，并返回新的 access_token；
+   * + 该接口调用频率限制为 1万次 每分钟，每天限制调用 50w 次；
+   * + 与获取Access token获取的调用凭证完全隔离，互不影响。该接口仅支持 POST JSON 形式的调用；
+   * 
+   * @param _appId 
+   * @param _secret 
+   * @tutorial https://developers.weixin.qq.com/doc/offiaccount/Basic_Information/getStableAccessToken.html
+   * @returns 
+   */
+  public async getStableAccessToken (_appId?: string, _secret?: string, force = false): Promise<AccountAccessTokenResult> {
+    const { appId, secret } = this.chooseAppIdAndSecret(_appId, _secret);
+    const url = 'https://api.weixin.qq.com/cgi-bin/stable_token';
+    const data = {
+      // eslint-disable-next-line camelcase
+      grant_type: 'client_credential',
+      appid: appId,
+      secret,
+      // eslint-disable-next-line camelcase
+      force_refresh: force,
+    };
+    const res = await axios.post<AccountAccessTokenResult>(url, data);
+    const ret = res && res.data;
+    this.logger.debug(`请求公众号或者小程序access_token:[errcode=${ret.errcode}][errmsg=${ret.errmsg}]`);
+    if (ret.access_token) {
+      // eslint-disable-next-line camelcase
+      ret.expires_in += (Math.floor(Date.now() / 1000) - 120);
+      if (this.cacheAdapter) {
+        this.logger.debug(`保存access_token到缓存[${WeChatService.KEY_ACCESS_TOKEN}_${appId}]`);
         this.cacheAdapter.set(`${WeChatService.KEY_ACCESS_TOKEN}_${appId}`, ret, 7100);
       }
     }
@@ -128,7 +175,7 @@ export class WeChatService {
     const { appId, secret } = this.chooseAppIdAndSecret(_appId, _secret);
     const cache = await this.cacheAdapter.get<AccountAccessTokenResult>(`${WeChatService.KEY_ACCESS_TOKEN}_${appId}`);
     if (!this.checkAccessToken(cache)) {
-      const ret = await this.getAccountAccessToken(appId, secret);
+      const ret = await this.getStableAccessToken(appId, secret);
       if (ret && ret.access_token) {
         accessToken = ret.access_token;
       }
@@ -332,6 +379,34 @@ export class WeChatService {
     const url = `https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=${token}`;
     const ret = await axios.post<DefaultRequestResult & { msgid: string }>(url, message);
     return ret.data;
+  }
+
+  /**
+   * 生成带参数的二维码
+   * @param data 
+   * @param appId 
+   * @param secret 
+   * @returns 
+   * @tutorial https://developers.weixin.qq.com/doc/offiaccount/Account_Management/Generating_a_Parametric_QR_Code.html
+   */
+  public async createQRCode (data: AccountCreateQRCode, appId?: string, secret?: string): Promise<AccountCreateQRCodeResult> {
+    const token = await this.getToken(appId, secret);
+    const url = `https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=${token}`;
+    const ret = await axios.post<AccountCreateQRCodeResult>(url, data);
+    return ret.data;
+  }
+
+  /**
+   * 通过ticket换取二维码
+   * 
+   * 参数TICKET记得进行UrlEncode
+   * 
+   * @param ticket 需要UrlEncode
+   * @returns 
+   */
+  public showQRCode (ticket: string) {
+    const url = `https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=${ticket}`;
+    return axios.get<Buffer>(url, { responseType: 'arraybuffer' });
   }
 
   /**

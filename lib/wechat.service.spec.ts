@@ -3,7 +3,10 @@ import { XMLParser } from 'fast-xml-parser';
 import * as fs from 'fs';
 import * as path from 'path';
 
+import { AccountCreateQRCode } from './interfaces';
 import { WeChatService } from './wechat.service';
+
+jest.setTimeout(120000);
 
 describe('wechat service test', () => {
 
@@ -77,6 +80,17 @@ describe('wechat service test', () => {
     expect(ret.expires_in > 0).toBeTruthy();
   });
 
+  it('Should got an stable access token', async () => {
+    const anotherAppId = process.env.TEST_APPID;
+    const anotherSecret = process.env.TEST_SECRET;
+    let ret = await service.getStableAccessToken(anotherAppId, anotherSecret);
+    expect(ret.access_token.length > 0).toBeTruthy();
+    const token = ret.access_token;
+    expect(ret.expires_in > 0).toBeTruthy();
+    ret = await service.getStableAccessToken(anotherAppId, anotherSecret);
+    expect(token).toEqual(ret.access_token);
+  });
+
   it('Should got a jsapi ticket', async () => {
     const anotherAppId = process.env.TEST_APPID;
     const anotherSecret = process.env.TEST_SECRET;
@@ -93,6 +107,29 @@ describe('wechat service test', () => {
     const ret = await service.jssdkSignature('https://www.baidu.com', anotherAppId, anotherSecret);
     expect(ret.appId).toStrictEqual(anotherAppId);
     expect(ret.signature.length > 0).toBeTruthy();
+  });
+
+  it('Should created one qr code', async () => {
+    const anotherAppId = process.env.TEST_APPID;
+    const anotherSecret = process.env.TEST_SECRET;
+    const data: AccountCreateQRCode = {
+      action_name: 'QR_SCENE',
+      action_info: {
+        scene: {
+          scene_id: 123,
+        },
+      },
+    }
+    let ret = await service.createQRCode(data, anotherAppId, anotherSecret);
+    expect(ret.ticket).toBeTruthy();
+    expect(ret.url).toBeTruthy();
+    const file = path.join(process.cwd(), 'qrcode.jpg');
+    if (fs.existsSync(file)) {
+      fs.unlinkSync(file);
+    }
+    const img = await service.showQRCode(encodeURIComponent(ret.ticket));
+    fs.writeFileSync(file, img.data);
+    expect(fs.existsSync(file)).toBeTruthy();
   });
 
 });
