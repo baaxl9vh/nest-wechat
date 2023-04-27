@@ -1,3 +1,10 @@
+## [0.2.28](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.27...v0.2.28) (2023-04-27)
+
+
+### Features
+
+* 新增接口 ([ef0870b](https://github.com/baaxl9vh/nest-wechat/commit/ef0870b9feda01eb19eae939c92613fdd0e2f931))
+
 ## [0.2.27](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.26...v0.2.27) (2023-02-23)
 
 ## [0.2.26](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.25...v0.2.26) (2023-02-23)
