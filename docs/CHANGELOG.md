@@ -1,3 +1,35 @@
+## [0.2.28](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.27...v0.2.28) (2023-04-27)
+
+
+### Features
+
+* 新增接口 ([ef0870b](https://github.com/baaxl9vh/nest-wechat/commit/ef0870b9feda01eb19eae939c92613fdd0e2f931))
+
+## [0.2.27](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.26...v0.2.27) (2023-02-23)
+
+## [0.2.26](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.25...v0.2.26) (2023-02-23)
+
+
+### Features
+
+* 可向获取不限制的小程序码方法传递axios请求配置 ([405aa07](https://github.com/baaxl9vh/nest-wechat/commit/405aa0736ca329c2cc1693c1dc86b9a69b4bc68f))
+
+## [0.2.25](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.24...v0.2.25) (2023-02-08)
+
+## [0.2.24](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.23...v0.2.24) (2023-02-08)
+
+
+### Bug Fixes
+
+* 更新微信支付回调逻辑,更新平台证书返回结果结构 ([eec3027](https://github.com/baaxl9vh/nest-wechat/commit/eec3027959ab63304647c3ff582174b29106ebf2))
+
+## [0.2.23](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.22...v0.2.23) (2023-02-07)
+
+
+### Features
+
+* 新增 即时配送 相关接口 ([f50fe01](https://github.com/baaxl9vh/nest-wechat/commit/f50fe0113907c07ef25c4ef6bd6392bae79652df))
+
 ## [0.2.22](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.21...v0.2.22) (2022-08-17)
 
 
