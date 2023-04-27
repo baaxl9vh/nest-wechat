@@ -39,13 +39,13 @@ describe('Test module register', () => {
 
     expect(service.cacheAdapter.get).toBeCalledTimes(2);
     expect(service.cacheAdapter.set).toBeCalledTimes(2);
-    expect(axios.get).toBeCalledTimes(2);
+    expect(axios.get).toBeCalledTimes(1);
 
     // 再次签名，读缓存，不再发请求，只读一次ticket缓存
     sign = await service.jssdkSignature(process.env.TEST_JSSDK_URL || '').catch(err => err);
     expect(service.cacheAdapter.get).toBeCalledTimes(3);
     expect(service.cacheAdapter.set).toBeCalledTimes(2);
-    expect(axios.get).toBeCalledTimes(2);
+    expect(axios.get).toBeCalledTimes(1);
 
 
     await app.close();

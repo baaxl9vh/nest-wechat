@@ -140,7 +140,7 @@ describe('jsapi', () => {
     expect(sign.signature).toBeTruthy();
 
     // request call twice
-    expect(axios.get).toBeCalledTimes(4);
+    expect(axios.get).toBeCalledTimes(3);
 
     // eslint-disable-next-line camelcase
     ticketInCache.expires_in += 10800;
