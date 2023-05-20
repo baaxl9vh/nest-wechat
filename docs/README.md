@@ -498,6 +498,12 @@ pay.buildMiniProgramPayment (appId: string, prepayId: string, privateKey: Buffer
 pay.paidCallback (publicKey: Buffer | string, apiKey: string, req: Request, res: Response): Promise<Trade>;
 ```
 
+#### 退款通知处理程序
+
+```javascript
+pay.refundedCallback (certs: Map<string, string>, apiKey: string, req: Request, res: Response): Promise<RefundNotifyResult>;
+```
+
 ## 微信消息加解密签名工具类
 
 ```typescript
