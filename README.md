@@ -165,6 +165,16 @@ public async getAccountAccessToken (_appId?: string, _secret?: string): Promise<
 
 > [参考文档](https://developers.weixin.qq.com/doc/offiaccount/Basic_Information/Get_access_token.html)
 
+### 获取稳定版接口调用凭据
+
+#### getStableAccessToken
+
+```typescript
+public async getStableAccessToken (_appId?: string, _secret?: string, force = false): Promise<AccountAccessTokenResult>;
+```
+
+> [参考文档](https://developers.weixin.qq.com/doc/offiaccount/Basic_Information/getStableAccessToken.html)
+
 ### 获取jsapi_ticket
 
 #### getJSApiTicket
@@ -206,6 +216,26 @@ public async sendTemplateMessage (message: TemplateMessage, appId?: string, secr
 ```
 
 > [参考文档](https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Template_Message_Interface.html#5)
+
+### 生成带参数的二维码
+
+#### createQRCode
+
+```typescript
+public async createQRCode (data: AccountCreateQRCode, appId?: string, secret?: string): Promise<AccountCreateQRCodeResult>;
+```
+
+> [参考文档](https://developers.weixin.qq.com/doc/offiaccount/Account_Management/Generating_a_Parametric_QR_Code.html)
+
+### 通过ticket换取二维码
+
+#### showQRCode
+
+```typescript
+public showQRCode (ticket: string): Promis<Buffer>;
+```
+
+> [参考文档](https://developers.weixin.qq.com/doc/offiaccount/Account_Management/Generating_a_Parametric_QR_Code.html)
 
 ## 微信小程序
 
