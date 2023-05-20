@@ -690,3 +690,20 @@ export enum RefundChannel {
    */
   OTHER_BANKCARD = 'OTHER_BANKCARD'
 }
+
+export interface RefundNotifyResult {
+  mchid: string;
+  out_trade_no: string;
+  transaction_id: string;
+  out_refund_no: string;
+  refund_id: string;
+  refund_status: 'SUCCESS' | 'ABNORMAL' | 'CLOSED';
+  success_time: string;
+  amount: {
+    total: number;
+    refund: number;
+    payer_total: number;
+    payer_refund: number;
+  };
+  user_received_account: string;
+}

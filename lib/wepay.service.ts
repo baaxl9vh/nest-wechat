@@ -8,6 +8,7 @@ import {
   CallbackResource,
   CertificateResult,
   MiniProgramPaymentParameters,
+  RefundNotifyResult,
   RefundParameters,
   RefundResult,
   RequireOnlyOne,
@@ -176,12 +177,6 @@ export class WePayService {
     });
   }
 
-  private async refundedCallback () {
-    // 退款结果通知
-    // https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter3_5_11.shtml
-    // 
-  }
-
   private async getTradeBill () {
     // 申请交易账单
     // https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter3_5_6.shtml
@@ -251,6 +246,22 @@ export class WePayService {
       res.status(401).json(responseData);
     }
     return result;
+  }
+
+  /**
+   * 退款结果通知
+   * 
+   * 实现与付款通知一样，解密后数据结构不同，直接复用付款通知实现
+   * 
+   * @param certs 
+   * @param apiKey 
+   * @param req 
+   * @param res 
+   * @returns 
+   * @tutorial https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter3_5_11.shtml
+   */
+  async refundedCallback (certs: Map<string, string>, apiKey: string, req: Request, res: Response): Promise<RefundNotifyResult> {
+    return this.paidCallback(certs, apiKey, req, res) as unknown as Promise<RefundNotifyResult>;
   }
 
   /**
