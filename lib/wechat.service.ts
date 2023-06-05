@@ -2,6 +2,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import axios from 'axios';
 import { createHash } from 'crypto';
 
+import { Request, Response } from 'express';
+import getRawBody from 'raw-body';
 import {
   AccountAccessTokenResult,
   AccountCreateQRCode,
@@ -55,6 +57,8 @@ export class WeChatService {
    */
   public pay: WePayService;
 
+  private debug = false;
+
   public set cacheAdapter (adapter: ICache) {
     if (adapter) {
       this._cacheAdapter = adapter;
@@ -68,6 +72,9 @@ export class WeChatService {
     this.mp = new MiniProgramService(options);
     this.pay = new WePayService();
     if (options && options.cacheAdapter) {
+      if (options.debug) {
+        this.debug = true;
+      }
       this.cacheAdapter = options.cacheAdapter as ICache;
     }
   }
@@ -292,6 +299,44 @@ export class WeChatService {
     };
   }
 
+  public async messagePushHandler (req: Request, res?: Response, resText?: string) {
+    const timestamp = req.query && req.query.timestamp;
+    const nonce = req.query && req.query.nonce;
+    const signature = req.query && req.query.msg_signature;
+    let rawBody;
+    try {
+      rawBody = await getRawBody(req);
+    } catch (error) {
+      const message = (error as Error).message as string;
+      this.logger.debug(message);
+      if (message === 'stream is not readable') {
+        rawBody = req.body;
+      }
+    }
+    let decrypt = '';
+    if (timestamp && nonce && signature && rawBody) {
+      decrypt = this.decryptMessage(signature as string, timestamp as string, nonce as string, rawBody.toString());
+      if (this.debug) this.logger.debug(`eventPushHandler:${decrypt}`);
+    }
+    if (res && typeof res.send === 'function') {
+      res.send(resText || '');
+    }
+    return decrypt;
+  }
+
+  public expressCheckSignature (req: Request, res: Response) {
+    const token = this.options?.token || '';
+    const signature = req.query && req.query.signature || '';
+    const timestamp = req.query && req.query.timestamp || '';
+    const nonce = req.query && req.query.nonce || '';
+    const echostr = req.query && req.query.echostr || '';
+    if (MessageCrypto.checkSignature(signature as string, timestamp as string, nonce as string, token)) {
+      res.send(echostr);
+    } else {
+      res.send('fail');
+    }
+  }
+
   /**
    * 
    * Check token saved in the cache
@@ -421,7 +466,7 @@ export class WeChatService {
    * @link https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/Before_Develop/Message_encryption_and_decryption.html
    */
   public encryptMessage (message: string, timestamp: string, nonce: string): string {
-    return MessageCrypto.encryptMessage(this.config.appId, this.config.token || '', this.config.encodingAESKey || '', message, timestamp, nonce);
+    return MessageCrypto.encryptMessage(this.options?.appId, this.options?.token || '', this.options?.encodingAESKey || '', message, timestamp, nonce);
   }
 
   /**
@@ -439,6 +484,6 @@ export class WeChatService {
    * 
    */
   public decryptMessage (signature: string, timestamp: string, nonce: string, encryptXml: string) {
-    return MessageCrypto.decryptMessage(this.config.token || '', this.config.encodingAESKey || '', signature, timestamp, nonce, encryptXml);
+    return MessageCrypto.decryptMessage(this.options?.token || '', this.options?.encodingAESKey || '', signature, timestamp, nonce, encryptXml);
   }
 }

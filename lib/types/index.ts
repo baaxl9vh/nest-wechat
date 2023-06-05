@@ -32,21 +32,22 @@ export interface WeChatModuleOptions {
    * WeChat official account secret
    */
   secret: string;
-
   /**
    * 微信公众号服务器Token
    */
   token?: string;
-
   /**
    * 微信公众号服务器EncodingAESKey
    */
   encodingAESKey?: string;
-
   /**
    * 缓存适配器
    */
   cacheAdapter?: object;
+  /**
+   * 打开调试
+   */
+  debug?: boolean;
 }
 
 /**

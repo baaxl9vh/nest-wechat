@@ -1,11 +1,11 @@
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 
-import WePayModule from './wepay.module';
+import WeChatAppModule from './wechat-app.module';
 
 
 async function bootstrap () {
-  const app = await NestFactory.create(WePayModule);
+  const app = await NestFactory.create(WeChatAppModule);
 
   app.enableShutdownHooks();
 

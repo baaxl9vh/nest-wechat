@@ -13,7 +13,23 @@ export class WeChatController {
   constructor (private readonly service: WeChatService) {
   }
 
-  @Get('/message_push')
+  /**
+   * 公众号配置服务器时推送签名验证
+   */
+  @Get('push')
+  async pushTest (@Req() req: Request, @Res() res: Response) {
+    this.service.expressCheckSignature(req, res);
+  }
+
+  /**
+   * 公众号推送消息
+   */
+  @Post('message_push')
+  async officialPushTest (@Req() req: Request, @Res() res: Response) {
+    this.service.messagePushHandler(req, res);
+  }
+
+  @Get('/mp_push')
   async messagePush (@Req() req: Request, @Res() res: Response) {
     const ret = this.service.mp.verifyMessagePush(req, res);
     this.logger.debug(`messagePush() ret = ${ret}`);

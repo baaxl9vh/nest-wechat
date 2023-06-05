@@ -164,4 +164,17 @@ export class MessageCrypto {
     return MessageCrypto.decrypt(aesKey, iv, encryptMessage);
   }
 
+  /**
+   * 用token检验签名是否正确
+   * @param signature 
+   * @param timestamp 
+   * @param nonce 
+   * @param token 
+   * @returns 
+   */
+  public static checkSignature (signature: string, timestamp: string, nonce: string, token: string) {
+    const my = MessageCrypto.sha1(token, timestamp, nonce);
+    return my === signature;
+  }
+
 }

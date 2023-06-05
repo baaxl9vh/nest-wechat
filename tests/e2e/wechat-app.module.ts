@@ -38,6 +38,6 @@ import { WeChatController } from './wechat.controller';
   ],
   controllers: [WeChatController],
 })
-export default class WePayModule {
+export default class WeChatAppModule {
 
 }
