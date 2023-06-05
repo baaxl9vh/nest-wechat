@@ -5,6 +5,8 @@ import axios from 'axios';
 import { WeChatService } from '../../lib';
 import { AppModule } from '../app.module';
 
+jest.setTimeout(40000);
+
 describe('Test module register', () => {
 
   let app: INestApplication;

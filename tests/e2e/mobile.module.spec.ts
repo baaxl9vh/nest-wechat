@@ -3,6 +3,8 @@ import { Test } from '@nestjs/testing';
 
 import { MobileService, WeChatMobileModule } from '../../lib';
 
+jest.setTimeout(40000);
+
 describe('', () => {
 
   let app: INestApplication;

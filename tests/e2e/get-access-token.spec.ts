@@ -4,6 +4,8 @@ import { WeChatService } from '../../lib';
 
 import { AppModule } from '../app.module';
 
+jest.setTimeout(40000);
+
 describe('Official Account', () => {
   
   let app: INestApplication;
