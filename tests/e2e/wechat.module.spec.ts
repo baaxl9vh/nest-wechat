@@ -62,7 +62,7 @@ describe('WeChat Module Test', () => {
     const nonce = createNonceStr(16);
     const signature = MessageCrypto.sha1(token || 'no_token', timestamp.toString(), nonce);
     const echostr = createNonceStr(16);
-    const ret = await axios.get('http://localhost:3000/wechat/message_push', { params: { signature, timestamp, nonce, echostr }});
+    const ret = await axios.get('http://localhost:3000/wechat/mp_push', { params: { signature, timestamp, nonce, echostr }});
     expect(ret.data).toStrictEqual(echostr);
   });
 
