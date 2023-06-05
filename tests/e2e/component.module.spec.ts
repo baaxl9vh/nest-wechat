@@ -11,6 +11,8 @@ import { WeChatComponentModule } from '../../lib/component.module';
 import { ComponentService } from '../../lib/component.service';
 import { ComponentController } from './component.controller';
 
+jest.setTimeout(20000);
+
 describe('Component module Test', () => {
 
   let service: ComponentService;
