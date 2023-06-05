@@ -3,7 +3,13 @@ import { NestFactory } from '@nestjs/core';
 
 import WeChatAppModule from './wechat-app.module';
 
-
+/**
+ * 测试接收微信公众号服务器配置等推送
+ * 
+ * 需要运行在公网环境，或者穿透内网环境
+ * 
+ * 运行命令：npx cross-env TEST_TOKEN=your/token TEST_AESKEY=your/aeskey ts-node tests/e2e/wechat-app.main.ts
+ */
 async function bootstrap () {
   const app = await NestFactory.create(WeChatAppModule);
 

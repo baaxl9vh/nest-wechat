@@ -18,15 +18,17 @@ export class WeChatController {
    */
   @Get('push')
   async pushTest (@Req() req: Request, @Res() res: Response) {
-    this.service.expressCheckSignature(req, res);
+    this.service.checkSignatureExpress(req, res);
   }
 
   /**
    * 公众号推送消息
    */
-  @Post('message_push')
+  @Post('push')
   async officialPushTest (@Req() req: Request, @Res() res: Response) {
-    this.service.messagePushHandler(req, res);
+    this.logger.debug('officialPushTest()');
+    const decrypt = await this.service.messagePushExpressHandler(req, res);
+    this.logger.debug('decrypt =', decrypt);
   }
 
   @Get('/mp_push')

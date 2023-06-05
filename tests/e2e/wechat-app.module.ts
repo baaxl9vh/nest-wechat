@@ -33,6 +33,7 @@ import { WeChatController } from './wechat.controller';
         token: config.get('TEST_TOKEN'),
         encodingAESKey: config.get('TEST_AESKEY'),
         cacheAdapter: new RedisCache(cache),
+        debug: true,
       }),
     }),
   ],

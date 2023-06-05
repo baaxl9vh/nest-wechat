@@ -11,6 +11,8 @@
   - [发送模板消息](README.md#发送模板消息)
   - [生成带参数的二维码](README.md#生成带参数的二维码)
   - [通过ticket换取二维码](README.md#通过ticket换取二维码)
+  - [填写服务器配置](README.md#填写服务器配置)
+  - [接收事件推送](README.md#接收事件推送)
 - [微信小程序](README.md#微信小程序)
   - [获取接口调用凭据](README.md#获取接口调用凭据)
   - [查询rid信息](README.md#查询rid信息)

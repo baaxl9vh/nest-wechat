@@ -237,6 +237,44 @@ public showQRCode (ticket: string): Promis<Buffer>;
 
 > [参考文档](https://developers.weixin.qq.com/doc/offiaccount/Account_Management/Generating_a_Parametric_QR_Code.html)
 
+### 填写服务器配置
+
+#### checkSignatureExpress
+
+```typescript
+WeChatService.checkSignatureExpress (req: Request, res: Response);
+```
+
+Usage:
+
+```typescript
+@Get('push')
+async pushTest (@Req() req: Request, @Res() res: Response) {
+  this.service.checkSignatureExpress(req, res);
+}
+```
+
+> [参考文档](https://developers.weixin.qq.com/doc/offiaccount/Basic_Information/Access_Overview.html)
+
+### 接收事件推送
+
+#### messagePushExpressHandler
+
+```typescript
+WeChatService.messagePushExpressHandler (req: Request, res?: Response, resText?: string);
+```
+
+Usage:
+
+```typescript
+@Post('push')
+async officialPushTest (@Req() req: Request, @Res() res: Response) {
+  const decrypt = await this.service.messagePushExpressHandler(req, res);
+}
+```
+
+> [参考文档](https://developers.weixin.qq.com/doc/offiaccount/Basic_Information/Access_Overview.html)
+
 ## 微信小程序
 
 ### 获取接口调用凭据
@@ -524,6 +562,8 @@ const sha1 = MessageCrypto.sha1('string to hash');
 + createNonceStr (length = 16): string;
 + encryptMessage (appId: string, token: string, encodingAESKey: string, message: string, timestamp: string, nonce: string): string;
 + decryptMessage (token: string, encodingAESKey: string, signature: string, timestamp: string, nonce: string, encryptXml: string);
++ decryptMessage (token: string, encodingAESKey: string, signature: string, timestamp: string, nonce: string, encryptXml: string);
++ checkSignature (signature: string, timestamp: string, nonce: string, token: string);
 
 ### Run Test
 
