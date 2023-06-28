@@ -25,6 +25,9 @@ export class WePayService {
 
   private readonly logger = new Logger(WePayService.name);
 
+  constructor (private readonly debug = false) {
+  }
+
   /**
    * 获取平台证书列表
    * @param mchId 
@@ -211,16 +214,18 @@ export class WePayService {
       rawBody = await getRawBody(req);
     } catch (error) {
       const message = (error as Error).message as string;
-      this.logger.debug(message);
+      if (this.debug) this.logger.debug(`getRawBody error:${message}`);
       if (message === 'stream is not readable') {
         rawBody = req.body;
       }
     }
-    this.logger.debug(`Wechatpay-Signature = ${signature}`);
-    this.logger.debug(`Wechatpay-Serial = ${platformSerial}`);
-    this.logger.debug(`Wechatpay-Timestamp = ${timestamp}`);
-    this.logger.debug(`Wechatpay-Nonce = ${nonce}`);
-    this.logger.debug(`Body = ${typeof rawBody === 'string' ? rawBody : JSON.stringify(rawBody)}`);
+    if (this.debug) {
+      this.logger.debug(`Wechatpay-Signature = ${signature}`);
+      this.logger.debug(`Wechatpay-Serial = ${platformSerial}`);
+      this.logger.debug(`Wechatpay-Timestamp = ${timestamp}`);
+      this.logger.debug(`Wechatpay-Nonce = ${nonce}`);
+      this.logger.debug(`Body = ${typeof rawBody === 'string' ? rawBody : JSON.stringify(rawBody)}`);
+    }
     let verified = false;
     const responseData = { code: 'FAIL', message: '' };
     let result: Trade = {} as Trade;

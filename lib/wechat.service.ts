@@ -70,13 +70,13 @@ export class WeChatService {
 
   constructor (private options: WeChatModuleOptions) {
     this.mp = new MiniProgramService(options);
-    this.pay = new WePayService();
     if (options && options.cacheAdapter) {
       if (options.debug) {
         this.debug = true;
       }
       this.cacheAdapter = options.cacheAdapter as ICache;
     }
+    this.pay = new WePayService(this.debug);
   }
 
   /**
@@ -117,12 +117,12 @@ export class WeChatService {
     const url = `https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=${appId}&secret=${secret}`;
     const res = await axios.get<AccountAccessTokenResult>(url);
     const ret = res && res.data;
-    this.logger.debug(`请求公众号或者小程序access_token:[errcode=${ret.errcode}][errmsg=${ret.errmsg}]`);
+    if (this.debug) this.logger.debug(`请求公众号或者小程序access_token:[errcode=${ret.errcode}][errmsg=${ret.errmsg}]`);
     if (ret.access_token) {
       // eslint-disable-next-line camelcase
       ret.expires_in += (Math.floor(Date.now() / 1000) - 120);
       if (this.cacheAdapter) {
-        this.logger.debug(`保存access_token到缓存[${WeChatService.KEY_ACCESS_TOKEN}_${appId}]`);
+        if (this.debug) this.logger.debug(`保存access_token到缓存[${WeChatService.KEY_ACCESS_TOKEN}_${appId}]`);
         this.cacheAdapter.set(`${WeChatService.KEY_ACCESS_TOKEN}_${appId}`, ret, 7100);
       }
     }
@@ -158,12 +158,12 @@ export class WeChatService {
     };
     const res = await axios.post<AccountAccessTokenResult>(url, data);
     const ret = res && res.data;
-    this.logger.debug(`请求公众号或者小程序access_token:[errcode=${ret.errcode}][errmsg=${ret.errmsg}]`);
+    if (this.debug) this.logger.debug(`请求公众号或者小程序access_token:[errcode=${ret.errcode}][errmsg=${ret.errmsg}]`);
     if (ret.access_token) {
       // eslint-disable-next-line camelcase
       ret.expires_in += (Math.floor(Date.now() / 1000) - 120);
       if (this.cacheAdapter) {
-        this.logger.debug(`保存access_token到缓存[${WeChatService.KEY_ACCESS_TOKEN}_${appId}]`);
+        if (this.debug) this.logger.debug(`保存access_token到缓存[${WeChatService.KEY_ACCESS_TOKEN}_${appId}]`);
         this.cacheAdapter.set(`${WeChatService.KEY_ACCESS_TOKEN}_${appId}`, ret, 7100);
       }
     }

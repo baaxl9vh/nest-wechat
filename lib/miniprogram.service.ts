@@ -50,7 +50,13 @@ export class MiniProgramService {
 
   private readonly logger = new Logger(MiniProgramService.name);
 
-  constructor (private options: WeChatModuleOptions) { }
+  private debug = false;
+
+  constructor (private options: WeChatModuleOptions) {
+    if (options && options.debug) {
+      this.debug = true;
+    }
+  }
 
   /**
    * 获取接口调用凭据
@@ -484,8 +490,10 @@ export class MiniProgramService {
    */
   public verifyMessagePush (@Req() req: Request, @Res() res: Response, token?: string) {
     token = token || this.options?.token;
-    this.logger.debug(`verifyMessagePush() token = ${token}`);
-    this.logger.debug(`verifyMessagePush() query = ${JSON.stringify(req.query)}`);
+    if (this.debug) {
+      this.logger.debug(`verifyMessagePush() token = ${token}`);
+      this.logger.debug(`verifyMessagePush() query = ${JSON.stringify(req.query)}`);
+    }
     const signature = (req.query && req.query.signature) || '';
     const timestamp = (req.query && req.query.timestamp) || '';
     const nonce = (req.query && req.query.nonce) || '';
