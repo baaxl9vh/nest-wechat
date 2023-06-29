@@ -59,6 +59,7 @@ import { RedisCache, WeChatModule } from 'nest-wechat';
         token: configService.get('WX_TOKEN'),
         encodingAESKey: configService.get('WX_AESKEY'),
         cacheAdapter: new RedisCache(cache),
+        debug: true,
       }),
     }),
   ]
