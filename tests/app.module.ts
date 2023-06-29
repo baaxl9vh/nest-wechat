@@ -46,6 +46,7 @@ export class AppModule {
             token: configService.get('TEST_TOKEN'),
             encodingAESKey: configService.get('TEST_AESKEY'),
             cacheAdapter: new RedisCache(cache),
+            debug: true,
           }),
         }),
       ],
