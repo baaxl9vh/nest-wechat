@@ -1,3 +1,10 @@
+## [0.2.30](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.29...v0.2.30) (2023-06-29)
+
+
+### Features
+
+* 增加debug参数 ([4249761](https://github.com/baaxl9vh/nest-wechat/commit/424976180836dd4fa7ef21fb5456b6d1f68a67a7))
+
 ## [0.2.29](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.28...v0.2.29) (2023-06-05)
 
 
