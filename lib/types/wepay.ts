@@ -46,6 +46,12 @@ export interface TransactionOrder {
    * 长度32
    */
   goods_tag?: string;
+
+  /**
+   * 电子发票入口开放标识
+   * 传入true时，支付成功消息和支付详情页将出现开票入口。需要在微信支付商户平台或微信公众平台开通电子发票功能，传此字段才可生效。 
+   */
+  support_fapiao?: boolean;
   /**
    * 订单金额
    */
