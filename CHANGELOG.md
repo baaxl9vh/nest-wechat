@@ -1,3 +1,10 @@
+## [0.2.31](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.30...v0.2.31) (2023-07-21)
+
+
+### Features
+
+* 微信支付jsapi下单更新support_fapaio电子发票入口 ([25c65c8](https://github.com/baaxl9vh/nest-wechat/commit/25c65c8fbb252af252b9802a6433c0911561ba13))
+
 ## [0.2.30](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.29...v0.2.30) (2023-06-29)
 
 
