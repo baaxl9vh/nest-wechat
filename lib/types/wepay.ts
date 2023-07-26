@@ -713,3 +713,231 @@ export interface RefundNotifyResult {
   };
   user_received_account: string;
 }
+
+/** 电子发票 **/
+
+/**
+ * 配置开发选项
+ */
+export interface DevelopmentConfigRequest {
+  /** 商户回调地址 **/
+  callback_url: string;
+  /** 全部账单展示开发票入口开关 **/
+  show_fapiao_cell?: boolean;
+}
+
+export interface CustomCell {
+  /** 【cell位文字】 展示在卡券详情页自定义cell位上的文字 */
+  words: string;
+  /** 【cell位描述】 展示在卡券详情页自定义cell位右侧的描述 */
+  description: string;
+  /** 【点击cell位跳转的地址】 点击卡券详情页自定义cell位后跳转的页面链接，用户跳转时会自动在链接后加上参数encrypt_code与card_id，商户需要调用code解码接口解码encrypt_code得到真实的code */
+  jump_url?: string;
+  /** 【点击cell位跳转的小程序的用户名】 用于指定点击卡券详情页自定义cell位后跳转的小程序，该小程序必须与商户插卡的AppID绑定 */
+  miniprogram_user_name?: string;
+  /** 【点击cell位跳转的小程序的页面路径】 用于指定点击卡券详情页自定义cell位后跳转的小程序页面路径，跳转小程序后，开发者可以通过页面onShow方法的query中获取到发起跳转的card_id、encrypt_code和用户的公众号OpenID，商户需要调用code解码接口解码encrypt_code得到真实的code */
+  miniprogram_path?: string;
+}
+
+export interface CardTemplateInfo {
+  /** 收款方名称】 收款方名称，显示在电子发票卡券信息中，若不传则默认取商户名称  **/
+  payee_name: string;
+  /** 【卡券logo地址】 卡券logo地址，请参考 */
+  logo_url: string;
+  /** 【卡券自定义cell位配置】 卡券自定义cell位配置，需要在卡券详情中增加 */
+  custom_cell: CustomCell;
+}
+
+export interface CreateCardTemplateRequest {
+  card_appid: string;
+  card_template_information: CardTemplateInfo;
+}
+
+export interface CreateCardTemplateResponse {
+  card_appid: string;
+  card_id: string;
+}
+
+export interface FapiaoNotifyResult {
+  mchid: string;
+  fapiao_apply_id: string;
+  apply_time: string;
+}
+
+export interface UserTitleEntity {
+  /** 【购买方类型】 购买方类型， INDIVIDUAL: 个人, ORGANIZATION: 单位 */
+  type: 'INDIVIDUAL' | 'ORGANIZATION';
+  /** 【名称】 购买方名称 */
+  name: string;
+  /** 【纳税人识别号】 购买方纳税人识别号，购买方类型为ORGANIZATION时必须存在 */
+  taxpayer_id?: string;
+  /** 【地址】 购买方地址 */
+  address?: string;
+  /** 【电话】 购买方电话 */
+  telephone?: string;
+  /** 【开户银行】 购买方开户银行 */
+  bank_name?: string;
+  /** 【银行账号】 购买方银行账号 */
+  bank_account?: string;
+  /**【手机号】 用户手机号。注意：该字段为密文字段，加解密算法请参见《微信支付V3版规范》 */
+  phone?: string;
+  /** 【邮箱地址】 用户邮箱地址。注意：该字段为密文字段，加解密算法请参见《微信支付V3版规范》 */
+  email?: string;
+}
+
+export type TAX_PREFER_MARK = 'NO_FAVORABLE' | 'OUTSIDE_VAT' | 'VAT_EXEMPT' | 'NORMAL_ZERO_RATED' | 'EXPORT_ZERO_RATED';
+export type FAPIAO_SCENE = 'WITH_WECHATPAY' | 'WITHOUT_WECHATPAY';
+
+export interface IssueItem {
+  /** 【税局侧规定的货物或应税劳务、服务税收分类编码】 税局侧规定的货物或应税劳务、服务税收分类编码。可自行指定符合税务部门规定的货物或应税劳务、服务编码；若使用在电子发票商户平台配置的商品类型，需要从接口【获取商户可开具的商品和服务税收分类编码对照表】获得商户已配置的编码；若该行为折扣行，必须与被折扣行的编码相同。 */
+  tax_code: string;
+  /**
+   * 【税局侧规定的货物或应税劳务、服务分类名称】 税局侧规定的货物或应税劳务、服务分类名称。
+   * 若使用在电子发票商户平台配置的商品类型进行开票时，无需传该参数。可从接口【获取商户可开具的商品和服务税收分类编码对照表】获得商户已配置的商品信息，请确认配置信息是否正确。
+   * 若该行为折扣行，则不设置
+   */
+  goods_category?: string;
+  /**
+   * 【货物或应税劳务、服务名称】 由商户自定义的货物或应税劳务、服务名称。
+   * 若使用在电子发票商户平台配置的商品类型进行开票时，无需传该参数。可从接口【获取商户可开具的商品和服务税收分类编码对照表】获得商户已配置的商品信息，请确认配置信息是否正确。
+   * 若该行为折扣行，则不设置
+   */
+  goods_name?: string;
+  /** 【企业侧维护的货物或应税劳务、服务编码】 企业侧维护的货物或应税劳务、服务编码。若使用在电子发票商户平台配置的商品类型进行开票时，需要传该编号，可从接口【获取商户可 开具的商品和服务税收分类编码对照表】获得商户已配置的编码 */
+  goods_id?: string;
+  /**
+   * 【规格型号】 规格型号，展示在发票中间的规格型号列。
+   * 若使用在电子发票商户平台配置的商品类型进行开票时，无需传该参数。可从接口【获取商户可开具的商品和服务税收分类编码对照表】获得商户已配置的商品信息，请确认配置信息是否正确
+   */
+  specification?: string;
+  /** 【单位】 单位，展示在发票中间的单位列 */
+  unit?: string;
+  /** 【数量】 数量，展示在发票中间的数量列，单位为10^-8^，100000000表示数量为1。若是折扣行或者没有数量概念，则默认为100000000 */
+  quantity: number;
+  /** 【单行金额合计】 单行金额和税费的和，折扣行的金额为负数，非折扣行的金额为正数，单位:分 */
+  total_amount: number;
+  /** 
+   * 税率】 税率，单位为万分之一，如1300代表13%。
+   * 若使用在电子发票商户平台配置的商品类型进行开票时，无需传该参数。可从接口【获取商户可开具的商品和服务税收分类编码对照表】获得商户已配置的商品信息，请确认配置信息是否正确。
+   * 现在支持的税率为0、1%、1.5%、3%、5%、6%、9%、10%、11%、13%、16%、17%
+   */
+  tax_rate?: number;
+  /**
+   * 【税收优惠政策标识】 若使用在电子发票商户平台配置的商品类型进行开票时，无需传该参数。可从接口【获取商户可开具的商品和服务税收分类编码对照表】获得商户已配置的商品信息，请确认配置信息是否正确。若该行为折扣行，则不设置可选取值： 
+   * 
+   * + NO_FAVORABLE: 无优惠
+   * + OUTSIDE_VAT: 不征税
+   * + VAT_EXEMPT: 免税
+   * + NORMAL_ZERO_RATED: 普通零税率
+   * + EXPORT_ZERO_RATED: 出口零税率
+   */
+  tax_prefer_mark?: TAX_PREFER_MARK;
+}
+
+export interface IssueFapiaoInfo {
+  /** 【商户发票单号】 商户发票单号，唯一标识一张要开具的发票。只能是字母、数字、中划线-、下划线_、竖线|、星号*这些英文半角字符，且该单号在每个商户下必须唯一 */
+  fapiao_id: string;
+  /** 【总价税合计】 总价税合计，所有发票行单行金额合计的累加，展示在发票的价税合计处，单位：分 注意：若是微信支付后开票，所有发票的总价税合计之和不能超过对应的微信支付单总金额；若是非微信支付开票，所有发票的总价税合计之和不能超过【获取用户授权链接】接口中指定的总金额 */
+  total_amount: number;
+  /** 【是否以清单形式开具发票】 若商户使用的是区块链电子发票产品，则不支持以清单形式开具发票，该字段不需要传值 */
+  need_list?: boolean;
+  /** 【发票备注】 发票备注 */
+  remark?: string;
+  /** 【发票行信息】 发票行信息，单张发票的发票行不能超过8行 */
+  items: IssueItem[];
+}
+
+export interface IssueFapiaoRequest {
+  /** 【开票场景】 开票场景， WITH_WECHATPAY: 微信支付场景， WITHOUT_WECHATPAY: 非微信支付场景 */
+  scene: FAPIAO_SCENE;
+  /** 【发票申请单号】 发票申请单号，唯一标识一次开票行为。当开票场景为WITHOUT_WECHATPAY时，为调用【获取用户授权链接】接口时指定的发票申请单号；当开票场景为WITH_WECHATPAY时，为与本次开票关联的微信支付订单号，且必须是属于相应商户的订单（服务商模式下该订单必须属于子商户；直连模式下该订单必须属于直连商户） */
+  fapiao_apply_id: string;
+  /** 【购买方信息】 购买方信息，即发票抬头。若商户使用微信官方抬头，可从【获取用户授权信息】接口获取用户填写的抬头；也可自行收集发票抬头 */
+  buyer_information: UserTitleEntity;
+  /** 【需要开具的发票信息】 需要开具的发票信息。注意：同一个开票申请单最多申请5张发票 */
+  fapiao_information: IssueFapiaoInfo[];
+}
+
+export interface GetUserTitleParams {
+  fapiao_apply_id: string;
+  scene: FAPIAO_SCENE;
+}
+
+export interface FapiaoItem {
+  tax_code: string;
+  goods_name: string;
+  specification?: string;
+  unit?: string;
+  quantity: number;
+  unit_price: number;
+  amount: number;
+  tax_amount: number;
+  total_amount: number;
+  tax_rate: number;
+  tax_prefer_mark: TAX_PREFER_MARK;
+  discount: boolean;
+}
+export interface ExtraInformation {
+  payee: string;
+  reviewer: string;
+  drawer: string;
+}
+
+export interface SellerInfo {
+  name: string;
+  taxpayer_id: string;
+  address: string;
+  telephone?: string;
+  bank_name?: string;
+  bank_account?: string;
+}
+export interface CardInfo {
+  card_appid: string;
+  card_openid: string;
+  card_id?: string;
+  card_code?: string;
+  card_status: 'INSERT_ACCEPTED' | 'INSERTED' | 'DISCARD_ACCEPTED' | 'DISCARDED';
+}
+
+export interface FapiaoInfo {
+  fapiao_code: string;
+  fapiao_number: string;
+  check_code: string;
+  password: string;
+  fapiao_time: string;
+}
+
+export interface FapiaoEntity {
+  fapiao_id: string;
+  status: 'ISSUE_ACCEPTED' | 'ISSUED' | 'REVERSE_ACCEPTED' | 'REVERSED';
+  blue_fapiao: FapiaoInfo;
+  red_fapiao: FapiaoInfo;
+  card_information: CardInfo;
+  total_amount: number;
+  tax_amount: number;
+  amount: number;
+  seller_information: SellerInfo;
+  buyer_information: UserTitleEntity;
+  extra_information: ExtraInformation;
+  items?: FapiaoItem[];
+  /** 【备注信息】 备注信息 */
+  remark?: string;
+}
+
+export interface GetIssueFapiaoResponse {
+  total_count: number;
+  fapiao_information: FapiaoEntity[];
+}
+
+export interface ReverseFapiaoInfo {
+  fapiao_id: string;
+  fapiao_code: string;
+  fapiao_number: string;
+}
+
+export interface ReverseFapiaoRequest {
+  reverse_reason: string;
+  fapiao_information: ReverseFapiaoInfo[];
+}
+
+/** 电子发票 **/
