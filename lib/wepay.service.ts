@@ -91,12 +91,13 @@ export class WePayService {
   }
 
   /**
-   * 商户订单号查询订单
+   * 微信支付订单号查询订单
    * @param id 
    * @param mchId 
    * @param serialNo 
    * @param privateKey 
    * @returns 
+   * @link https://pay.weixin.qq.com/docs/merchant/apis/jsapi-payment/query-by-wx-trade-no.html
    */
   async getTransactionById (id: string, mchId: string, serialNo: string, privateKey: Buffer | string) {
     const nonceStr = createNonceStr();
@@ -110,12 +111,13 @@ export class WePayService {
   }
 
   /**
-   * 微信支付订单号查询订单
+   * 商户订单号查询订单
    * @param outTradeNo 
    * @param mchId 
    * @param serialNo 
    * @param privateKey 
    * @returns 
+   * @link https://pay.weixin.qq.com/docs/merchant/apis/jsapi-payment/query-by-out-trade-no.html
    */
   async getTransactionByOutTradeNo (outTradeNo: string, mchId: string, serialNo: string, privateKey: Buffer | string) {
     const nonceStr = createNonceStr();
