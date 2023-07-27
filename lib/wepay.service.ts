@@ -339,8 +339,11 @@ export class WePayService {
    * 
    * @link https://pay.weixin.qq.com/docs/merchant/apis/fapiao/fapiao-applications/get-fapiao-applications.html
    */
-  async getIssueFapiao (fapiaoApplyId: string, fapiaoId: string, mchId: string, serialNo: string, privateKey: Buffer | string) {
-    const url = `/v3/new-tax-control-fapiao/fapiao-applications/${fapiaoApplyId}?fapiao_id=${fapiaoId}`;
+  async getIssueFapiao (fapiaoApplyId: string, fapiaoId: string | null | undefined, mchId: string, serialNo: string, privateKey: Buffer | string) {
+    let url = `/v3/new-tax-control-fapiao/fapiao-applications/${fapiaoApplyId}`;
+    if (fapiaoId) {
+      url += `?fapiao_id=${fapiaoId}`;
+    }
     const nonceStr = createNonceStr();
     const timestamp = Math.floor(Date.now() / 1000);
     const signature = this.generateSignature('GET', url, timestamp, nonceStr, privateKey);
