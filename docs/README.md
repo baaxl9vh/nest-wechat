@@ -543,6 +543,50 @@ pay.paidCallback (publicKey: Buffer | string, apiKey: string, req: Request, res:
 pay.refundedCallback (certs: Map<string, string>, apiKey: string, req: Request, res: Response): Promise<RefundNotifyResult>;
 ```
 
+### 电子发票
+
+#### 配置开发选项
+
+```javascript
+pay.fapiaoDevConfig (data: DevelopmentConfigRequest, mchId: string, serialNo: string, privateKey: Buffer | string);
+```
+
+#### 创建电子发票卡券模板
+
+```javascript
+pay.createCardTemplate (data: CreateCardTemplateRequest, mchId: string, serialNo: string, privateKey: Buffer | string);
+```
+
+#### 微信发票通知
+
+```javascript
+pay.fapiaoCallback (certs: Map<string, string>, apiKey: string, req: Request, res: Response): Promise<FapiaoNotifyResult>;
+```
+
+#### 获取用户填写的抬头
+
+```javascript
+pay.getUserTitle (params: GetUserTitleParams, mchId: string, serialNo: string, privateKey: Buffer | string);
+```
+
+#### 开具电子发票
+
+```javascript
+pay.issueFapiao (data: IssueFapiaoRequest, mchId: string, serialNo: string, privateKey: Buffer | string);
+```
+
+#### 查询电子发票
+
+```javascript
+pay.getIssueFapiao (fapiaoApplyId: string, fapiaoId: string, mchId: string, serialNo: string, privateKey: Buffer | string);
+```
+
+#### 冲红电子发票
+
+```javascript
+pay.reverseFapiao (fapiaoApplyId: string, data: ReverseFapiaoRequest, mchId: string, serialNo: string, privateKey: Buffer | string);
+```
+
 ## 微信消息加解密签名工具类
 
 ```typescript

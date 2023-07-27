@@ -297,7 +297,7 @@ export class WePayService {
   }
 
   /**
-   * 用户发票抬头填写完成通知
+   * 微信发票通知
    * @link https://pay.weixin.qq.com/docs/merchant/apis/fapiao/fapiao-card-template/user-invoice-rise-write-notice.html
    */
   async fapiaoCallback (certs: Map<string, string>, apiKey: string, req: Request, res: Response): Promise<FapiaoNotifyResult> {
