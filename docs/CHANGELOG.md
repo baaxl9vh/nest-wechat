@@ -1,3 +1,15 @@
+## [0.2.32](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.31...v0.2.32) (2023-07-27)
+
+
+### Bug Fixes
+
+* 修复商户订单查询和微信支付订单查询两个接口注释写反问题 ([c36563c](https://github.com/baaxl9vh/nest-wechat/commit/c36563cb576072bf1e3998f3a833ffbb3bf611c2))
+
+
+### Features
+
+* 添加微信支付区块链电子发票接口 ([0fcaf35](https://github.com/baaxl9vh/nest-wechat/commit/0fcaf35fc50c0541bdea03c50836ba9f17a693bf))
+
 ## [0.2.31](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.30...v0.2.31) (2023-07-21)
 
 
