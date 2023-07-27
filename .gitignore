@@ -108,8 +108,8 @@ dist
 demo.ts
 
 # wepay private key
-apiclient_key.pem
-apiclient_cert.pem
+apiclient_key*.pem
+apiclient_cert*.pem
 
 # This has secret data
 *.local.spec.ts
