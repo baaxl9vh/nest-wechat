@@ -741,14 +741,15 @@ export interface CustomCell {
 
 export interface CardTemplateInfo {
   /** 收款方名称】 收款方名称，显示在电子发票卡券信息中，若不传则默认取商户名称  **/
-  payee_name: string;
+  payee_name?: string;
   /** 【卡券logo地址】 卡券logo地址，请参考 */
   logo_url: string;
   /** 【卡券自定义cell位配置】 卡券自定义cell位配置，需要在卡券详情中增加 */
-  custom_cell: CustomCell;
+  custom_cell?: CustomCell;
 }
 
 export interface CreateCardTemplateRequest {
+  /** 【插卡公众号AppID】 插卡公众号AppID。若是服务商模式，则可以是服务商申请的AppId，也可以是子商户申请的AppId；若是直连模式，则是直连商户申请的AppId */
   card_appid: string;
   card_template_information: CardTemplateInfo;
 }
@@ -832,6 +833,8 @@ export interface IssueItem {
    * + EXPORT_ZERO_RATED: 出口零税率
    */
   tax_prefer_mark?: TAX_PREFER_MARK;
+  /** 【是否折扣行】 指定该发票行是否折扣行，折扣行必须是被折扣行的下一行 */
+  discount: boolean;
 }
 
 export interface IssueFapiaoInfo {
@@ -937,7 +940,7 @@ export interface ReverseFapiaoInfo {
 
 export interface ReverseFapiaoRequest {
   reverse_reason: string;
-  fapiao_information: ReverseFapiaoInfo[];
+  fapiao_information?: ReverseFapiaoInfo[];
 }
 
 /** 电子发票 **/

@@ -271,7 +271,7 @@ export class WePayService {
    * 
    * @link https://pay.weixin.qq.com/docs/merchant/apis/fapiao/fapiao-merchant/update-development-config.html
    */
-  async taxDevelopmentConfig (data: DevelopmentConfigRequest, mchId: string, serialNo: string, privateKey: Buffer | string) {
+  async fapiaoDevConfig (data: DevelopmentConfigRequest, mchId: string, serialNo: string, privateKey: Buffer | string) {
     const url = '/v3/new-tax-control-fapiao/merchant/development-config';
     const nonceStr = createNonceStr();
     const timestamp = Math.floor(Date.now() / 1000);
@@ -310,12 +310,11 @@ export class WePayService {
    * @link https://pay.weixin.qq.com/docs/merchant/apis/fapiao/user-title/get-user-title.html
    */
   async getUserTitle (params: GetUserTitleParams, mchId: string, serialNo: string, privateKey: Buffer | string) {
-    const url = '/v3/new-tax-control-fapiao/user-title';
+    const url = `/v3/new-tax-control-fapiao/user-title?fapiao_apply_id=${params.fapiao_apply_id}&scene=${params.scene}`;
     const nonceStr = createNonceStr();
     const timestamp = Math.floor(Date.now() / 1000);
     const signature = this.generateSignature('GET', url, timestamp, nonceStr, privateKey);
     return axios.get<UserTitleEntity>(this.API_ROOT + url, {
-      params,
       headers: this.generateHeader(mchId, nonceStr, timestamp, serialNo, signature),
     });
   }
@@ -341,13 +340,11 @@ export class WePayService {
    * @link https://pay.weixin.qq.com/docs/merchant/apis/fapiao/fapiao-applications/get-fapiao-applications.html
    */
   async getIssueFapiao (fapiaoApplyId: string, fapiaoId: string, mchId: string, serialNo: string, privateKey: Buffer | string) {
-    const url = `/v3/new-tax-control-fapiao/fapiao-applications/${fapiaoApplyId}`;
+    const url = `/v3/new-tax-control-fapiao/fapiao-applications/${fapiaoApplyId}?fapiao_id=${fapiaoId}`;
     const nonceStr = createNonceStr();
     const timestamp = Math.floor(Date.now() / 1000);
     const signature = this.generateSignature('GET', url, timestamp, nonceStr, privateKey);
     return axios.get<GetIssueFapiaoResponse>(this.API_ROOT + url, {
-      // eslint-disable-next-line camelcase
-      params: { fapiao_id: fapiaoId },
       headers: this.generateHeader(mchId, nonceStr, timestamp, serialNo, signature),
     });
   }
