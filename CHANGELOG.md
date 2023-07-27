@@ -1,3 +1,10 @@
+## [0.2.33](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.32...v0.2.33) (2023-07-27)
+
+
+### Features
+
+* 微信支付查询电子发票接口支持没有商户发票单号查询 ([e13df7f](https://github.com/baaxl9vh/nest-wechat/commit/e13df7f681758a54b5bedbfee95aae9e6ef3e35b))
+
 ## [0.2.32](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.31...v0.2.32) (2023-07-27)
 
 
