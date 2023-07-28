@@ -368,6 +368,41 @@ export class WePayService {
 
   /** 电子发票 **/
 
+
+  /**
+   * 敏感信息加解密
+   * 
+   * 解密算法
+   * 
+   * @param cipherText base64密文
+   * @param privateKey 私钥证书
+   * @returns 
+   * @link https://wechatpay-api.gitbook.io/wechatpay-api-v3/qian-ming-zhi-nan-1/min-gan-xin-xi-jia-mi
+   */
+  rsaDecryptOAEP (cipherText: string, privateKey: Buffer | string) {
+    return crypto.privateDecrypt({
+      key: privateKey,
+      padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+    }, Buffer.from(cipherText, 'base64'));
+  }
+
+  /**
+   * 敏感信息加解密
+   * 
+   * 加密算法
+   * 
+   * @param text 明文
+   * @param publicKey 公钥证书
+   * @returns 
+   * @link https://wechatpay-api.gitbook.io/wechatpay-api-v3/qian-ming-zhi-nan-1/min-gan-xin-xi-jia-mi
+   */
+  rsaEncryptOAEP (text: string, publicKey: Buffer | string) {
+    return crypto.publicEncrypt({
+      key: publicKey,
+      padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+    }, Buffer.from(text, 'utf-8'));
+  }
+
   /**
    * 退款结果通知
    * 
