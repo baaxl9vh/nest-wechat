@@ -188,4 +188,11 @@ describe('WePayService Test(Unit)', () => {
     }
   });
 
+  it('Should encrypt and decrypt text', () => {
+    const email = '123110@qq.com';
+    const encryptBuf = service.rsaEncryptOAEP(email, publicKey);
+    const decryptBuf = service.rsaDecryptOAEP(encryptBuf.toString('base64'), privateKey);
+    expect(decryptBuf.toString()).toStrictEqual(email);
+  });
+
 });
