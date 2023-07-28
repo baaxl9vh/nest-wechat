@@ -1,3 +1,10 @@
+## [0.2.35](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.34...v0.2.35) (2023-07-28)
+
+
+### Bug Fixes
+
+* 更新开具发票涉敏感信息时需要使用平台证书 ([572dcce](https://github.com/baaxl9vh/nest-wechat/commit/572dcceaf37bbb3ffbe85a3f86d0784ab33665ab))
+
 ## [0.2.34](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.33...v0.2.34) (2023-07-28)
 
 
