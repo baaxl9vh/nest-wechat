@@ -587,6 +587,20 @@ pay.getIssueFapiao (fapiaoApplyId: string, fapiaoId: string, mchId: string, seri
 pay.reverseFapiao (fapiaoApplyId: string, data: ReverseFapiaoRequest, mchId: string, serialNo: string, privateKey: Buffer | string);
 ```
 
+### 敏感信息加解密
+
+#### 加密
+
+```javascript
+pay.rsaEncryptOAEP (text: string, publicKey: Buffer | string);
+```
+
+#### 解密
+
+```javascript
+pay.rsaDecryptOAEP (cipherText: string, privateKey: Buffer | string);
+```
+
 ## 微信消息加解密签名工具类
 
 ```typescript

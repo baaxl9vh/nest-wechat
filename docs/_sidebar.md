@@ -61,5 +61,8 @@
     - [开具电子发票](README.md#开具电子发票)
     - [查询电子发票](README.md#查询电子发票)
     - [冲红电子发票](README.md#冲红电子发票)
+  - [敏感信息加解密](README.md#敏感信息加解密)
+    - [加密](README.md#加密)
+    - [解密](README.md#解密)
 - [微信消息加解密签名工具类](README.md#微信消息加解密签名工具类)
 - [Changelog](CHANGELOG.md)
