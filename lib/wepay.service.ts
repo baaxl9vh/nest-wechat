@@ -324,13 +324,18 @@ export class WePayService {
    * 
    * @link https://pay.weixin.qq.com/docs/merchant/apis/fapiao/fapiao-applications/issue-fapiao-applications.html
    */
-  async issueFapiao (data: IssueFapiaoRequest, mchId: string, serialNo: string, privateKey: Buffer | string) {
+  async issueFapiao (data: IssueFapiaoRequest, mchId: string, serialNo: string, privateKey: Buffer | string, platformSerial: string) {
     const url = '/v3/new-tax-control-fapiao/fapiao-applications';
     const nonceStr = createNonceStr();
     const timestamp = Math.floor(Date.now() / 1000);
     const signature = this.generateSignature('POST', url, timestamp, nonceStr, privateKey, data);
+    const headers = {
+      ...this.generateHeader(mchId, nonceStr, timestamp, serialNo, signature),
+      'Wechatpay-Serial': platformSerial, 
+    };
+    console.log(headers);
     return axios.post<void>(this.API_ROOT + url, data, {
-      headers: this.generateHeader(mchId, nonceStr, timestamp, serialNo, signature),
+      headers,
     });
   }
 

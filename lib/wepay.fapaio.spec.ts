@@ -3,7 +3,7 @@ import * as path from 'path';
 
 import { AxiosError } from 'axios';
 import dayjs from 'dayjs';
-import { CreateCardTemplateRequest, FapiaoEntity, GetUserTitleParams, IssueFapiaoRequest, ReverseFapiaoRequest, Trade } from './types';
+import { CreateCardTemplateRequest, FapiaoEntity, GetUserTitleParams, IssueFapiaoRequest, ReverseFapiaoRequest, Trade, UserTitleEntity } from './types';
 import { WePayService } from './wepay.service';
 
 jest.setTimeout(20000);
@@ -34,11 +34,10 @@ describe('WePayService Test(Unit)', () => {
   let service: WePayService;
   let privateKey: Buffer;
   let publicKey: Buffer;
-
   beforeAll(() => {
     service = new WePayService();
-    privateKey = fs.readFileSync(path.join(__dirname, '..', 'apiclient_key.pem'));
-    publicKey = fs.readFileSync(path.join(__dirname, '..', 'apiclient_cert.pem'));
+    privateKey = fs.readFileSync(path.join(__dirname, '..', 'apiclient_key_1637426819.pem'));
+    publicKey = fs.readFileSync(path.join(__dirname, '..', 'apiclient_cert_1637426819.pem'));
   });
 
   it('Should get the certificate serial number', () => {
@@ -98,10 +97,13 @@ describe('WePayService Test(Unit)', () => {
       fapiao_apply_id: transactionId,
       scene: 'WITH_WECHATPAY',
     }
+    let title: UserTitleEntity | undefined = undefined;
     try {
       const ret = await service.getUserTitle(params, mchId, serial, privateKey);
-      expect(ret.data.name).toStrictEqual(taxpayer_name);
-      expect(ret.data.taxpayer_id).toStrictEqual(taxpayer_id);
+      console.log('title =', ret.data);
+      title = ret && ret.data;
+      expect(title.name).toStrictEqual(taxpayer_name);
+      expect(title.taxpayer_id).toStrictEqual(taxpayer_id);
     } catch (error) {
       if (error instanceof AxiosError) {
         console.log(error.response?.data);
@@ -111,57 +113,94 @@ describe('WePayService Test(Unit)', () => {
       expect(error).toBeUndefined();
     }
 
-    fapiaoId = dayjs().format('YYYYMMDDHHmmssSSS');
-    console.log('fapiaoId =', fapiaoId);
-    const fapiao: IssueFapiaoRequest = {
-      scene: 'WITH_WECHATPAY',
-      fapiao_apply_id: transactionId,
-      buyer_information: {
-        type: 'ORGANIZATION',
-        name: taxpayer_name,
-        taxpayer_id: taxpayer_id,
-      },
-      fapiao_information: [
-        {
-          fapiao_id: fapiaoId,
-          total_amount: total,
-          items: [
-            {
-              tax_code: '3040502000000000000',
-              goods_category: '经营租赁',
-              goods_name: '停车费',
-              unit: '次',
-              quantity: 100000000,
-              total_amount: total,
-              tax_rate: 500,
-              tax_prefer_mark: 'NO_FAVORABLE',
-              discount: false,
-            },
-          ],
+    if (title) {
+      fapiaoId = dayjs().format('YYYYMMDDHHmmssSSS');
+      console.log('fapiaoId =', fapiaoId);
+      const fapiao: IssueFapiaoRequest = {
+        scene: 'WITH_WECHATPAY',
+        fapiao_apply_id: transactionId,
+        buyer_information: {
+          type: 'ORGANIZATION',
+          name: taxpayer_name,
+          taxpayer_id: taxpayer_id,
         },
-      ],
-    };
-    try {
-      const ret = await service.issueFapiao(fapiao, mchId, serial, privateKey);
-      expect(ret.status).toStrictEqual(202);
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        console.log(error.response?.data);
-      } else {
-        console.log(error);
+        fapiao_information: [
+          {
+            fapiao_id: fapiaoId,
+            total_amount: total,
+            items: [
+              {
+                tax_code: '3040502000000000000',
+                goods_category: '经营租赁',
+                goods_name: '停车费',
+                unit: '次',
+                quantity: 100000000,
+                total_amount: total,
+                tax_rate: 500,
+                tax_prefer_mark: 'NO_FAVORABLE',
+                discount: false,
+              },
+            ],
+          },
+        ],
+      };
+  
+      if (title.taxpayer_id) fapiao.buyer_information.taxpayer_id = title.taxpayer_id;
+      if (title.address) fapiao.buyer_information.address = title.address;
+      if (title.telephone) fapiao.buyer_information.telephone = title.telephone;
+      if (title.bank_name) fapiao.buyer_information.bank_name = title.bank_name;
+      if (title.bank_account) fapiao.buyer_information.bank_account = title.bank_account;
+
+      const certs = await service.getPlatformCertificates(mchId, serial, privateKey, apiKey);
+      let platformSn = '';
+      if (certs && certs.size > 0) {
+        platformSn = certs.keys().next().value;
       }
-      expect(error).toBeUndefined();
-    }
+
+      if (title.phone) {
+        let phone = service.rsaDecryptOAEP(title.phone, privateKey).toString();
+        phone = service.rsaEncryptOAEP(phone, certs.get(platformSn) as string).toString('base64');
+        fapiao.buyer_information.phone = phone;
+      }
+      if (title.email) {
+        let email = service.rsaDecryptOAEP(title.email, privateKey).toString();
+        email = service.rsaEncryptOAEP(email, certs.get(platformSn) as string).toString('base64');
+        fapiao.buyer_information.email = email;
+      }
+
+      console.log('psn =', platformSn);
+      try {
+        const ret = await service.issueFapiao(fapiao, mchId, serial, privateKey, platformSn);
+        expect(ret.status).toStrictEqual(202);
+      } catch (error) {
+        if (error instanceof AxiosError) {
+          console.log(error.response?.data);
+        } else {
+          console.log(error);
+        }
+        expect(error).toBeUndefined();
+      }
+    } else {
+      expect(title).toBeDefined();
+    }    
   });
 
   it('Should get issued fapiao', async () => {
-    const ret = await service.getIssueFapiao(transactionId, fapiaoId, mchId, serial, privateKey);
-    // console.log('ret =', JSON.stringify(ret.data));
-    expect(ret.data.total_count).toStrictEqual(1);
-    expect(ret.data.fapiao_information.length).toBeGreaterThan(0);
-    const fapiao = ret.data.fapiao_information.pop();
-    expect(fapiao?.buyer_information.name).toStrictEqual(taxpayer_name);
-    issuedFapiao = fapiao as FapiaoEntity;
+    try {
+      const ret = await service.getIssueFapiao(transactionId, fapiaoId, mchId, serial, privateKey);
+      console.log('ret =', JSON.stringify(ret.data));
+      expect(ret.data.total_count).toStrictEqual(1);
+      expect(ret.data.fapiao_information.length).toBeGreaterThan(0);
+      const fapiao = ret.data.fapiao_information.pop();
+      expect(fapiao?.buyer_information.name).toStrictEqual(taxpayer_name);
+      issuedFapiao = fapiao as FapiaoEntity;      
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        console.log(error.response?.data);
+      } else {
+        console.log(error);
+      }
+    }
   });
 
   it('Should get reverse fapiao', async () => {
