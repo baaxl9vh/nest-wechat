@@ -1,3 +1,10 @@
+## [0.2.34](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.33...v0.2.34) (2023-07-28)
+
+
+### Features
+
+* 微信支付敏感消息加解密算法 ([2bb743f](https://github.com/baaxl9vh/nest-wechat/commit/2bb743f5da4b79b94f45fe00477415133000fae1))
+
 ## [0.2.33](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.32...v0.2.33) (2023-07-27)
 
 
