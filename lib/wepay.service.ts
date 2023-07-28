@@ -333,7 +333,6 @@ export class WePayService {
       ...this.generateHeader(mchId, nonceStr, timestamp, serialNo, signature),
       'Wechatpay-Serial': platformSerial, 
     };
-    console.log(headers);
     return axios.post<void>(this.API_ROOT + url, data, {
       headers,
     });
