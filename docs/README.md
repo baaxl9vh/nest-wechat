@@ -601,6 +601,34 @@ pay.rsaEncryptOAEP (text: string, publicKey: Buffer | string);
 pay.rsaDecryptOAEP (cipherText: string, privateKey: Buffer | string);
 ```
 
+### 现金红包
+
+没有可用测试商户，未做成功测试，请自行测试，有问题请提issue。
+
+测试可自行执行单元测试（需要修改配置）
+
+```bash
+npm run test lib/wepay.hb.spec.ts
+```
+
+#### 发放红包
+
+```javascript
+pay.sendRedPack(redPack: RedPackData, appId: string, mchId: string, apiKey: string, publicKey: Buffer | string, privateKey: Buffer | string, group = false): Promise<AxiosResponse<string, any>>;
+```
+
+#### 发放裂变红包
+
+```javascript
+pay.sendGroupRedPack(redPack: GroupRedPackData, appId: string, mchId: string, apiKey: string, publicKey: Buffer | string, privateKey: Buffer | string): Promise<AxiosResponse<string, any>>;
+```
+
+#### 查询红包记录
+
+```javascript
+pay.getHbInfo(billNO: string, appId: string, mchId: string, apiKey: string, publicKey: Buffer | string, privateKey: Buffer | string): Promise<AxiosResponse<string, any>>;
+```
+
 ## 微信消息加解密签名工具类
 
 ```typescript

@@ -944,3 +944,39 @@ export interface ReverseFapiaoRequest {
 }
 
 /** 电子发票 **/
+
+/** 现金红包 **/
+
+export interface RedPackData {
+  billNO: string;
+  sendName: string;
+  recipientOpenId: string;
+  /** 付款金额，单位：分 */
+  totalAmount: number;
+  /** 红包发放总人数 */
+  totalNum: number;
+  /** 红包祝福语 */
+  wishing: string;
+  clientIp: string;
+  actName: string;
+  remark: string;
+  /**
+   * 发放红包使用场景，红包金额大于200或者小于1元时必传
+   * PRODUCT_1:商品促销
+   * PRODUCT_2:抽奖
+   * PRODUCT_3:虚拟物品兑奖 
+   * PRODUCT_4:企业内部福利
+   * PRODUCT_5:渠道分润
+   * PRODUCT_6:保险回馈
+   * PRODUCT_7:彩票派奖
+   * PRODUCT_8:税务刮奖
+   */
+  sceneId: 'PRODUCT_1' | 'PRODUCT_2' | 'PRODUCT_3' | 'PRODUCT_4' | 'PRODUCT_5' | 'PRODUCT_6' | 'PRODUCT_7' | 'PRODUCT_8';
+  riskInfo?: string;
+}
+
+export interface GroupRedPackData extends RedPackData {
+  amtType: 'ALL_RAND';
+}
+
+/** 现金红包 **/

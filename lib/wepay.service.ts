@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import axios from 'axios';
 import * as crypto from 'crypto';
+import * as https from 'https';
 import forge from 'node-forge';
 import getRawBody from 'raw-body';
 
@@ -13,8 +14,10 @@ import {
   FapiaoNotifyResult,
   GetIssueFapiaoResponse,
   GetUserTitleParams,
+  GroupRedPackData,
   IssueFapiaoRequest,
   MiniProgramPaymentParameters,
+  RedPackData,
   RefundNotifyResult,
   RefundParameters,
   RefundResult,
@@ -27,6 +30,7 @@ import {
 import { createNonceStr } from './utils';
 
 import type { Request, Response } from 'express';
+import { XMLBuilder } from 'fast-xml-parser';
 @Injectable()
 export class WePayService {
 
@@ -372,7 +376,6 @@ export class WePayService {
 
   /** 电子发票 **/
 
-
   /**
    * 敏感信息加解密
    * 
@@ -422,6 +425,148 @@ export class WePayService {
   async refundedCallback (certs: Map<string, string>, apiKey: string, req: Request, res: Response): Promise<RefundNotifyResult> {
     return this.paidCallback(certs, apiKey, req, res) as unknown as Promise<RefundNotifyResult>;
   }
+
+  /** 现金红包 **/
+
+  /**
+   * 
+   * 发放红包接口
+   * 
+   * @param redPack 
+   * @param appId 
+   * @param mchId 
+   * @param apiKey 
+   * @param publicKey 
+   * @param privateKey 
+   * @param group 是否裂变红包，默认否 
+   * @returns XML字符串
+   * @link https://pay.weixin.qq.com/wiki/doc/api/tools/cash_coupon.php?chapter=13_4&index=3
+   */
+  async sendRedPack (redPack: RedPackData, appId: string, mchId: string, apiKey: string, publicKey: Buffer | string, privateKey: Buffer | string, group = false) {
+    const url = `${this.API_ROOT}/mmpaymkttransfers/${ group ? 'sendgroupredpack' : 'sendredpack' }`;
+    const nonceStr = createNonceStr();
+    const dataObj = {
+      // eslint-disable-next-line camelcase
+      mch_billno: { cValue: redPack.billNO },
+      // eslint-disable-next-line camelcase
+      mch_id: { cValue: mchId },
+      wxappid: { cValue: appId },
+      // eslint-disable-next-line camelcase
+      nonce_str: { cValue: nonceStr},
+      // eslint-disable-next-line camelcase
+      send_name: { cValue: redPack.sendName },
+      // eslint-disable-next-line camelcase
+      re_openid: { cValue: redPack.recipientOpenId },
+      // eslint-disable-next-line camelcase
+      total_amount: { cValue: redPack.totalAmount },
+      // eslint-disable-next-line camelcase
+      total_num: { cValue: redPack.totalNum },
+      wishing: { cValue: redPack.wishing },
+      // eslint-disable-next-line camelcase
+      client_ip: { cValue: redPack.clientIp },
+      // eslint-disable-next-line camelcase
+      act_name: { cValue: redPack.actName },
+      remark: { cValue: redPack.remark },
+      // eslint-disable-next-line camelcase
+      scene_id: { cValue: redPack.sceneId },
+      // eslint-disable-next-line camelcase
+      risk_info: { cValue: redPack.riskInfo },
+      sign: '',
+    };
+    if (group) {
+      // eslint-disable-next-line camelcase, @typescript-eslint/no-explicit-any
+      (dataObj as any).amt_type = { cValue: (redPack as GroupRedPackData).amtType || 'ALL_RAND' };
+    }
+    const keys = Object.keys(dataObj).sort();
+
+    let tmp = '';
+    type DataObjectType = typeof dataObj;
+    keys.forEach((k: string) => {
+      const node = dataObj[k as keyof DataObjectType] as { cValue: string};
+      if (node && node.cValue) {
+        tmp += k + '=' + node?.cValue.toString() + '&';
+      }
+    });
+    dataObj.sign = crypto.createHash('md5').update(tmp + 'key=' + apiKey).digest('hex').toUpperCase();
+    const builder = new XMLBuilder({
+      arrayNodeName: 'xml',
+      cdataPropName: 'cValue',
+    });
+    const bodyXml = builder.build([dataObj]);
+    if (this.debug) {
+      this.logger.debug('Request body xml:' + bodyXml);
+    }
+    const httpsAgent = new https.Agent({
+      rejectUnauthorized: false, // (NOTE: this will disable client verification)
+      cert: publicKey,
+      key: privateKey,
+    });
+    return axios.post<string>(url, bodyXml, {
+      httpsAgent,
+    });
+  }
+
+  /**
+   * 发放裂变红包
+   * @param redPack 
+   * @param appId 
+   * @param mchId 
+   * @param apiKey 
+   * @param publicKey 
+   * @param privateKey 
+   * @returns XML字符串
+   * @link https://pay.weixin.qq.com/wiki/doc/api/tools/cash_coupon.php?chapter=13_5&index=4
+   */
+  async sendGroupRedPack (redPack: GroupRedPackData, appId: string, mchId: string, apiKey: string, publicKey: Buffer | string, privateKey: Buffer | string) {
+    return this.sendRedPack(redPack, appId, mchId, apiKey, publicKey, privateKey, true);
+  }
+
+  async getHbInfo (billNO: string, appId: string, mchId: string, apiKey: string, publicKey: Buffer | string, privateKey: Buffer | string) {
+    const url = `${this.API_ROOT}/mmpaymkttransfers/gethbinfo`;
+    const nonceStr = createNonceStr();
+    const dataObj = {
+      // eslint-disable-next-line camelcase
+      mch_billno: { cValue: billNO },
+      // eslint-disable-next-line camelcase
+      mch_id: { cValue: mchId },
+      appid: { cValue: appId },
+      // eslint-disable-next-line camelcase
+      bill_type: { cValue: 'MCHT' },
+      // eslint-disable-next-line camelcase
+      nonce_str: { cValue: nonceStr },
+      sign: '',
+    };
+
+    const keys = Object.keys(dataObj).sort();
+
+    let tmp = '';
+    type DataObjectType = typeof dataObj;
+    keys.forEach((k: string) => {
+      const node = dataObj[k as keyof DataObjectType] as { cValue: string};
+      if (node && node.cValue) {
+        tmp += k + '=' + node?.cValue.toString() + '&';
+      }
+    });
+    dataObj.sign = crypto.createHash('md5').update(tmp + 'key=' + apiKey).digest('hex').toUpperCase();
+    const builder = new XMLBuilder({
+      arrayNodeName: 'xml',
+      cdataPropName: 'cValue',
+    });
+    const bodyXml = builder.build([dataObj]);
+    if (this.debug) {
+      this.logger.debug('Request body xml:' + bodyXml);
+    }
+    const httpsAgent = new https.Agent({
+      rejectUnauthorized: false, // (NOTE: this will disable client verification)
+      cert: publicKey,
+      key: privateKey,
+    });
+    return axios.post<string>(url, bodyXml, {
+      httpsAgent,
+    });
+  }
+
+  /** 现金红包 **/
 
   /**
    * 报文解密
@@ -510,7 +655,7 @@ export class WePayService {
    * @param body 
    * @returns 
    */
-  private generateSignature (method: 'GET' | 'POST' | 'PATCH', url: string, timestamp: number, nonceStr: string, privateKey: Buffer | string, body?: object): string {
+  private generateSignature (method: 'GET' | 'POST' | 'PATCH', url: string, timestamp: number, nonceStr: string, privateKey: Buffer | string, body?: object | string): string {
     let message = `${method}\n${url}\n${timestamp}\n${nonceStr}\n\n`;
 
     if (method === 'POST' || method === 'PATCH') {
