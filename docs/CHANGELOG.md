@@ -1,3 +1,10 @@
+## [0.2.37](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.36...v0.2.37) (2023-08-09)
+
+
+### Features
+
+* 新增微信支付现金红包接口 ([df9d210](https://github.com/baaxl9vh/nest-wechat/commit/df9d210381d800b722b2d4a6ff0a4757e97df4a2))
+
 ## [0.2.36](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.35...v0.2.36) (2023-07-28)
 
 ## [0.2.35](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.34...v0.2.35) (2023-07-28)
