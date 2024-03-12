@@ -1,3 +1,10 @@
+## [0.2.38](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.37...v0.2.38) (2024-03-12)
+
+
+### Features
+
+* 添加公众号拉取用户信息接口 ([4a32491](https://github.com/baaxl9vh/nest-wechat/commit/4a32491f0ecb622a000ca6b0b35d5c21166b520a))
+
 ## [0.2.37](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.36...v0.2.37) (2023-08-09)
 
 
