@@ -138,6 +138,39 @@ public async getAccessTokenByCode (code: string, _appId?: string, _secret?: stri
 
 > [参考文档](https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/Wechat_webpage_authorization.html)
 
+#### getUserInfo
+
+公众号拉取用户信息
+
+```typescript
+public async getUserInfo (accessToken: string, openid: string, lang: 'zh_CN' | 'zh_TW' | 'en' = 'zh_CN'): Promise<UserInfoResult>;
+```
+
+正确返回
+
+```json
+{   
+  "openid": "OPENID",
+  "nickname": NICKNAME,
+  "sex": 1,
+  "province":"PROVINCE",
+  "city":"CITY",
+  "country":"COUNTRY",
+  "headimgurl":"https://thirdwx.qlogo.cn/mmopen/g3MonUZtNHkdmzicIlibx6iaFqAc56vxLSUfpb6n5WKSYVY0ChQKkiaJSgQ1dZuTOgvLLrhJbERQQ4eMsv84eavHiaiceqxibJxCfHe/46",
+  "privilege":[ "PRIVILEGE1" "PRIVILEGE2"     ],
+  "unionid": "o6_bmasdasdsad6_2sgVt7hMZOPfL"
+}
+```
+
+错误返回
+
+```json
+{
+  "errcode":40003,
+  "errmsg":" invalid openid "
+}
+```
+
 ### 获取Access token
 
 #### getAccountAccessToken
@@ -670,8 +703,14 @@ REDIS_DB=0
 REDIS_TTL=600
 ```
 
-Run test.
+Run e2e test.
 
 ```shell
 npm run test:e2e
+```
+
+Run unit test.
+
+```shell
+npm run test wechat.service.userinfo.spec.ts
 ```

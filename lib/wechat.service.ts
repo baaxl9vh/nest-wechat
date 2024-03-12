@@ -8,14 +8,15 @@ import {
   AccountAccessTokenResult,
   AccountCreateQRCode,
   AccountCreateQRCodeResult,
-  createNonceStr,
   DefaultRequestResult,
   MessageCrypto,
   SignatureResult,
   TemplateMessage,
   TicketResult,
   UserAccessTokenResult,
+  UserInfoResult,
   WeChatModuleOptions,
+  createNonceStr,
 } from '.';
 import { MiniProgramService } from './miniprogram.service';
 import { ICache } from './types/utils';
@@ -430,6 +431,23 @@ export class WeChatService {
     const { appId, secret } = this.chooseAppIdAndSecret(_appId, _secret);
     const url = `https://api.weixin.qq.com/sns/oauth2/access_token?appid=${appId}&secret=${secret}&code=${code}&grant_type=authorization_code`;
     const ret = await axios.get<UserAccessTokenResult>(url);
+    return ret.data;
+  }
+
+  /**
+   * 拉取用户信息(需scope为 snsapi_userinfo)
+   * 
+   * 如果网页授权作用域为snsapi_userinfo，则此时开发者可以通过access_token和openid拉取用户信息了。
+   * 
+   * @param accessToken 通过code换取网页授权access_token
+   * @param openid 用户的唯一标识
+   * @param lang 返回国家地区语言版本，zh_CN 简体，zh_TW 繁体，en 英语，默认zh_CN
+   * @returns 
+   * @tutorial https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/Wechat_webpage_authorization.html#3
+   */
+  public async getUserInfo (accessToken: string, openid: string, lang: 'zh_CN' | 'zh_TW' | 'en' = 'zh_CN') {
+    const url = `https://api.weixin.qq.com/sns/userinfo?access_token=${accessToken}&openid=${openid}&lang=${lang}`;
+    const ret = await axios.get<DefaultRequestResult & UserInfoResult>(url);
     return ret.data;
   }
 

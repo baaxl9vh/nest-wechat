@@ -106,6 +106,7 @@ dist
 *.local
 .DS_Store
 demo.ts
+*.jpg
 
 # wepay private key
 apiclient_key*.pem
