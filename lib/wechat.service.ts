@@ -315,7 +315,7 @@ export class WeChatService {
   public async messagePushExpressHandler (req: Request, res?: Response, resText?: string) {
     const timestamp = req.query && req.query.timestamp;
     const nonce = req.query && req.query.nonce;
-    const signature = req.query && req.query.msg_signature;
+    const signature = req.query && (req.query.msg_signature || req.query.signature);
     let rawBody;
     try {
       rawBody = await getRawBody(req);
@@ -326,12 +326,15 @@ export class WeChatService {
       }
     }
     let decrypt = '';
+    let success = false;
     if (timestamp && nonce && signature && rawBody) {
       decrypt = this.decryptMessage(signature as string, timestamp as string, nonce as string, rawBody.toString());
+      success = true;
       if (this.debug) this.logger.debug(`messagePushHandler:${decrypt}`);
+    } else {
+      throw new Error('message params incorrect');
     }
-    if (res && typeof res.send === 'function') {
-      if (this.debug) this.logger.debug(`messagePushHandler:send:${resText || ''}`);
+    if (success && res && typeof res.send === 'function') {
       res.send(resText || '');
     }
     return decrypt;

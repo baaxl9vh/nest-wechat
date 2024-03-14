@@ -26,9 +26,7 @@ export class WeChatController {
    */
   @Post('push')
   async officialPushTest (@Req() req: Request, @Res() res: Response) {
-    this.logger.debug('officialPushTest()');
-    const decrypt = await this.service.messagePushExpressHandler(req, res);
-    this.logger.debug('decrypt =', decrypt);
+    await this.service.messagePushExpressHandler(req, res);
   }
 
   @Get('/mp_push')
