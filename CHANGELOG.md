@@ -1,3 +1,10 @@
+## [0.2.39](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.38...v0.2.39) (2024-03-14)
+
+
+### Bug Fixes
+
+* [#14](https://github.com/baaxl9vh/nest-wechat/issues/14), 增加兼容signature参数, 补e2e测试 ([af7c977](https://github.com/baaxl9vh/nest-wechat/commit/af7c977aa91be31a96e5e76d24c8c2c3c345d34a))
+
 ## [0.2.38](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.37...v0.2.38) (2024-03-12)
 
 
