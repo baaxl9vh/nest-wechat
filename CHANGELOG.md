@@ -1,3 +1,5 @@
+## [0.2.41](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.40...v0.2.41) (2024-05-21)
+
 ## [0.2.40](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.39...v0.2.40) (2024-05-21)
 
 ## [0.2.39](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.38...v0.2.39) (2024-03-14)
