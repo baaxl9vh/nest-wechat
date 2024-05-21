@@ -151,9 +151,9 @@ describe('jsapi', () => {
 
     // now token and ticket are valid
     const message: TemplateMessage = {
-      touser: 'osMyH5vmDjG3ouh2qfSm3EItWLyk',
+      touser: 'oya4u693JoLu7s8jEA-mrisvFqVE',
       // eslint-disable-next-line camelcase
-      template_id: 'Kr6sFcWadMfRz_rZumNbLw-mtZ5qJEeCo3X4pdcmNAQ',
+      template_id: 'vUGw0kXzaCctwOp4fO-054_Mt97y5mwlG4ldhTaIwp4',
       data: {
         'TITLE': {
           value: 'This is title',
