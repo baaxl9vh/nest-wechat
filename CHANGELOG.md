@@ -1,3 +1,10 @@
+## [0.2.43](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.42...v0.2.43) (2024-07-06)
+
+
+### Bug Fixes
+
+* 未导出wepay-partner类型 ([1da5c84](https://github.com/baaxl9vh/nest-wechat/commit/1da5c8409b8ab9b76519b87e920e54296d323fd8))
+
 ## [0.2.42](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.41...v0.2.42) (2024-07-06)
 
 
