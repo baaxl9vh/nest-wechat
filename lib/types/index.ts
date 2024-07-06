@@ -2,6 +2,7 @@ import { ModuleMetadata } from '@nestjs/common';
 
 export * from './utils';
 export * from './wepay';
+export * from './wepay-partner';
 
 /**
  * At least one property required of keys of type T，e.g.
