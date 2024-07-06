@@ -6,6 +6,7 @@ import forge from 'node-forge';
 import getRawBody from 'raw-body';
 
 import {
+  CallbackBody,
   CallbackResource,
   CertificateResult,
   CreateCardTemplateRequest,
@@ -23,6 +24,7 @@ import {
   RefundResult,
   RequireOnlyOne,
   ReverseFapiaoRequest,
+  SignatureHeaders,
   Trade,
   TransactionOrder,
   UserTitleEntity,
@@ -31,6 +33,7 @@ import { createNonceStr } from './utils';
 
 import type { Request, Response } from 'express';
 import { XMLBuilder } from 'fast-xml-parser';
+import { RefundNotifyResultOfPartner, RefundParametersOfPartner, TradeOfPartner, TransactionOrderOfPartner } from './types/wepay-partner';
 @Injectable()
 export class WePayService {
 
@@ -88,7 +91,26 @@ export class WePayService {
     });
   }
 
-  async h5 () {
+  /**
+   * 服务端JSAPI下单
+   * @param order 下单信息
+   * @param serialNo 私钥序列号
+   * @param privateKey 私钥
+   * @returns 
+   * @link https://pay.weixin.qq.com/docs/partner/apis/partner-jsapi-payment/partner-jsons/partner-jsapi-prepay.html
+   */
+  async jsapiOfPartner (order: TransactionOrderOfPartner, serialNo: string, privateKey: Buffer | string) {
+    const nonceStr = createNonceStr();
+    const timestamp = Math.floor(Date.now() / 1000);
+    let url = '/v3/pay/partner/transactions/jsapi';
+    const signature = this.generateSignature('POST', url, timestamp, nonceStr, privateKey, order);
+    url = 'https://api.mch.weixin.qq.com' + url;
+    return axios.post<{ prepay_id: string }>(url, order, {
+      headers: this.generateHeader(order.sp_mchid, nonceStr, timestamp, serialNo, signature),
+    });
+  }
+
+  private async h5 () {
     // H5下单
     // https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter3_3_1.shtml
     // https://api.mch.weixin.qq.com/v3/pay/transactions/h5
@@ -115,6 +137,27 @@ export class WePayService {
   }
 
   /**
+   * 服务商微信支付订单号查询订单
+   * @param id 
+   * @param spMchId 
+   * @param subMchid 
+   * @param serialNo 
+   * @param privateKey 
+   * @returns 
+   * @link https://pay.weixin.qq.com/docs/partner/apis/partner-jsapi-payment/query-by-wx-trade-no.html
+   */
+  async getTransactionByIdOfPartner (id: string, spMchId: string, subMchid: string, serialNo: string, privateKey: Buffer | string) {
+    const nonceStr = createNonceStr();
+    const timestamp = Math.floor(Date.now() / 1000);
+    let url = `/v3/pay/partner/transactions/id/${id}?sp_mchid=${spMchId}&sub_mchid=${subMchid}`;
+    const signature = this.generateSignature('GET', url, timestamp, nonceStr, privateKey);
+    url = this.API_ROOT + url;
+    return axios.get<Trade>(url, {
+      headers: this.generateHeader(spMchId, nonceStr, timestamp, serialNo, signature),
+    });
+  }
+
+  /**
    * 商户订单号查询订单
    * @param outTradeNo 
    * @param mchId 
@@ -131,6 +174,26 @@ export class WePayService {
     url = 'https://api.mch.weixin.qq.com' + url;
     return axios.get<Trade>(url, {
       headers: this.generateHeader(mchId, nonceStr, timestamp, serialNo, signature),
+    });
+  }
+
+  /**
+   * 服务商按商户订单号查询订单
+   * @param outTradeNo 
+   * @param spMchId 
+   * @param serialNo 
+   * @param privateKey 
+   * @returns 
+   * @link https://pay.weixin.qq.com/docs/partner/apis/partner-jsapi-payment/query-by-out-trade-no.html
+   */
+  async getTransactionByOutTradeNoOfPartner (outTradeNo: string, spMchId: string, subMchid: string, serialNo: string, privateKey: Buffer | string) {
+    const nonceStr = createNonceStr();
+    const timestamp = Math.floor(Date.now() / 1000);
+    let url = `/v3/pay/partner/transactions/out-trade-no/${outTradeNo}?sp_mchid=${spMchId}&sub_mchid=${subMchid}`;
+    const signature = this.generateSignature('GET', url, timestamp, nonceStr, privateKey);
+    url = this.API_ROOT + url;
+    return axios.get<TradeOfPartner>(url, {
+      headers: this.generateHeader(spMchId, nonceStr, timestamp, serialNo, signature),
     });
   }
 
@@ -156,6 +219,29 @@ export class WePayService {
   }
 
   /**
+   * 关闭订单
+   * @param outTradeNo 
+   * @param spMchId 
+   * @param subMchId 
+   * @param serialNo 
+   * @param privateKey 
+   * @returns 
+   * @link https://pay.weixin.qq.com/docs/partner/apis/partner-jsapi-payment/close-order.html
+   */
+  async closeOfPartner (outTradeNo: string, spMchId: string, subMchId: string, serialNo: string, privateKey: Buffer | string) {
+    // eslint-disable-next-line camelcase
+    const data = { sp_mchid: spMchId, sub_mchid: subMchId };
+    const nonceStr = createNonceStr();
+    const timestamp = Math.floor(Date.now() / 1000);
+    let url = `/v3/pay/partner/transactions/out-trade-no/${outTradeNo}/close`;
+    const signature = this.generateSignature('POST', url, timestamp, nonceStr, privateKey, data);
+    url = this.API_ROOT + url;
+    return axios.post(url, data, {
+      headers: this.generateHeader(spMchId, nonceStr, timestamp, serialNo, signature),
+    });
+  }
+
+  /**
    * 申请退款
    * @param refund 
    * @param mchId 
@@ -176,6 +262,26 @@ export class WePayService {
   }
 
   /**
+   * 服务商申请退款
+   * @param refund 
+   * @param spMchId 
+   * @param serialNo 
+   * @param privateKey 
+   * @returns 
+   * @link https://pay.weixin.qq.com/docs/partner/apis/partner-jsapi-payment/create.html
+   */
+  async refundOfPartner (refund: RequireOnlyOne<RefundParametersOfPartner, 'transaction_id' | 'out_trade_no'>, spMchId: string, serialNo: string, privateKey: Buffer | string) {
+    const nonceStr = createNonceStr();
+    const timestamp = Math.floor(Date.now() / 1000);
+    let url = '/v3/refund/domestic/refunds';
+    const signature = this.generateSignature('POST', url, timestamp, nonceStr, privateKey, refund);
+    url = this.API_ROOT + url;
+    return axios.post<RefundResult>(url, refund, {
+      headers: this.generateHeader(spMchId, nonceStr, timestamp, serialNo, signature),
+    });
+  }
+
+  /**
    * 查询单笔退款
    * @param outRefundNo 
    * @param mchId 
@@ -192,6 +298,27 @@ export class WePayService {
     url = this.API_ROOT + url;
     return axios.get<RefundResult>(url, {
       headers: this.generateHeader(mchId, nonceStr, timestamp, serialNo, signature),
+    });
+  }
+
+  /**
+   * 服务商查询单笔退款
+   * @param outRefundNo 
+   * @param spMchId 
+   * @param subMchId 
+   * @param serialNo 
+   * @param privateKey 
+   * @returns 
+   * @link https://pay.weixin.qq.com/docs/partner/apis/partner-jsapi-payment/query-by-out-refund-no.html
+   */
+  async getRefundOfPartner (outRefundNo: string, spMchId: string, subMchId: string, serialNo: string, privateKey: Buffer | string) {
+    const nonceStr = createNonceStr();
+    const timestamp = Math.floor(Date.now() / 1000);
+    let url = `/v3/refund/domestic/refunds/${outRefundNo}?sub_mchid=${subMchId}`;
+    const signature = this.generateSignature('GET', url, timestamp, nonceStr, privateKey);
+    url = this.API_ROOT + url;
+    return axios.get<RefundResult>(url, {
+      headers: this.generateHeader(spMchId, nonceStr, timestamp, serialNo, signature),
     });
   }
 
@@ -426,6 +553,96 @@ export class WePayService {
     return this.paidCallback(certs, apiKey, req, res) as unknown as Promise<RefundNotifyResult>;
   }
 
+  /**
+   * 服务商退款结果通知处理
+   * 
+   * 实现与付款通知一样，解密后数据结构不同，直接复用付款通知实现
+   * 
+   * @param certs 
+   * @param apiKey 
+   * @param req 
+   * @param res 
+   * @returns 
+   * @link https://pay.weixin.qq.com/docs/partner/apis/partner-jsapi-payment/refund-result-notice.html
+   */
+  async refundedCallbackOfPartner (certs: Map<string, string>, apiKey: string, req: Request, res: Response): Promise<RefundNotifyResultOfPartner> {
+    return this.paidCallback(certs, apiKey, req, res) as unknown as Promise<RefundNotifyResultOfPartner>;
+  }
+
+  /**
+   * 服务商支付通知处理程序
+   * @param certs 微信支付平台证书
+   * @param apiKey 
+   * @param req 
+   * @param res 
+   * @returns 
+   * @link https://pay.weixin.qq.com/docs/partner/apis/partner-jsapi-payment/payment-notice.html
+   */
+  async paidCallbackOfPartner (certs: Map<string, string>, apiKey: string, req: Request, res: Response): Promise<TradeOfPartner> {
+    return this.paidCallback(certs, apiKey, req, res) as unknown as Promise<TradeOfPartner>;
+  }
+
+  async callbackHandlerForExpress<T> (certs: Map<string, string>, apiKey: string, req: Request, res: Response) {
+    let rawBody;
+    try {
+      rawBody = await getRawBody(req);
+    } catch (error) {
+      const message = (error as Error).message as string;
+      if (this.debug) this.logger.debug(`getRawBody error:${message}`);
+      if (message === 'stream is not readable') {
+        rawBody = req.body;
+      }
+    }
+    const { fail, result, callbackBody } = await this.callbackHandler<T>(certs, apiKey, req.headers as SignatureHeaders, rawBody);
+    if (res && typeof res.status === 'function') {
+      if (fail) {
+        res.status(401).json({ code: 'FAIL', message: '失败' });
+      } else {
+        res.status(200).send();
+      }
+    }
+    return { result, callbackBody };
+  }
+
+  async callbackHandler<T> (certs: Map<string, string>, apiKey: string, headers: SignatureHeaders, body: Buffer | string) {
+    const parameters = this.getCallbackSignatureParameters(headers);
+    const publicKey = certs.get(parameters.platformSerial as string);
+    let fail = true;
+    const callbackBody: CallbackBody | undefined = undefined;
+    let result: T | undefined = undefined;
+    if (publicKey) {
+      const verified = this.verifySignature(publicKey, parameters.timestamp, parameters.nonce, body, parameters.signature);
+      if (verified) {
+        const callBackBody: CallbackBody = JSON.parse(JSON.stringify(body));
+        const resource = callBackBody.resource;
+        result = this.decryptCipherText<T>(apiKey, resource.ciphertext, resource.associated_data, resource.nonce);
+        fail = false;
+      } else {
+        fail = true;
+      }
+    } else {
+      fail = true;
+    }
+    return {
+      fail,
+      result,
+      callbackBody,
+    };
+  }
+
+  getCallbackSignatureParameters (headers: SignatureHeaders) {
+    const signature = headers['Wechatpay-Signature'] || headers['wechatpay-signature'];
+    const platformSerial = headers['Wechatpay-Serial'] || headers['wechatpay-serial'];
+    const timestamp = headers['Wechatpay-Timestamp'] || headers['wechatpay-timestamp'];
+    const nonce = headers['Wechatpay-Nonce'] || headers['wechatpay-nonce'];
+    return {
+      signature,
+      platformSerial,
+      timestamp,
+      nonce,
+    };
+  }
+
   /** 现金红包 **/
 
   /**
@@ -618,6 +835,30 @@ export class WePayService {
    * @link https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter3_5_4.shtml
    */
   buildMiniProgramPayment (appId: string, prepayId: string, privateKey: Buffer | string): MiniProgramPaymentParameters {
+    const nonceStr = createNonceStr();
+    const timestamp = Math.floor(Date.now() / 1000);
+    const message = `${appId}\n${timestamp}\n${nonceStr}\nprepay_id=${prepayId}\n`;
+    const paySign = crypto.createSign('sha256WithRSAEncryption').update(message).sign(privateKey, 'base64');
+    return {
+      timeStamp: timestamp.toString(),
+      nonceStr,
+      package: `prepay_id=${prepayId}`,
+      signType: 'RSA',
+      paySign,
+    };
+  }
+
+  /**
+   * 
+   * 构造JSAPI拉起支付参数
+   * 
+   * @param appId 商户申请的公众号对应的AppID，由微信支付生成，可在公众号后台查看。服务商模式若下单时传了sub_appid，可为sub_appid的值。
+   * @param prepayId JSAPI下单生成的prepay_id
+   * @param privateKey 微信支付私钥
+   * @returns MiniProgramPaymentParameters
+   * @link https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter3_5_4.shtml
+   */
+  buildJSAPIParameters (appId: string, prepayId: string, privateKey: Buffer | string): MiniProgramPaymentParameters {
     const nonceStr = createNonceStr();
     const timestamp = Math.floor(Date.now() / 1000);
     const message = `${appId}\n${timestamp}\n${nonceStr}\nprepay_id=${prepayId}\n`;

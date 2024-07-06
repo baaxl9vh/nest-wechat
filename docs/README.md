@@ -662,6 +662,83 @@ pay.sendGroupRedPack(redPack: GroupRedPackData, appId: string, mchId: string, ap
 pay.getHbInfo(billNO: string, appId: string, mchId: string, apiKey: string, publicKey: Buffer | string, privateKey: Buffer | string): Promise<AxiosResponse<string, any>>;
 ```
 
+### 微信支付服务商
+
+#### 服务商JSAPI下单
+
+> [参考文档](https://pay.weixin.qq.com/docs/partner/apis/partner-jsapi-payment/partner-jsons/partner-jsapi-prepay.html)
+
+```javascript
+jsapiOfPartner (order: TransactionOrderOfPartner, serialNo: string, privateKey: Buffer | string);
+```
+
+#### 服务商JSAPI调起支付
+
+> [参考文档](https://pay.weixin.qq.com/docs/partner/apis/partner-jsapi-payment/jsapi-transfer-payment.html)
+
+构建调起微信支付参数接口
+
+```javascript
+buildJSAPIParameters (appId: string, prepayId: string, privateKey: Buffer | string): MiniProgramPaymentParameters;
+```
+
+#### 服务商支付通知
+
+> [参考文档](https://pay.weixin.qq.com/docs/partner/apis/partner-jsapi-payment/payment-notice.html)
+
+```javascript
+paidCallbackOfPartner (certs: Map<string, string>, apiKey: string, req: Request, res: Response): Promise<TradeOfPartner>;
+```
+
+#### 服务商关闭订单
+
+> [参考文档](https://pay.weixin.qq.com/docs/partner/apis/partner-jsapi-payment/close-order.html)
+
+```javascript
+closeOfPartner (outTradeNo: string, spMchId: string, subMchId: string, serialNo: string, privateKey: Buffer | string);
+```
+
+#### 服务商微信支付订单号查询订单
+
+> [参考文档](https://pay.weixin.qq.com/docs/partner/apis/partner-jsapi-payment/query-by-wx-trade-no.html)
+
+```javascript
+getTransactionByIdOfPartner (id: string, spMchId: string, subMchid: string, serialNo: string, privateKey: Buffer | string);
+```
+
+#### 服务商商户订单号查询订单
+
+> [参考文档](https://pay.weixin.qq.com/docs/partner/apis/partner-jsapi-payment/query-by-out-trade-no.html)
+
+```javascript
+getTransactionByOutTradeNoOfPartner (outTradeNo: string, spMchId: string, subMchid: string, serialNo: string, privateKey: Buffer | string);
+```
+
+#### 服务商退款申请
+
+> [参考文档](https://pay.weixin.qq.com/docs/partner/apis/partner-jsapi-payment/create.html)
+
+```javascript
+refundOfPartner (refund: RequireOnlyOne<RefundParametersOfPartner, 'transaction_id' | 'out_trade_no'>, spMchId: string, serialNo: string, privateKey: Buffer | string);
+```
+
+#### 服务商查询单笔退款
+
+> [参考文档](https://pay.weixin.qq.com/docs/partner/apis/partner-jsapi-payment/query-by-out-refund-no.html)
+
+```javascript
+getRefundOfPartner (outRefundNo: string, spMchId: string, subMchId: string, serialNo: string, privateKey: Buffer | string);
+```
+
+#### 服务商退款结果通知
+
+> [参考文档](https://pay.weixin.qq.com/docs/partner/apis/partner-jsapi-payment/refund-result-notice.html)
+
+```javascript
+refundedCallbackOfPartner (certs: Map<string, string>, apiKey: string, req: Request, res: Response): Promise<RefundNotifyResultOfPartner>;
+```
+
+
 ## 微信消息加解密签名工具类
 
 ```typescript
@@ -685,7 +762,7 @@ const sha1 = MessageCrypto.sha1('string to hash');
 + decryptMessage (token: string, encodingAESKey: string, signature: string, timestamp: string, nonce: string, encryptXml: string);
 + checkSignature (signature: string, timestamp: string, nonce: string, token: string);
 
-### Run Test
+## Run Test
 
 Create .env.test.local file, and save your test appid and secret in the file.
 

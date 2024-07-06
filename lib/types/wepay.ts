@@ -187,6 +187,21 @@ export interface MiniProgramPaymentParameters {
 
 }
 
+/**
+ * 通知回调包体结构
+ */
+export interface CallbackBody {
+  id: string;
+  create_time: string;
+  resource_type: 'encrypt-resource',
+  event_type: 'TRANSACTION.SUCCESS' | 'REFUND.SUCCESS' | string,
+  summary: string;
+  resource: CallbackResource;
+}
+
+/**
+ * 通知加密资源数据
+ */
 export interface CallbackResource {
   original_type: string;
   algorithm: string;
@@ -712,6 +727,22 @@ export interface RefundNotifyResult {
     payer_refund: number;
   };
   user_received_account: string;
+}
+
+/**
+ * 回调签名请求头
+ */
+export type SignatureHeaderKeys = 'Wechatpay-Signature' | 'Wechatpay-Serial' | 'Wechatpay-Timestamp' | 'Wechatpay-Nonce';
+/**
+ * 回调签名请求头兼容小写
+ */
+export type LowercaseSignatureHeaderKeys = Lowercase<SignatureHeaderKeys>;
+
+/**
+ * 回调签名请求头类型
+ */
+export type SignatureHeaders = {
+  [Property in SignatureHeaderKeys | LowercaseSignatureHeaderKeys]: string;
 }
 
 /** 电子发票 **/
