@@ -791,3 +791,31 @@ Run unit test.
 ```shell
 npm run test wechat.service.userinfo.spec.ts
 ```
+
+### 消息推送测试
+
++ 开启服务测试
+
+```bash
+npx ts-node -T tests/e2e/wechat-app.main.ts
+```
+
++ 公众号消息推送配置（微信公众测试平台），开启上面服务测试后，可以通过配置验证
+
++ URL: http://your/url/wechat/push，如：http://113.22.11.2:3001/wechat/push
++ Token: pamtest
+
++ 在[微信公众平台接口调试工具](https://mp.weixin.qq.com/debug/)获得access_token
+
+body
+
+```json
+{
+  "grant_type": "client_credential", 
+  "appid": "your/appid", 
+  "secret": "your/secret", 
+  "force_refresh": false
+}
+```
+
++ 在[微信开放平台调试工具-消息推送测试](https://developers.weixin.qq.com/apiExplorer?type=messagePush)的调试工具测试推送

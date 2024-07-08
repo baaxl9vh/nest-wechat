@@ -141,6 +141,21 @@ export class WeChatService {
    * + 该接口调用频率限制为 1万次 每分钟，每天限制调用 50w 次；
    * + 与获取Access token获取的调用凭证完全隔离，互不影响。该接口仅支持 POST JSON 形式的调用；
    * 
+   * ## 使用调试工具构造请求
+   * 
+   * [微信公众平台接口调试工具](https://mp.weixin.qq.com/debug/)
+   * 
+   * body
+   * 
+   * ```json
+   * {
+   *   "grant_type": "client_credential", 
+   *   "appid": "your/appid", 
+   *   "secret": "your/secret", 
+   *   "force_refresh": false
+   * }
+   * ```
+   * 
    * @param _appId 
    * @param _secret 
    * @tutorial https://developers.weixin.qq.com/doc/offiaccount/Basic_Information/getStableAccessToken.html
