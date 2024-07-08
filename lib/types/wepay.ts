@@ -165,6 +165,43 @@ export interface TransactionOrder {
   }
 }
 
+
+/**
+ * 小程序调起支付请求参数
+ */
+export interface MiniProgramPayRequest {
+  /**
+   * 时间戳，单位：秒（10位数字）
+   */
+  timeStamp: string;
+  /**
+   * 随机字符串，长度32
+   */
+  nonceStr: string;
+  /**
+   * 订单详情扩展字符串，长度：128，如：
+   * prepay_id=wx201410272009395522657a690389285100
+   */
+  package: string;
+  signType: 'RSA',
+  /**
+   * 签名，长度512
+   */
+  paySign: string;
+}
+
+export interface JSAPIPayRequest extends MiniProgramPayRequest {
+  /**
+   * 商户申请的公众号对应的AppID，由微信支付生成，可在公众号后台查看
+   * 
+   * 服务商模式时，若下单时传了sub_appid，可为sub_appid的值
+   */
+  appId: string;
+}
+
+/**
+ * @deprecated 请使用 MiniProgramPayRequest
+ */
 export interface MiniProgramPaymentParameters {
   /**
    * 时间戳，单位：秒（10位数字）

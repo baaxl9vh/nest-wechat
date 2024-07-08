@@ -17,7 +17,8 @@ import {
   GetUserTitleParams,
   GroupRedPackData,
   IssueFapiaoRequest,
-  MiniProgramPaymentParameters,
+  JSAPIPayRequest,
+  MiniProgramPayRequest,
   RedPackData,
   RefundNotifyResult,
   RefundParameters,
@@ -834,7 +835,7 @@ export class WePayService {
    * @returns MiniProgramPaymentParameters
    * @link https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter3_5_4.shtml
    */
-  buildMiniProgramPayment (appId: string, prepayId: string, privateKey: Buffer | string): MiniProgramPaymentParameters {
+  buildMiniProgramPayment (appId: string, prepayId: string, privateKey: Buffer | string): MiniProgramPayRequest {
     const nonceStr = createNonceStr();
     const timestamp = Math.floor(Date.now() / 1000);
     const message = `${appId}\n${timestamp}\n${nonceStr}\nprepay_id=${prepayId}\n`;
@@ -858,12 +859,13 @@ export class WePayService {
    * @returns MiniProgramPaymentParameters
    * @link https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter3_5_4.shtml
    */
-  buildJSAPIParameters (appId: string, prepayId: string, privateKey: Buffer | string): MiniProgramPaymentParameters {
+  buildJSAPIParameters (appId: string, prepayId: string, privateKey: Buffer | string): JSAPIPayRequest {
     const nonceStr = createNonceStr();
     const timestamp = Math.floor(Date.now() / 1000);
     const message = `${appId}\n${timestamp}\n${nonceStr}\nprepay_id=${prepayId}\n`;
     const paySign = crypto.createSign('sha256WithRSAEncryption').update(message).sign(privateKey, 'base64');
     return {
+      appId,
       timeStamp: timestamp.toString(),
       nonceStr,
       package: `prepay_id=${prepayId}`,
