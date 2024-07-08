@@ -518,8 +518,19 @@ export class MiniProgramService {
    * 即时配送 获取配送公司列表
    * @param accessToken 
    * @returns 
+   * @deprecated 单词拼写修订，请使用 expressLocalGetAllIMMEDelivery
    */
   public expressLocalgetAllImmeDelivery (accessToken: string) {
+    const url = `https://api.weixin.qq.com/cgi-bin/express/local/business/order/getallimme?access_token=${accessToken}`;
+    return axios.post<DefaultRequestResult & { list: { delivery_id: string, delivery_name: string }[] }>(url);
+  }
+
+  /**
+   * 即时配送 获取配送公司列表
+   * @param accessToken 
+   * @returns 
+   */
+  public expressLocalGetAllIMMEDelivery (accessToken: string) {
     const url = `https://api.weixin.qq.com/cgi-bin/express/local/business/order/getallimme?access_token=${accessToken}`;
     return axios.post<DefaultRequestResult & { list: { delivery_id: string, delivery_name: string }[] }>(url);
   }
