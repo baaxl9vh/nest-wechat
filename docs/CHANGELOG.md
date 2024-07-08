@@ -1,3 +1,17 @@
+## [0.2.43](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.42...v0.2.43) (2024-07-06)
+
+
+### Bug Fixes
+
+* 未导出wepay-partner类型 ([1da5c84](https://github.com/baaxl9vh/nest-wechat/commit/1da5c8409b8ab9b76519b87e920e54296d323fd8))
+
+## [0.2.42](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.41...v0.2.42) (2024-07-06)
+
+
+### Features
+
+* 新增部分微信支付服务商接口 ([fa289ca](https://github.com/baaxl9vh/nest-wechat/commit/fa289cabf7030bc06167bf967c0cc9b9e005a9fb))
+
 ## [0.2.41](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.40...v0.2.41) (2024-05-21)
 
 ## [0.2.40](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.39...v0.2.40) (2024-05-21)
