@@ -1,3 +1,10 @@
+## [0.2.45](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.44...v0.2.45) (2024-07-15)
+
+
+### Features
+
+* 新增发票通知处理 ([20dbefc](https://github.com/baaxl9vh/nest-wechat/commit/20dbefc199cf8f7004b3c90e994389e045f608fa))
+
 ## [0.2.44](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.43...v0.2.44) (2024-07-15)
 
 
