@@ -34,7 +34,7 @@ import { createNonceStr } from './utils';
 
 import type { Request, Response } from 'express';
 import { XMLBuilder } from 'fast-xml-parser';
-import { RefundNotifyResultOfPartner, RefundParametersOfPartner, TradeOfPartner, TransactionOrderOfPartner } from './types/wepay-partner';
+import { DevelopmentConfigRequestOfPartner, RefundNotifyResultOfPartner, RefundParametersOfPartner, TradeOfPartner, TransactionOrderOfPartner } from './types/wepay-partner';
 @Injectable()
 export class WePayService {
 
@@ -410,6 +410,51 @@ export class WePayService {
     const signature = this.generateSignature('PATCH', url, timestamp, nonceStr, privateKey, data);
     return axios.patch<DevelopmentConfigRequest>(this.API_ROOT + url, data, {
       headers: this.generateHeader(mchId, nonceStr, timestamp, serialNo, signature),
+    });
+  }
+
+  /**
+   * 查询商户配置的开发选项
+   * 
+   * @link https://pay.weixin.qq.com/docs/merchant/apis/fapiao/fapiao-merchant/query-development-config.html
+   */
+  async getFapiaoDevConfig (mchId: string, serialNo: string, privateKey: Buffer | string) {
+    const url = '/v3/new-tax-control-fapiao/merchant/development-config';
+    const nonceStr = createNonceStr();
+    const timestamp = Math.floor(Date.now() / 1000);
+    const signature = this.generateSignature('GET', url, timestamp, nonceStr, privateKey);
+    return axios.get<DevelopmentConfigRequest>(this.API_ROOT + url, {
+      headers: this.generateHeader(mchId, nonceStr, timestamp, serialNo, signature),
+    });
+  }
+
+  /**
+   * 服务端为特约商户配置开发选项
+   * 
+   * @link https://pay.weixin.qq.com/docs/partner/apis/fapiao/fapiao-merchant/update-development-config.html
+   */
+  async fapiaoDevConfigOfPartner (data: DevelopmentConfigRequestOfPartner, spMchId: string, serialNo: string, privateKey: Buffer | string) {
+    const url = '/v3/new-tax-control-fapiao/merchant/development-config';
+    const nonceStr = createNonceStr();
+    const timestamp = Math.floor(Date.now() / 1000);
+    const signature = this.generateSignature('PATCH', url, timestamp, nonceStr, privateKey, data);
+    return axios.patch<DevelopmentConfigRequest>(this.API_ROOT + url, data, {
+      headers: this.generateHeader(spMchId, nonceStr, timestamp, serialNo, signature),
+    });
+  }
+
+  /**
+   * 服务商查询商户配置的开发选项
+   * 
+   * @link https://pay.weixin.qq.com/docs/partner/apis/fapiao/fapiao-merchant/query-development-config.html
+   */
+  async getFapiaoDevConfigOfPartner (spMchId: string, subMchId: string, serialNo: string, privateKey: Buffer | string) {
+    const url = `/v3/new-tax-control-fapiao/merchant/development-config?sub_mch_code=${subMchId}`;
+    const nonceStr = createNonceStr();
+    const timestamp = Math.floor(Date.now() / 1000);
+    const signature = this.generateSignature('GET', url, timestamp, nonceStr, privateKey);
+    return axios.get<DevelopmentConfigRequest>(this.API_ROOT + url, {
+      headers: this.generateHeader(spMchId, nonceStr, timestamp, serialNo, signature),
     });
   }
 
