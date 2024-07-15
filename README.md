@@ -584,6 +584,12 @@ pay.refundedCallback (certs: Map<string, string>, apiKey: string, req: Request, 
 pay.fapiaoDevConfig (data: DevelopmentConfigRequest, mchId: string, serialNo: string, privateKey: Buffer | string);
 ```
 
+#### 查询商户配置的开发选项
+
+```javascript
+pay.getFapiaoDevConfig (mchId: string, serialNo: string, privateKey: Buffer | string);
+```
+
 #### 创建电子发票卡券模板
 
 ```javascript
@@ -738,6 +744,31 @@ getRefundOfPartner (outRefundNo: string, spMchId: string, subMchId: string, seri
 refundedCallbackOfPartner (certs: Map<string, string>, apiKey: string, req: Request, res: Response): Promise<RefundNotifyResultOfPartner>;
 ```
 
+#### 服务商电子发票
+
+##### 服务商配置开发选项
+
+> [参考文档](https://pay.weixin.qq.com/docs/partner/apis/fapiao/fapiao-merchant/update-development-config.html)
+
+```javascript
+fapiaoDevConfigOfPartner (data: DevelopmentConfigRequestOfPartner, spMchId: string, serialNo: string, privateKey: Buffer | string);
+```
+
+##### 服务商查询商户配置的开发选项
+
+> [参考文档](https://pay.weixin.qq.com/docs/partner/apis/fapiao/fapiao-merchant/query-development-config.html)
+
+```javascript
+getFapiaoDevConfigOfPartner (spMchId: string, subMchId: string, serialNo: string, privateKey: Buffer | string);
+```
+
+##### 服务商微信发票通知
+
+> [参考文档](https://pay.weixin.qq.com/docs/partner/apis/fapiao/fapiao-card-template/user-invoice-rise-write-notice.html)
+
+```javascript
+fapiaoCallbackOfPartner (certs: Map<string, string>, apiKey: string, req: Request, res: Response): Promise<FapiaoNotifyResultOfPartner> {
+```
 
 ## 微信消息加解密签名工具类
 
