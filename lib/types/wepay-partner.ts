@@ -1,5 +1,5 @@
 import { RequireOnlyOne } from '.';
-import { DevelopmentConfigRequest, RefundNotifyResult, RefundParameters, Trade, TransactionOrder } from './wepay';
+import { DevelopmentConfigRequest, FapiaoNotifyResult, RefundNotifyResult, RefundParameters, Trade, TransactionOrder } from './wepay';
 
 /**
  * 微信支付服务务下单数据结构
@@ -99,6 +99,13 @@ export interface DevelopmentConfigRequestOfPartner extends DevelopmentConfigRequ
    * 【子商户号】 微信支付分配的子商户号，服务商为子商户设置全部账单展示发票入口开关时必填
    */
   sub_mch_code?: string;
+}
+
+export interface FapiaoNotifyResultOfPartner extends FapiaoNotifyResult {
+  /**
+   * 微信支付分配的子商户号，服务商模式下存在
+   */
+  sub_mchid: string;
 }
 
 /** 电子发票 **/

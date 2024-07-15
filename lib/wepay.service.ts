@@ -34,7 +34,7 @@ import { createNonceStr } from './utils';
 
 import type { Request, Response } from 'express';
 import { XMLBuilder } from 'fast-xml-parser';
-import { DevelopmentConfigRequestOfPartner, RefundNotifyResultOfPartner, RefundParametersOfPartner, TradeOfPartner, TransactionOrderOfPartner } from './types/wepay-partner';
+import { DevelopmentConfigRequestOfPartner, FapiaoNotifyResultOfPartner, RefundNotifyResultOfPartner, RefundParametersOfPartner, TradeOfPartner, TransactionOrderOfPartner } from './types/wepay-partner';
 @Injectable()
 export class WePayService {
 
@@ -479,6 +479,14 @@ export class WePayService {
    */
   async fapiaoCallback (certs: Map<string, string>, apiKey: string, req: Request, res: Response): Promise<FapiaoNotifyResult> {
     return this.paidCallback(certs, apiKey, req, res) as unknown as Promise<FapiaoNotifyResult>;
+  }
+
+  /**
+   * 服务商微信发票通知
+   * @link https://pay.weixin.qq.com/docs/partner/apis/fapiao/fapiao-card-template/user-invoice-rise-write-notice.html
+   */
+  async fapiaoCallbackOfPartner (certs: Map<string, string>, apiKey: string, req: Request, res: Response): Promise<FapiaoNotifyResultOfPartner> {
+    return this.fapiaoCallback(certs, apiKey, req, res) as unknown as Promise<FapiaoNotifyResultOfPartner>;
   }
 
   /**
