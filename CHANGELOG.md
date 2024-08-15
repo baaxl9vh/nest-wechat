@@ -1,3 +1,10 @@
+## [0.2.46](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.45...v0.2.46) (2024-08-15)
+
+
+### Features
+
+* 新增服务商发票部分接口 ([47a5e76](https://github.com/baaxl9vh/nest-wechat/commit/47a5e76428ab360fd9f7d8ee33da23a57a47c827))
+
 ## [0.2.45](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.44...v0.2.45) (2024-07-15)
 
 
