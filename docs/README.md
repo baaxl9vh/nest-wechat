@@ -767,7 +767,39 @@ getFapiaoDevConfigOfPartner (spMchId: string, subMchId: string, serialNo: string
 > [参考文档](https://pay.weixin.qq.com/docs/partner/apis/fapiao/fapiao-card-template/user-invoice-rise-write-notice.html)
 
 ```javascript
-fapiaoCallbackOfPartner (certs: Map<string, string>, apiKey: string, req: Request, res: Response): Promise<FapiaoNotifyResultOfPartner> {
+fapiaoCallbackOfPartner (certs: Map<string, string>, apiKey: string, req: Request, res: Response): Promise<FapiaoNotifyResultOfPartner>;
+```
+
+##### 服务商获取用户填写的抬头
+
+> [参考文档](https://pay.weixin.qq.com/docs/partner/apis/fapiao/user-title/get-user-title.html)
+
+```javascript
+getUserTitleOfPartner (params: GetUserTitleParams, spMchId: string, subMchId: string, serialNo: string, privateKey: Buffer | string);
+```
+
+##### 服务商开具电子发票
+
+> [参考文档](https://pay.weixin.qq.com/docs/partner/apis/fapiao/fapiao-applications/issue-fapiao-applications.html)
+
+```javascript
+issueFapiaoOfPartner (data: IssueFapiaoRequestOfPartner, spMchId: string, serialNo: string, privateKey: Buffer | string, platformSerial: string);
+```
+
+##### 服务商查询电子发票
+
+> [参考文档](https://pay.weixin.qq.com/docs/partner/apis/fapiao/fapiao-applications/get-fapiao-applications.html)
+
+```javascript
+getIssueFapiaoOfPartner (fapiaoApplyId: string, fapiaoId: string | null | undefined, spMchId: string, subMchid: string, serialNo: string, privateKey: Buffer | string);
+```
+
+##### 服务商冲红电子发票
+
+> [参考文档](https://pay.weixin.qq.com/docs/partner/apis/fapiao/fapiao-applications/reverse-fapiao-applications.html)
+
+```javascript
+reverseFapiaoOfPartner (fapiaoApplyId: string, data: ReverseFapiaoRequestOfPartner, spMchId: string, serialNo: string, privateKey: Buffer | string);
 ```
 
 ## 微信消息加解密签名工具类
