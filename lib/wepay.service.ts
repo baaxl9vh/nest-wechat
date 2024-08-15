@@ -34,7 +34,7 @@ import { createNonceStr } from './utils';
 
 import type { Request, Response } from 'express';
 import { XMLBuilder } from 'fast-xml-parser';
-import { DevelopmentConfigRequestOfPartner, FapiaoNotifyResultOfPartner, RefundNotifyResultOfPartner, RefundParametersOfPartner, TradeOfPartner, TransactionOrderOfPartner } from './types/wepay-partner';
+import { DevelopmentConfigRequestOfPartner, FapiaoNotifyResultOfPartner, IssueFapiaoRequestOfPartner, RefundNotifyResultOfPartner, RefundParametersOfPartner, ReverseFapiaoRequestOfPartner, TradeOfPartner, TransactionOrderOfPartner } from './types/wepay-partner';
 @Injectable()
 export class WePayService {
 
@@ -505,6 +505,21 @@ export class WePayService {
   }
 
   /**
+   * 服务商获取用户填写的抬头
+   * 
+   * @link https://pay.weixin.qq.com/docs/partner/apis/fapiao/user-title/get-user-title.html
+   */
+  async getUserTitleOfPartner (params: GetUserTitleParams, spMchId: string, subMchId: string, serialNo: string, privateKey: Buffer | string) {
+    const url = `/v3/new-tax-control-fapiao/user-title?sub_mchid=${subMchId}&fapiao_apply_id=${params.fapiao_apply_id}&scene=${params.scene}`;
+    const nonceStr = createNonceStr();
+    const timestamp = Math.floor(Date.now() / 1000);
+    const signature = this.generateSignature('GET', url, timestamp, nonceStr, privateKey);
+    return axios.get<UserTitleEntity>(this.API_ROOT + url, {
+      headers: this.generateHeader(spMchId, nonceStr, timestamp, serialNo, signature),
+    });
+  }
+
+  /**
    * 开具电子发票
    * 
    * @link https://pay.weixin.qq.com/docs/merchant/apis/fapiao/fapiao-applications/issue-fapiao-applications.html
@@ -516,6 +531,25 @@ export class WePayService {
     const signature = this.generateSignature('POST', url, timestamp, nonceStr, privateKey, data);
     const headers = {
       ...this.generateHeader(mchId, nonceStr, timestamp, serialNo, signature),
+      'Wechatpay-Serial': platformSerial, 
+    };
+    return axios.post<void>(this.API_ROOT + url, data, {
+      headers,
+    });
+  }
+
+  /**
+   * 服务商开具电子发票
+   * 
+   * @link https://pay.weixin.qq.com/docs/partner/apis/fapiao/fapiao-applications/issue-fapiao-applications.html
+   */
+  async issueFapiaoOfPartner (data: IssueFapiaoRequestOfPartner, spMchId: string, serialNo: string, privateKey: Buffer | string, platformSerial: string) {
+    const url = '/v3/new-tax-control-fapiao/fapiao-applications';
+    const nonceStr = createNonceStr();
+    const timestamp = Math.floor(Date.now() / 1000);
+    const signature = this.generateSignature('POST', url, timestamp, nonceStr, privateKey, data);
+    const headers = {
+      ...this.generateHeader(spMchId, nonceStr, timestamp, serialNo, signature),
       'Wechatpay-Serial': platformSerial, 
     };
     return axios.post<void>(this.API_ROOT + url, data, {
@@ -540,6 +574,25 @@ export class WePayService {
       headers: this.generateHeader(mchId, nonceStr, timestamp, serialNo, signature),
     });
   }
+
+  /**
+   * 服务商查询电子发票
+   * 
+   * @link https://pay.weixin.qq.com/docs/partner/apis/fapiao/fapiao-applications/get-fapiao-applications.html
+   */
+  async getIssueFapiaoOfPartner (fapiaoApplyId: string, fapiaoId: string | null | undefined, spMchId: string, subMchid: string, serialNo: string, privateKey: Buffer | string) {
+    let url = `/v3/new-tax-control-fapiao/fapiao-applications/${fapiaoApplyId}?sub_mchid=${subMchid}`;
+    if (fapiaoId) {
+      url += `fapiao_id=${fapiaoId}`;
+    }
+    const nonceStr = createNonceStr();
+    const timestamp = Math.floor(Date.now() / 1000);
+    const signature = this.generateSignature('GET', url, timestamp, nonceStr, privateKey);
+    return axios.get<GetIssueFapiaoResponse>(this.API_ROOT + url, {
+      headers: this.generateHeader(spMchId, nonceStr, timestamp, serialNo, signature),
+    });
+  }
+
   /**
    * 冲红电子发票
    * 
@@ -552,6 +605,21 @@ export class WePayService {
     const signature = this.generateSignature('POST', url, timestamp, nonceStr, privateKey, data);
     return axios.post<void>(this.API_ROOT + url, data, {
       headers: this.generateHeader(mchId, nonceStr, timestamp, serialNo, signature),
+    });
+  }
+
+  /**
+   * 服务商冲红电子发票
+   * 
+   * @link https://pay.weixin.qq.com/docs/partner/apis/fapiao/fapiao-applications/reverse-fapiao-applications.html
+   */
+  async reverseFapiaoOfPartner (fapiaoApplyId: string, data: ReverseFapiaoRequestOfPartner, spMchId: string, serialNo: string, privateKey: Buffer | string) {
+    const url = `/v3/new-tax-control-fapiao/fapiao-applications/${fapiaoApplyId}/reverse`;
+    const nonceStr = createNonceStr();
+    const timestamp = Math.floor(Date.now() / 1000);
+    const signature = this.generateSignature('POST', url, timestamp, nonceStr, privateKey, data);
+    return axios.post<void>(this.API_ROOT + url, data, {
+      headers: this.generateHeader(spMchId, nonceStr, timestamp, serialNo, signature),
     });
   }
 
