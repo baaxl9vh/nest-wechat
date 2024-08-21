@@ -746,6 +746,14 @@ refundedCallbackOfPartner (certs: Map<string, string>, apiKey: string, req: Requ
 
 #### 服务商电子发票
 
+##### 服务商创建电子发票卡券模板
+
+> [参考文档](https://pay.weixin.qq.com/docs/partner/apis/fapiao/fapiao-card-template/create-fapiao-card-template.html)
+
+```javascript
+createCardTemplateOfPartner (data: CreateCardTemplateRequestOfPartner, spMchId: string, serialNo: string, privateKey: Buffer | string);
+```
+
 ##### 服务商配置开发选项
 
 > [参考文档](https://pay.weixin.qq.com/docs/partner/apis/fapiao/fapiao-merchant/update-development-config.html)

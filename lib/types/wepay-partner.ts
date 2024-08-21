@@ -1,5 +1,5 @@
 import { RequireOnlyOne } from '.';
-import { DevelopmentConfigRequest, FapiaoNotifyResult, IssueFapiaoRequest, RefundNotifyResult, RefundParameters, ReverseFapiaoRequest, Trade, TransactionOrder } from './wepay';
+import { CreateCardTemplateRequest, DevelopmentConfigRequest, FapiaoNotifyResult, IssueFapiaoRequest, RefundNotifyResult, RefundParameters, ReverseFapiaoRequest, Trade, TransactionOrder } from './wepay';
 
 /**
  * 微信支付服务务下单数据结构
@@ -113,6 +113,10 @@ export interface IssueFapiaoRequestOfPartner extends IssueFapiaoRequest {
 }
 
 export interface ReverseFapiaoRequestOfPartner extends ReverseFapiaoRequest {
+  sub_mchid: string;
+}
+
+export interface CreateCardTemplateRequestOfPartner extends CreateCardTemplateRequest {
   sub_mchid: string;
 }
 

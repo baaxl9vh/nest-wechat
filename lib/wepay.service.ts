@@ -34,7 +34,7 @@ import { createNonceStr } from './utils';
 
 import type { Request, Response } from 'express';
 import { XMLBuilder } from 'fast-xml-parser';
-import { DevelopmentConfigRequestOfPartner, FapiaoNotifyResultOfPartner, IssueFapiaoRequestOfPartner, RefundNotifyResultOfPartner, RefundParametersOfPartner, ReverseFapiaoRequestOfPartner, TradeOfPartner, TransactionOrderOfPartner } from './types/wepay-partner';
+import { CreateCardTemplateRequestOfPartner, DevelopmentConfigRequestOfPartner, FapiaoNotifyResultOfPartner, IssueFapiaoRequestOfPartner, RefundNotifyResultOfPartner, RefundParametersOfPartner, ReverseFapiaoRequestOfPartner, TradeOfPartner, TransactionOrderOfPartner } from './types/wepay-partner';
 @Injectable()
 export class WePayService {
 
@@ -470,6 +470,21 @@ export class WePayService {
     const signature = this.generateSignature('POST', url, timestamp, nonceStr, privateKey, data);
     return axios.post<CreateCardTemplateResponse>(this.API_ROOT + url, data, {
       headers: this.generateHeader(mchId, nonceStr, timestamp, serialNo, signature),
+    });
+  }
+
+  /**
+   * 服务商创建电子发票卡券模板
+   * 
+   * @link https://pay.weixin.qq.com/docs/partner/apis/fapiao/fapiao-card-template/create-fapiao-card-template.html
+   */
+  async createCardTemplateOfPartner (data: CreateCardTemplateRequestOfPartner, spMchId: string, serialNo: string, privateKey: Buffer | string) {
+    const url = '/v3/new-tax-control-fapiao/card-template';
+    const nonceStr = createNonceStr();
+    const timestamp = Math.floor(Date.now() / 1000);
+    const signature = this.generateSignature('POST', url, timestamp, nonceStr, privateKey, data);
+    return axios.post<CreateCardTemplateResponse>(this.API_ROOT + url, data, {
+      headers: this.generateHeader(spMchId, nonceStr, timestamp, serialNo, signature),
     });
   }
 
