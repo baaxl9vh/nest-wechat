@@ -1,3 +1,10 @@
+## [0.2.47](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.46...v0.2.47) (2024-08-21)
+
+
+### Features
+
+* 添加服务商创建电子发票模板接口 ([a7258a7](https://github.com/baaxl9vh/nest-wechat/commit/a7258a77bfd0a6d514cb81cc0b1d945d0e040223))
+
 ## [0.2.46](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.45...v0.2.46) (2024-08-15)
 
 
