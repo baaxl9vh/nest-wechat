@@ -363,8 +363,8 @@ export class WeChatService {
    * @param req 
    * @param res 
    */
-  public checkSignatureExpress (req: Request, res: Response) {
-    const token = this.options?.token || '';
+  public checkSignatureExpress (req: Request, res: Response, token?: string) {
+    token = token || this.options?.token || '';
     const signature = req.query && req.query.signature || '';
     const timestamp = req.query && req.query.timestamp || '';
     const nonce = req.query && req.query.nonce || '';
