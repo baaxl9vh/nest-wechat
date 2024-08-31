@@ -1,3 +1,10 @@
+## [0.2.48](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.47...v0.2.48) (2024-08-25)
+
+
+### Features
+
+* 公众号服务器配置推送测试支持传token参数 ([c44fa92](https://github.com/baaxl9vh/nest-wechat/commit/c44fa920ed77cf554ceb91c813f1d5d0e301dea5))
+
 ## [0.2.47](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.46...v0.2.47) (2024-08-21)
 
 
