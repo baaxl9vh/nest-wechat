@@ -356,6 +356,49 @@ export class WeChatService {
   }
 
   /**
+   * 明文模式微信消息推送处理函数，基于express
+   * 
+   * 函数返回微信推送文本内容
+   * 
+   * 使用方法参考tests/wechat.controller.ts
+   * 
+   * @param req express Request对象
+   * @param res express Response对象，提供res参数会自动调用res.send()
+   * @param resText 调用res.send()时的回复内容，不提供则回复空串
+   * @returns 
+   */
+  public async plainMessagePushExpressHandler (req: Request, res?: Response, resText?: string) {
+    const timestamp = req.query && req.query.timestamp;
+    const nonce = req.query && req.query.nonce;
+    const signature = req.query && (req.query.msg_signature || req.query.signature);
+    let rawBody;
+    try {
+      rawBody = await getRawBody(req);
+    } catch (error) {
+      const message = (error as Error).message as string;
+      if (message === 'stream is not readable') {
+        rawBody = req.body;
+      }
+    }
+    let decrypt = '';
+    let success = false;
+    if (timestamp && nonce && signature && rawBody) {
+      success = MessageCrypto.checkSignature(signature as string, timestamp as string, nonce as string, this.options.token || '');
+      if (success) {
+        decrypt = rawBody;
+      } else {
+        throw new Error('signature incorrect');
+      }
+    } else {
+      throw new Error('message params incorrect');
+    }
+    if (success && res && typeof res.send === 'function') {
+      res.send(resText || '');
+    }
+    return decrypt;
+  }
+
+  /**
    * 微信公众号基本配置的服务器配置验证接口封装，基于express。
    * 
    * 使用方法参考tests/wechat.controller.ts
