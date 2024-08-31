@@ -55,13 +55,16 @@ export class MessageCrypto {
    * 对给定的密文进行AES解密
    * @param {Buffer} aesKey 
    * @param {Buffer} iv 
-   * @param {String} str 
+   * @param {String} encryptMessage 
    * @returns 
    */
-  public static decrypt (aesKey: Buffer, iv: Buffer, str: string) {
+  public static decrypt (aesKey: Buffer, iv: Buffer, encryptMessage: string) {
+    if (!encryptMessage) {
+      throw new Error('no encrypt message');
+    }
     const aesCipher = crypto.createDecipheriv('aes-256-cbc', aesKey, iv);
     aesCipher.setAutoPadding(false);
-    const decipheredBuff = MessageCrypto.PKCS7Decoder(Buffer.concat([aesCipher.update(str, 'base64'), aesCipher.final()]));
+    const decipheredBuff = MessageCrypto.PKCS7Decoder(Buffer.concat([aesCipher.update(encryptMessage, 'base64'), aesCipher.final()]));
     const data = decipheredBuff.slice(16);
     const msgLen = data.slice(0, 4).readUInt32BE(0);
     return data.slice(4, msgLen + 4).toString();
@@ -158,6 +161,9 @@ export class MessageCrypto {
     const parser = new XMLParser();
     const xml = parser.parse(encryptXml).xml;
     const encryptMessage = xml.Encrypt;
+    if (!encryptMessage) {
+      throw new Error('No Encrypt');
+    }
     if (signature !== MessageCrypto.sha1(token || '', timestamp, nonce, encryptMessage)) {
       throw new Error('signature incorrect');
     }
