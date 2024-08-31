@@ -16,17 +16,27 @@ export class WeChatController {
   /**
    * 公众号配置服务器时推送签名验证
    */
-  @Get('push')
+  @Get(['push', 'push_plain'])
   async pushTest (@Req() req: Request, @Res() res: Response) {
     this.service.checkSignatureExpress(req, res);
   }
 
   /**
-   * 公众号推送消息
+   * 公众号推送加密消息
    */
   @Post('push')
   async officialPushTest (@Req() req: Request, @Res() res: Response) {
-    await this.service.messagePushExpressHandler(req, res);
+    const encrypt = await this.service.messagePushExpressHandler(req, res);
+    this.logger.debug('encrypt:', encrypt);
+  }
+
+  /**
+   * 公众号推送明文消息
+   */
+  @Post('push_plain')
+  async officialPlainPushTest (@Req() req: Request, @Res() res: Response) {
+    const plain = await this.service.plainMessagePushExpressHandler(req, res);
+    this.logger.debug('plain:', plain);
   }
 
   @Get('/mp_push')
