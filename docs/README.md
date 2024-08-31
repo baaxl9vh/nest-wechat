@@ -295,7 +295,10 @@ async pushTest (@Req() req: Request, @Res() res: Response) {
 #### messagePushExpressHandler
 
 ```typescript
+// 加密模式
 WeChatService.messagePushExpressHandler (req: Request, res?: Response, resText?: string);
+// 明文模式
+WeChatService.plainMessagePushExpressHandler (req: Request, res?: Response, resText?: string);
 ```
 
 Usage:
