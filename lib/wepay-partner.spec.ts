@@ -98,6 +98,30 @@ describe('WePayService Partner Test(Unit)', () => {
     expect(ret.data.out_trade_no).toStrictEqual(outTradeNo);
   });
 
+  it('Should get one trade by transaction id', async () => {
+    const id = 'your/transaction/id';
+    const ret = await service.getTransactionByIdOfPartner(id, spMchId, subMchId, serial, privateKey);
+    expect(ret.data).toBeDefined();
+    expect(ret.data.transaction_id).toStrictEqual(id);
+  });
+
+  it('Should refund success', async () => {
+    const no = 'your/out/trade/no'
+    const refundParameters: RequireOnlyOne<RefundParametersOfPartner, 'transaction_id' | 'out_trade_no'> = {
+      sub_mchid: subMchId,
+      out_trade_no: no,
+      out_refund_no: no,
+      amount: {
+        refund: 1, // how much
+        total: 1, // how much
+        currency: 'CNY',
+      },
+    };
+    const ret = await service.refundOfPartner(refundParameters, spMchId, serial, privateKey);
+    console.log(ret.data);
+    expect(ret.data.out_refund_no).toStrictEqual(no);
+  });
+
   it('Should refund fail', async () => {
     const refundParameters: RequireOnlyOne<RefundParametersOfPartner, 'transaction_id' | 'out_trade_no'> = {
       sub_mchid: subMchId,
@@ -140,6 +164,12 @@ describe('WePayService Partner Test(Unit)', () => {
       }
       expect(error).toBeUndefined();
     }
+  });
+
+  it('Should decrypt ciphertext', async () => {
+    const ciphertext = 'your/ciphertext';
+    const plain = service.decryptCipherText(apiKey, ciphertext, 'the/associated/data', 'the/nonce');
+    expect(plain).toBeDefined();
   });
 
 });
