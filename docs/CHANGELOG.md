@@ -1,3 +1,15 @@
+## [0.2.49](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.48...v0.2.49) (2024-08-31)
+
+
+### Bug Fixes
+
+* 加解密工具bug修复 ([efaabf2](https://github.com/baaxl9vh/nest-wechat/commit/efaabf2620d88072645dfce8ebb3a8d476d7dfa2))
+
+
+### Features
+
+* 添加微信消息推送模式模式express处理handler ([eceb683](https://github.com/baaxl9vh/nest-wechat/commit/eceb68339f3a5ac8d440686ec1166c3236f462be))
+
 ## [0.2.48](https://github.com/baaxl9vh/nest-wechat/compare/v0.2.47...v0.2.48) (2024-08-25)
 
 

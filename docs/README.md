@@ -813,6 +813,18 @@ getIssueFapiaoOfPartner (fapiaoApplyId: string, fapiaoId: string | null | undefi
 reverseFapiaoOfPartner (fapiaoApplyId: string, data: ReverseFapiaoRequestOfPartner, spMchId: string, serialNo: string, privateKey: Buffer | string);
 ```
 
+### 微信支付工具函数
+
+#### 报文解密
+
+decryptCipherText
+
+```javascript
+decryptCipherText<T> (apiKey: string, cipher: string, associatedData: string, nonce: string): T | string;
+```
+
+> [参考文档](https://pay.weixin.qq.com/wiki/doc/apiv3/wechatpay/wechatpay4_2.shtml)
+
 ## 微信消息加解密签名工具类
 
 ```typescript

@@ -371,7 +371,7 @@ export class WePayService {
     }
     let verified = false;
     const responseData = { code: 'FAIL', message: '' };
-    let result: Trade = {} as Trade;
+    let result: Trade | string = {} as Trade;
 
     const publicKey = certs.get(platformSerial as string);
 
@@ -393,7 +393,7 @@ export class WePayService {
     } else {
       res.status(401).json(responseData);
     }
-    return result;
+    return result as Trade;
   }
 
   /** 电子发票 **/
@@ -746,7 +746,7 @@ export class WePayService {
     const publicKey = certs.get(parameters.platformSerial as string);
     let fail = true;
     const callbackBody: CallbackBody | undefined = undefined;
-    let result: T | undefined = undefined;
+    let result: T | string | undefined = undefined;
     if (publicKey) {
       const verified = this.verifySignature(publicKey, parameters.timestamp, parameters.nonce, body, parameters.signature);
       if (verified) {
@@ -923,7 +923,12 @@ export class WePayService {
   /** 现金红包 **/
 
   /**
+   * 
    * 报文解密
+   * 
+   * 密文是json时，返回对象，类型是T
+   * 密文是string时，返回string
+   * 
    * @param apiKey 
    * @param cipher 
    * @param associatedData 
@@ -931,7 +936,7 @@ export class WePayService {
    * @returns 
    * @link https://pay.weixin.qq.com/wiki/doc/apiv3/wechatpay/wechatpay4_2.shtml
    */
-  private decryptCipherText<T> (apiKey: string, cipher: string, associatedData: string, nonce: string): T {
+  decryptCipherText<T> (apiKey: string, cipher: string, associatedData: string, nonce: string): T | string {
     // algorithm: AEAD_AES_256_GCM
     const buff = Buffer.from(cipher, 'base64');
     const authTag = buff.slice(buff.length - 16);
@@ -942,9 +947,9 @@ export class WePayService {
     const decoded = decipher.update(data, undefined, 'utf8');
     decipher.final();
     try {
-      return JSON.parse(decoded);
+      return JSON.parse(decoded) as T;
     } catch (e) {
-      return decoded as unknown as T;
+      return decoded;
     }
   }
 
