@@ -725,26 +725,28 @@ export class WePayService {
       rawBody = await getRawBody(req);
     } catch (error) {
       const message = (error as Error).message as string;
-      if (this.debug) this.logger.debug(`getRawBody error:${message}`);
       if (message === 'stream is not readable') {
         rawBody = req.body;
       }
     }
-    const { fail, result, callbackBody } = await this.callbackHandler<T>(certs, apiKey, req.headers as SignatureHeaders, rawBody);
-    if (res && typeof res.status === 'function') {
-      if (fail) {
-        res.status(401).json({ code: 'FAIL', message: '失败' });
-      } else {
+    const autoReply = res && typeof res.status === 'function';
+    try {
+      const { result, callbackBody } = this.callbackHandler<T>(certs, apiKey, req.headers as SignatureHeaders, rawBody);
+      if (autoReply) {
         res.status(200).send();
+      }      
+      return { result, callbackBody };
+    } catch (error) {
+      if (autoReply) {
+        res.status(401).json({ code: 'FAIL', message: 'FAIL' });
       }
+      throw error;
     }
-    return { result, callbackBody };
   }
 
-  async callbackHandler<T> (certs: Map<string, string>, apiKey: string, headers: SignatureHeaders, body: Buffer | string) {
+  callbackHandler<T> (certs: Map<string, string>, apiKey: string, headers: SignatureHeaders, body: Buffer | string) {
     const parameters = this.getCallbackSignatureParameters(headers);
     const publicKey = certs.get(parameters.platformSerial as string);
-    let fail = true;
     const callbackBody: CallbackBody | undefined = undefined;
     let result: T | string | undefined = undefined;
     if (publicKey) {
@@ -753,15 +755,13 @@ export class WePayService {
         const callBackBody: CallbackBody = JSON.parse(JSON.stringify(body));
         const resource = callBackBody.resource;
         result = this.decryptCipherText<T>(apiKey, resource.ciphertext, resource.associated_data, resource.nonce);
-        fail = false;
       } else {
-        fail = true;
+        throw new Error(`Verify signature fail[${parameters.nonce}][${parameters.timestamp}][${parameters.signature}]`);
       }
     } else {
-      fail = true;
+      throw new Error(`Platform certificate [${parameters.platformSerial}] not found`);
     }
     return {
-      fail,
       result,
       callbackBody,
     };
