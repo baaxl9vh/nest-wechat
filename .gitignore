@@ -114,3 +114,4 @@ apiclient_cert*.pem
 
 # This has secret data
 *.local.spec.ts
+*.local.ts
