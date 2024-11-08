@@ -962,7 +962,7 @@ export class WePayService {
    * @param signature 
    * @returns 
    */
-  private verifySignature (publicKey: Buffer | string, timestamp: string, nonce: string, body: string | object, signature: string): boolean {
+  verifySignature (publicKey: Buffer | string, timestamp: string, nonce: string, body: string | object, signature: string): boolean {
     const message = `${timestamp}\n${nonce}\n${typeof body === 'string' ? body : JSON.stringify(body)}\n`;
     const verify = crypto.createVerify('RSA-SHA256').update(Buffer.from(message));
     return verify.verify(publicKey, signature, 'base64');
